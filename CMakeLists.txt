@@ -1,33 +1,37 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 project(message_filters)
 
 if(NOT WIN32)
   set_directory_properties(PROPERTIES COMPILE_OPTIONS "-Wall;-Wextra")
 endif()
 
-find_package(catkin REQUIRED COMPONENTS roscpp rosconsole)
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES message_filters
-  CATKIN_DEPENDS roscpp rosconsole
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+
+set(Boost_USE_STATIC_LIBS ON)
+find_package(Boost REQUIRED)
+
+include_directories(include 
+  ${rclcpp_INCLUDE_DIRS} 
+  ${Boost_INCLUDE_DIRS}
 )
-catkin_python_setup()
-
-find_package(Boost REQUIRED COMPONENTS signals thread)
-
-include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-link_directories(${catkin_LIBRARY_DIRS})
 
 add_library(${PROJECT_NAME} src/connection.cpp)
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} 
+  ${rclcpp_LIBRARIES}
+)
+
+ament_export_include_directories(include)
+ament_export_libraries(${PROJECT_NAME})
+ament_package()
 
 install(TARGETS ${PROJECT_NAME}
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
 
 install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  DESTINATION include/${PROJECT_NAME}
   FILES_MATCHING PATTERN "*.h")
 
 if(CATKIN_ENABLE_TESTING)
