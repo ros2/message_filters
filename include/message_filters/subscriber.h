@@ -35,7 +35,10 @@
 #ifndef MESSAGE_FILTERS_SUBSCRIBER_H
 #define MESSAGE_FILTERS_SUBSCRIBER_H
 
-#include <ros/ros.h>
+#include <utility>
+
+#include <rclcpp/node.hpp>
+#include <rclcpp/subscription.hpp>
 
 #include <boost/thread/mutex.hpp>
 
@@ -60,7 +63,7 @@ public:
    * \param transport_hints The transport hints to pass along
    * \param callback_queue The callback queue to pass along
    */
-  virtual void subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size, const ros::TransportHints& transport_hints = ros::TransportHints(), ros::CallbackQueueInterface* callback_queue = 0) = 0;
+  virtual void subscribe(rclcpp::Node::SharedPtr& nh, const std::string& topic, uint32_t queue_size) = 0;
   /**
    * \brief Re-subscribe to a topic.  Only works if this subscriber has previously been subscribed to a topic.
    */
@@ -70,7 +73,7 @@ public:
    */
   virtual void unsubscribe() = 0;
 };
-typedef boost::shared_ptr<SubscriberBase> SubscriberBasePtr;
+typedef std::shared_ptr<SubscriberBase> SubscriberBasePtr;
 
 /**
  * \brief ROS subscription filter.
@@ -79,7 +82,7 @@ typedef boost::shared_ptr<SubscriberBase> SubscriberBasePtr;
  * filters which have connected to it.
  *
  * When this object is destroyed it will unsubscribe from the ROS subscription.
- *
+ * 
  * The Subscriber object is templated on the type of message being subscribed to.
  *
  * \section connections CONNECTIONS
@@ -90,12 +93,13 @@ typedef boost::shared_ptr<SubscriberBase> SubscriberBasePtr;
 \verbatim
 void callback(const boost::shared_ptr<M const>&);
 \endverbatim
- */
+  */
 template<class M>
 class Subscriber : public SubscriberBase, public SimpleFilter<M>
 {
 public:
-  typedef boost::shared_ptr<M const> MConstPtr;
+  typedef boost::shared_ptr<M const> BoostMConstPtr;
+  typedef std::shared_ptr<M> MConstPtr;
   typedef ros::MessageEvent<M const> EventType;
 
   /**
@@ -109,9 +113,9 @@ public:
    * \param transport_hints The transport hints to pass along
    * \param callback_queue The callback queue to pass along
    */
-  Subscriber(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size, const ros::TransportHints& transport_hints = ros::TransportHints(), ros::CallbackQueueInterface* callback_queue = 0)
+  Subscriber(rclcpp::Node::SharedPtr& nh, const std::string& topic, uint32_t queue_size)
   {
-    subscribe(nh, topic, queue_size, transport_hints, callback_queue);
+    subscribe(nh, topic, queue_size);
   }
 
   /**
@@ -137,16 +141,17 @@ public:
    * \param transport_hints The transport hints to pass along
    * \param callback_queue The callback queue to pass along
    */
-  void subscribe(ros::NodeHandle& nh, const std::string& topic, uint32_t queue_size, const ros::TransportHints& transport_hints = ros::TransportHints(), ros::CallbackQueueInterface* callback_queue = 0)
+  void subscribe(rclcpp::Node::SharedPtr& nh, const std::string& topic, uint32_t queue_size)
   {
     unsubscribe();
 
     if (!topic.empty())
     {
-      ops_.template initByFullCallbackType<const EventType&>(topic, queue_size, boost::bind(&Subscriber<M>::cb, this, _1));
-      ops_.callback_queue = callback_queue;
-      ops_.transport_hints = transport_hints;
-      sub_ = nh.subscribe(ops_);
+      topic_ = topic;
+      // TODO: why is this multi-line version needed?
+      auto stdFxn = std::bind(&Subscriber<M>::cb, this, std::placeholders::_1);
+      std::function<void(const std::shared_ptr<M>)> stdFxnPtr = stdFxn;
+      sub_ = nh->create_subscription<M>(topic_, stdFxnPtr, rmw_qos_profile_default);
       nh_ = nh;
     }
   }
@@ -158,9 +163,12 @@ public:
   {
     unsubscribe();
 
-    if (!ops_.topic.empty())
+    if (!topic_.empty())
     {
-      sub_ = nh_.subscribe(ops_);
+      // TODO: why is this multi-line version needed?
+      auto stdFxn = std::bind(&Subscriber<M>::cb, this, std::placeholders::_1);
+      std::function<void(const std::shared_ptr<M>)> stdFxnPtr = stdFxn;
+      sub_ = nh_->create_subscription<M>(topic_, stdFxnPtr, rmw_qos_profile_default);
     }
   }
 
@@ -169,18 +177,18 @@ public:
    */
   void unsubscribe()
   {
-    sub_.shutdown();
+    // TODO: No idea how to do this in ROS2???
   }
 
   std::string getTopic() const
   {
-    return ops_.topic;
+    return sub_->get_topic_name();
   }
 
   /**
    * \brief Returns the internal ros::Subscriber object
    */
-  const ros::Subscriber& getSubscriber() const { return sub_; }
+  const std::shared_ptr<rclcpp::Subscription<M>> getSubscriber() const { return sub_; }
 
   /**
    * \brief Does nothing.  Provided so that Subscriber may be used in a message_filters::Chain
@@ -201,14 +209,14 @@ public:
 
 private:
 
-  void cb(const EventType& e)
+  void cb(const MConstPtr& e)
   {
     this->signalMessage(e);
   }
 
-  ros::Subscriber sub_;
-  ros::SubscribeOptions ops_;
-  ros::NodeHandle nh_;
+  std::string topic_;
+  std::shared_ptr<rclcpp::Subscription<M>> sub_;
+  rclcpp::Node::SharedPtr nh_;
 };
 
 }

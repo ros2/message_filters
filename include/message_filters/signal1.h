@@ -38,8 +38,8 @@
 #include <boost/noncopyable.hpp>
 
 #include "connection.h"
+
 #include <ros/message_event.h>
-#include <ros/parameter_adapter.h>
 
 #include <boost/bind.hpp>
 #include <boost/thread/mutex.hpp>
@@ -54,26 +54,24 @@ public:
 
   virtual void call(const ros::MessageEvent<M const>& event, bool nonconst_need_copy) = 0;
 
-  typedef boost::shared_ptr<CallbackHelper1<M> > Ptr;
+  typedef std::shared_ptr<CallbackHelper1<M> > Ptr;
 };
 
 template<typename P, typename M>
 class CallbackHelper1T : public CallbackHelper1<M>
 {
 public:
-  typedef ros::ParameterAdapter<P> Adapter;
-  typedef boost::function<void(typename Adapter::Parameter)> Callback;
-  typedef typename Adapter::Event Event;
+  typedef std::function<void(const std::shared_ptr<M const>& msg)> Callback;
 
   CallbackHelper1T(const Callback& cb)
-  : callback_(cb)
+    : callback_(cb)
   {
   }
 
   virtual void call(const ros::MessageEvent<M const>& event, bool nonconst_force_copy)
   {
-    Event my_event(event, nonconst_force_copy || event.nonConstWillCopy());
-    callback_(Adapter::getParameter(my_event));
+    // TODO: validate
+    callback_(event.getMessage());
   }
 
 private:
@@ -83,12 +81,12 @@ private:
 template<class M>
 class Signal1
 {
-  typedef boost::shared_ptr<CallbackHelper1<M> > CallbackHelper1Ptr;
+  typedef std::shared_ptr<CallbackHelper1<M> > CallbackHelper1Ptr;
   typedef std::vector<CallbackHelper1Ptr> V_CallbackHelper1;
 
 public:
   template<typename P>
-  CallbackHelper1Ptr addCallback(const boost::function<void(P)>& callback)
+  CallbackHelper1Ptr addCallback(const std::function<void(P)>& callback)
   {
     CallbackHelper1T<P, M>* helper = new CallbackHelper1T<P, M>(callback);
 
