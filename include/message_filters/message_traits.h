@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008, Willow Garage, Inc.
+ * Copyright (C) 2009, Willow Garage, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -8,7 +8,7 @@
  *   * Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in the
  *     documentation and/or other materials provided with the distribution.
- *   * Neither the names of Stanford University or Willow Garage, Inc. nor the names of its
+ *   * Neither the names of Willow Garage, Inc. nor the names of its
  *     contributors may be used to endorse or promote products derived from
  *     this software without specific prior written permission.
  *
@@ -25,20 +25,49 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MESSAGE_FILTERS_MACROS_H_
-#define MESSAGE_FILTERS_MACROS_H_
+#ifndef ROSLIB_MESSAGE_TRAITS_H
+#define ROSLIB_MESSAGE_TRAITS_H
 
-#include <rclcpp/visibility_control.hpp>
-// Import/export for windows dll's and visibility for gcc shared libraries.
+#include <type_traits>
+#include <rclcpp/rclcpp.hpp>
 
-#ifdef ROS_BUILD_SHARED_LIBS // ros is being built around shared libraries
-  #ifdef message_filters_EXPORTS // we are building a shared lib/dll
-    #define MESSAGE_FILTERS_DECL RCLCPP_EXPORT
-  #else // we are using shared lib/dll
-    #define MESSAGE_FILTERS_DECL RCLCPP_IMPORT
-  #endif
-#else // ros is being built around static libraries
-  #define MESSAGE_FILTERS_DECL
-#endif
+namespace message_filters
+{
+namespace message_traits
+{
 
-#endif /* MESSAGE_FILTERS_MACROS_H_ */
+/**
+ * \brief HasHeader informs whether or not there is a header that gets serialized as the first thing in the message
+ */
+template<typename M, typename = void> struct HasHeader : public std::false_type {};
+
+template <typename M>
+struct HasHeader<M, decltype((void) M::header)> : std::true_type {};
+
+/**
+ * \brief TimeStamp trait.  In the default implementation pointer()
+ * returns &m.header.stamp if HasHeader<M>::value is true, otherwise returns NULL.  value()
+ * does not exist, and causes a compile error
+ */
+template<typename M, typename Enable = void>
+struct TimeStamp
+{
+  static rclcpp::Time value(const M& m) {
+    (void)m;
+    return rclcpp::Time();
+  }
+};
+
+template<typename M>
+struct TimeStamp<M, typename std::enable_if<HasHeader<M>::value>::type >
+{
+  static rclcpp::Time value(const M& m) {
+    auto stamp = m.header.stamp;
+    return rclcpp::Time(stamp.sec, stamp.nanosec);
+  }
+};
+
+} // namespace message_traits
+} // namespace message_filters
+
+#endif // ROSLIB_MESSAGE_TRAITS_H

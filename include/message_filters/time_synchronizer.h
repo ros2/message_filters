@@ -38,13 +38,11 @@
 #include "synchronizer.h"
 #include "sync_policies/exact_time.h"
 
-#include <boost/shared_ptr.hpp>
-
-#include <ros/message_event.h>
+#include <memory>
+#include "message_event.h"
 
 namespace message_filters
 {
-namespace mpl = boost::mpl;
 
 /**
  * \brief Synchronizes up to 9 messages by their timestamps.
@@ -60,12 +58,12 @@ namespace mpl = boost::mpl;
  *
  * The input connections for the TimeSynchronizer object is the same signature as for roscpp subscription callbacks, ie.
 \verbatim
-void callback(const boost::shared_ptr<M const>&);
+void callback(const std::shared_ptr<M const>&);
 \endverbatim
  * The output connection for the TimeSynchronizer object is dependent on the number of messages being synchronized.  For
  * a 3-message synchronizer for example, it would be:
 \verbatim
-void callback(const boost::shared_ptr<M0 const>&, const boost::shared_ptr<M1 const>&, const boost::shared_ptr<M2 const>&);
+void callback(const std::shared_ptr<M0 const>&, const std::shared_ptr<M1 const>&, const std::shared_ptr<M2 const>&);
 \endverbatim
  * \section usage USAGE
  * Example usage would be:
@@ -87,15 +85,15 @@ class TimeSynchronizer : public Synchronizer<sync_policies::ExactTime<M0, M1, M2
 public:
   typedef sync_policies::ExactTime<M0, M1, M2, M3, M4, M5, M6, M7, M8> Policy;
   typedef Synchronizer<Policy> Base;
-  typedef boost::shared_ptr<M0 const> M0ConstPtr;
-  typedef boost::shared_ptr<M1 const> M1ConstPtr;
-  typedef boost::shared_ptr<M2 const> M2ConstPtr;
-  typedef boost::shared_ptr<M3 const> M3ConstPtr;
-  typedef boost::shared_ptr<M4 const> M4ConstPtr;
-  typedef boost::shared_ptr<M5 const> M5ConstPtr;
-  typedef boost::shared_ptr<M6 const> M6ConstPtr;
-  typedef boost::shared_ptr<M7 const> M7ConstPtr;
-  typedef boost::shared_ptr<M8 const> M8ConstPtr;
+  typedef std::shared_ptr<M0 const> M0ConstPtr;
+  typedef std::shared_ptr<M1 const> M1ConstPtr;
+  typedef std::shared_ptr<M2 const> M2ConstPtr;
+  typedef std::shared_ptr<M3 const> M3ConstPtr;
+  typedef std::shared_ptr<M4 const> M4ConstPtr;
+  typedef std::shared_ptr<M5 const> M5ConstPtr;
+  typedef std::shared_ptr<M6 const> M6ConstPtr;
+  typedef std::shared_ptr<M7 const> M7ConstPtr;
+  typedef std::shared_ptr<M8 const> M8ConstPtr;
 
   using Base::add;
   using Base::connectInput;

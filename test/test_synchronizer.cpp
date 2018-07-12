@@ -34,16 +34,16 @@
 
 #include <gtest/gtest.h>
 
-#include "ros/time.h"
-#include <ros/init.h>
+#include <rclcpp/rclcpp.hpp>
 #include "message_filters/synchronizer.h"
-#include <boost/array.hpp>
+#include <array>
 
 using namespace message_filters;
+using namespace std::placeholders;
 
 struct Header
 {
-  ros::Time stamp;
+  rclcpp::Time stamp;
 };
 
 
@@ -52,8 +52,8 @@ struct Msg
   Header header;
   int data;
 };
-typedef boost::shared_ptr<Msg> MsgPtr;
-typedef boost::shared_ptr<Msg const> MsgConstPtr;
+typedef std::shared_ptr<Msg> MsgPtr;
+typedef std::shared_ptr<Msg const> MsgConstPtr;
 
 
 template<typename M0, typename M1, typename M2 = NullType, typename M3 = NullType, typename M4 = NullType,
@@ -80,12 +80,12 @@ struct NullPolicy : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   }
 
   template<int i>
-  void add(const typename mpl::at_c<Events, i>::type&)
+  void add(const typename std::tuple_element<i, Events>::type&)
   {
     ++added_.at(i);
   }
 
-  boost::array<int32_t, RealTypeCount::value> added_;
+  std::array<int32_t, RealTypeCount::value> added_;
 };
 typedef NullPolicy<Msg, Msg> Policy2;
 typedef NullPolicy<Msg, Msg, Msg> Policy3;
@@ -151,7 +151,7 @@ void function5(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const
 void function6(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
 void function7(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
 void function8(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function9(const MsgConstPtr&, MsgConstPtr, const MsgPtr&, MsgPtr, const Msg&, Msg, const ros::MessageEvent<Msg const>&, const ros::MessageEvent<Msg>&, const MsgConstPtr&) {}
+void function9(const MsgConstPtr&, MsgConstPtr, const MsgPtr&, MsgPtr, const Msg&, Msg, const MessageEvent<Msg const>&, const MessageEvent<Msg>&, const MsgConstPtr&) {}
 
 TEST(Synchronizer, compileFunction2)
 {
@@ -209,7 +209,7 @@ struct MethodHelper
   void method5(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
   void method6(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
   void method7(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-  void method8(const MsgConstPtr&, MsgConstPtr, const MsgPtr&, MsgPtr, const Msg&, Msg, const ros::MessageEvent<Msg const>&, const ros::MessageEvent<Msg>&) {}
+  void method8(const MsgConstPtr&, MsgConstPtr, const MsgPtr&, MsgPtr, const Msg&, Msg, const MessageEvent<Msg const>&, const MessageEvent<Msg>&) {}
   // Can only do 8 here because the object instance counts as a parameter and bind only supports 9
 };
 
@@ -265,7 +265,7 @@ TEST(Synchronizer, compileMethod8)
 TEST(Synchronizer, add2)
 {
   Synchronizer<Policy2> sync;
-  MsgPtr m(boost::make_shared<Msg>());
+  MsgPtr m(std::make_shared<Msg>());
 
   ASSERT_EQ(sync.added_[0], 0);
   sync.add<0>(m);
@@ -278,7 +278,7 @@ TEST(Synchronizer, add2)
 TEST(Synchronizer, add3)
 {
   Synchronizer<Policy3> sync;
-  MsgPtr m(boost::make_shared<Msg>());
+  MsgPtr m(std::make_shared<Msg>());
 
   ASSERT_EQ(sync.added_[0], 0);
   sync.add<0>(m);
@@ -294,7 +294,7 @@ TEST(Synchronizer, add3)
 TEST(Synchronizer, add4)
 {
   Synchronizer<Policy4> sync;
-  MsgPtr m(boost::make_shared<Msg>());
+  MsgPtr m(std::make_shared<Msg>());
 
   ASSERT_EQ(sync.added_[0], 0);
   sync.add<0>(m);
@@ -313,7 +313,7 @@ TEST(Synchronizer, add4)
 TEST(Synchronizer, add5)
 {
   Synchronizer<Policy5> sync;
-  MsgPtr m(boost::make_shared<Msg>());
+  MsgPtr m(std::make_shared<Msg>());
 
   ASSERT_EQ(sync.added_[0], 0);
   sync.add<0>(m);
@@ -335,7 +335,7 @@ TEST(Synchronizer, add5)
 TEST(Synchronizer, add6)
 {
   Synchronizer<Policy6> sync;
-  MsgPtr m(boost::make_shared<Msg>());
+  MsgPtr m(std::make_shared<Msg>());
 
   ASSERT_EQ(sync.added_[0], 0);
   sync.add<0>(m);
@@ -360,7 +360,7 @@ TEST(Synchronizer, add6)
 TEST(Synchronizer, add7)
 {
   Synchronizer<Policy7> sync;
-  MsgPtr m(boost::make_shared<Msg>());
+  MsgPtr m(std::make_shared<Msg>());
 
   ASSERT_EQ(sync.added_[0], 0);
   sync.add<0>(m);
@@ -388,7 +388,7 @@ TEST(Synchronizer, add7)
 TEST(Synchronizer, add8)
 {
   Synchronizer<Policy8> sync;
-  MsgPtr m(boost::make_shared<Msg>());
+  MsgPtr m(std::make_shared<Msg>());
 
   ASSERT_EQ(sync.added_[0], 0);
   sync.add<0>(m);
@@ -419,7 +419,7 @@ TEST(Synchronizer, add8)
 TEST(Synchronizer, add9)
 {
   Synchronizer<Policy9> sync;
-  MsgPtr m(boost::make_shared<Msg>());
+  MsgPtr m(std::make_shared<Msg>());
 
   ASSERT_EQ(sync.added_[0], 0);
   sync.add<0>(m);
@@ -452,11 +452,6 @@ TEST(Synchronizer, add9)
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
-  ros::init(argc, argv, "blah");
-
-  ros::Time::init();
-  ros::Time::setNow(ros::Time());
-
   return RUN_ALL_TESTS();
 }
 
