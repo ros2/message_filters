@@ -52,4 +52,58 @@ install(
 ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
 
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+
+  find_package(ament_cmake_gtest)
+
+  ament_add_gtest(${PROJECT_NAME}-test_simple test/test_simple.cpp)
+  if(TARGET ${PROJECT_NAME}-test_simple)
+    target_link_libraries(${PROJECT_NAME}-test_simple ${PROJECT_NAME})
+  endif()
+
+
+  ament_add_gtest(${PROJECT_NAME}-msg_cache_unittest test/msg_cache_unittest.cpp)
+  if(TARGET ${PROJECT_NAME}-msg_cache_unittest)
+    target_link_libraries(${PROJECT_NAME}-msg_cache_unittest ${PROJECT_NAME})
+  endif()
+
+  ament_add_gtest(${PROJECT_NAME}-test_chain test/test_chain.cpp)
+  if(TARGET ${PROJECT_NAME}-test_chain)
+    target_link_libraries(${PROJECT_NAME}-test_chain ${PROJECT_NAME})
+  endif()
+
+  ament_add_gtest(${PROJECT_NAME}-test_subscriber test/test_subscriber.cpp)
+  if(TARGET ${PROJECT_NAME}-test_subscriber)
+    target_link_libraries(${PROJECT_NAME}-test_subscriber ${PROJECT_NAME})
+  endif()
+
+  ament_add_gtest(${PROJECT_NAME}-test_synchronizer test/test_synchronizer.cpp)
+  if(TARGET ${PROJECT_NAME}-test_synchronizer)
+    target_link_libraries(${PROJECT_NAME}-test_synchronizer ${PROJECT_NAME})
+  endif()
+
+  ament_add_gtest(${PROJECT_NAME}-time_synchronizer_unittest test/time_synchronizer_unittest.cpp)
+  if(TARGET ${PROJECT_NAME}-time_synchronizer_unittest)
+    target_link_libraries(${PROJECT_NAME}-time_synchronizer_unittest ${PROJECT_NAME})
+  endif()
+
+  ament_add_gtest(${PROJECT_NAME}-test_exact_time_policy test/test_exact_time_policy.cpp)
+  if(TARGET ${PROJECT_NAME}-test_exact_time_policy)
+    target_link_libraries(${PROJECT_NAME}-test_exact_time_policy ${PROJECT_NAME})
+  endif()
+
+  ament_add_gtest(${PROJECT_NAME}-test_approximate_time_policy test/test_approximate_time_policy.cpp)
+  if(TARGET ${PROJECT_NAME}-test_approximate_time_policy)
+    target_link_libraries(${PROJECT_NAME}-test_approximate_time_policy ${PROJECT_NAME})
+  endif()
+
+  ament_add_gtest(${PROJECT_NAME}-test_fuzz test/test_fuzz.cpp SKIP_TEST)
+  if(TARGET ${PROJECT_NAME}-test_fuzz)
+    target_link_libraries(${PROJECT_NAME}-test_fuzz ${PROJECT_NAME})
+  endif()
+
+endif()
+
 ament_package()
