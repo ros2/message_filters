@@ -35,12 +35,21 @@
 #ifndef MESSAGE_FILTERS_CONNECTION_H
 #define MESSAGE_FILTERS_CONNECTION_H
 
-#include <boost/function.hpp>
-#include <boost/signals2/connection.hpp>
+#include <functional>
+#include <memory>
 #include "macros.h"
 
 namespace message_filters
 {
+
+class noncopyable
+{
+protected:
+  noncopyable() {}
+  ~noncopyable() {}
+  noncopyable( const noncopyable& ) = delete;
+  noncopyable& operator=( const noncopyable& ) = delete;
+};
 
 /**
  * \brief Encapsulates a connection from one filter to another (or to a user-specified callback)
@@ -48,23 +57,19 @@ namespace message_filters
 class MESSAGE_FILTERS_DECL Connection
 {
 public:
-  typedef boost::function<void(void)> VoidDisconnectFunction;
-  typedef boost::function<void(const Connection&)> WithConnectionDisconnectFunction;
+  typedef std::function<void(void)> VoidDisconnectFunction;
+  typedef std::function<void(const Connection&)> WithConnectionDisconnectFunction;
   Connection() {}
   Connection(const VoidDisconnectFunction& func);
-  Connection(const WithConnectionDisconnectFunction& func, boost::signals2::connection conn);
 
   /**
    * \brief disconnects this connection
    */
   void disconnect();
 
-  boost::signals2::connection getBoostConnection() const { return connection_; }
-
 private:
   VoidDisconnectFunction void_disconnect_;
   WithConnectionDisconnectFunction connection_disconnect_;
-  boost::signals2::connection connection_;
 };
 
 }

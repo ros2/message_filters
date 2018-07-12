@@ -35,60 +35,48 @@
 #ifndef MESSAGE_FILTERS_SYNCHRONIZER_H
 #define MESSAGE_FILTERS_SYNCHRONIZER_H
 
-#include <boost/tuple/tuple.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/function.hpp>
-#include <boost/thread/mutex.hpp>
-
-#include <boost/bind.hpp>
-#include <boost/type_traits/is_same.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/mpl/or.hpp>
-#include <boost/mpl/at.hpp>
-#include <boost/mpl/vector.hpp>
-#include <boost/function_types/function_arity.hpp>
-#include <boost/function_types/is_nonmember_callable_builtin.hpp>
-
 #include "connection.h"
 #include "null_types.h"
 #include "signal9.h"
-#include <ros/message_traits.h>
-#include <ros/message_event.h>
+#include "message_event.h"
 
+#include <type_traits>
 #include <deque>
+#include <tuple>
 #include <vector>
 #include <string>
 
 namespace message_filters
 {
 
-namespace mpl = boost::mpl;
-
 template<class Policy>
-class Synchronizer : public boost::noncopyable, public Policy
+class Synchronizer : public noncopyable, public Policy
 {
 public:
   typedef typename Policy::Messages Messages;
   typedef typename Policy::Events Events;
   typedef typename Policy::Signal Signal;
-  typedef typename mpl::at_c<Messages, 0>::type M0;
-  typedef typename mpl::at_c<Messages, 1>::type M1;
-  typedef typename mpl::at_c<Messages, 2>::type M2;
-  typedef typename mpl::at_c<Messages, 3>::type M3;
-  typedef typename mpl::at_c<Messages, 4>::type M4;
-  typedef typename mpl::at_c<Messages, 5>::type M5;
-  typedef typename mpl::at_c<Messages, 6>::type M6;
-  typedef typename mpl::at_c<Messages, 7>::type M7;
-  typedef typename mpl::at_c<Messages, 8>::type M8;
-  typedef typename mpl::at_c<Events, 0>::type M0Event;
-  typedef typename mpl::at_c<Events, 1>::type M1Event;
-  typedef typename mpl::at_c<Events, 2>::type M2Event;
-  typedef typename mpl::at_c<Events, 3>::type M3Event;
-  typedef typename mpl::at_c<Events, 4>::type M4Event;
-  typedef typename mpl::at_c<Events, 5>::type M5Event;
-  typedef typename mpl::at_c<Events, 6>::type M6Event;
-  typedef typename mpl::at_c<Events, 7>::type M7Event;
-  typedef typename mpl::at_c<Events, 8>::type M8Event;
+
+  typedef typename std::tuple_element<0, Messages>::type M0;
+  typedef typename std::tuple_element<1, Messages>::type M1;
+  typedef typename std::tuple_element<2, Messages>::type M2;
+  typedef typename std::tuple_element<3, Messages>::type M3;
+  typedef typename std::tuple_element<4, Messages>::type M4;
+  typedef typename std::tuple_element<5, Messages>::type M5;
+  typedef typename std::tuple_element<6, Messages>::type M6;
+  typedef typename std::tuple_element<7, Messages>::type M7;
+  typedef typename std::tuple_element<8, Messages>::type M8;
+
+
+  typedef typename std::tuple_element<0, Events>::type M0Event;
+  typedef typename std::tuple_element<1, Events>::type M1Event;
+  typedef typename std::tuple_element<2, Events>::type M2Event;
+  typedef typename std::tuple_element<3, Events>::type M3Event;
+  typedef typename std::tuple_element<4, Events>::type M4Event;
+  typedef typename std::tuple_element<5, Events>::type M5Event;
+  typedef typename std::tuple_element<6, Events>::type M6Event;
+  typedef typename std::tuple_element<7, Events>::type M7Event;
+  typedef typename std::tuple_element<8, Events>::type M8Event;
 
   static const uint8_t MAX_MESSAGES = 9;
 
@@ -287,15 +275,15 @@ public:
   {
     disconnectAll();
 
-    input_connections_[0] = f0.registerCallback(boost::function<void(const M0Event&)>(boost::bind(&Synchronizer::template cb<0>, this, _1)));
-    input_connections_[1] = f1.registerCallback(boost::function<void(const M1Event&)>(boost::bind(&Synchronizer::template cb<1>, this, _1)));
-    input_connections_[2] = f2.registerCallback(boost::function<void(const M2Event&)>(boost::bind(&Synchronizer::template cb<2>, this, _1)));
-    input_connections_[3] = f3.registerCallback(boost::function<void(const M3Event&)>(boost::bind(&Synchronizer::template cb<3>, this, _1)));
-    input_connections_[4] = f4.registerCallback(boost::function<void(const M4Event&)>(boost::bind(&Synchronizer::template cb<4>, this, _1)));
-    input_connections_[5] = f5.registerCallback(boost::function<void(const M5Event&)>(boost::bind(&Synchronizer::template cb<5>, this, _1)));
-    input_connections_[6] = f6.registerCallback(boost::function<void(const M6Event&)>(boost::bind(&Synchronizer::template cb<6>, this, _1)));
-    input_connections_[7] = f7.registerCallback(boost::function<void(const M7Event&)>(boost::bind(&Synchronizer::template cb<7>, this, _1)));
-    input_connections_[8] = f8.registerCallback(boost::function<void(const M8Event&)>(boost::bind(&Synchronizer::template cb<8>, this, _1)));
+    input_connections_[0] = f0.registerCallback(std::function<void(const M0Event&)>(std::bind(&Synchronizer::template cb<0>, this, _1)));
+    input_connections_[1] = f1.registerCallback(std::function<void(const M1Event&)>(std::bind(&Synchronizer::template cb<1>, this, _1)));
+    input_connections_[2] = f2.registerCallback(std::function<void(const M2Event&)>(std::bind(&Synchronizer::template cb<2>, this, _1)));
+    input_connections_[3] = f3.registerCallback(std::function<void(const M3Event&)>(std::bind(&Synchronizer::template cb<3>, this, _1)));
+    input_connections_[4] = f4.registerCallback(std::function<void(const M4Event&)>(std::bind(&Synchronizer::template cb<4>, this, _1)));
+    input_connections_[5] = f5.registerCallback(std::function<void(const M5Event&)>(std::bind(&Synchronizer::template cb<5>, this, _1)));
+    input_connections_[6] = f6.registerCallback(std::function<void(const M6Event&)>(std::bind(&Synchronizer::template cb<6>, this, _1)));
+    input_connections_[7] = f7.registerCallback(std::function<void(const M7Event&)>(std::bind(&Synchronizer::template cb<7>, this, _1)));
+    input_connections_[8] = f8.registerCallback(std::function<void(const M8Event&)>(std::bind(&Synchronizer::template cb<8>, this, _1)));
   }
 
   template<class C>
@@ -337,9 +325,9 @@ public:
   using Policy::add;
 
   template<int i>
-  void add(const boost::shared_ptr<typename mpl::at_c<Messages, i>::type const>& msg)
+  void add(const std::shared_ptr<typename std::tuple_element<i, Messages>::type const>& msg)
   {
-    this->template add<i>(typename mpl::at_c<Events, i>::type(msg));
+    this->template add<i>(typename std::tuple_element<i, Events>::type(msg));
   }
 
 private:
@@ -353,7 +341,7 @@ private:
   }
 
   template<int i>
-  void cb(const typename mpl::at_c<Events, i>::type& evt)
+  void cb(const typename std::tuple_element<i, Events>::type& evt)
   {
     this->template add<i>(evt);
   }
@@ -367,25 +355,45 @@ private:
   std::string name_;
 };
 
+template<class... T> struct mp_plus;
+template<> struct mp_plus<>
+{
+  using type = std::integral_constant<int, 0>;
+};
+template<class T1, class... T> struct mp_plus<T1, T...>
+{
+  static constexpr auto _v = !T1::value + mp_plus<T...>::type::value;
+  using type = std::integral_constant<
+    typename std::remove_const<decltype(_v)>::type, _v>;
+};
+
+template<class L, class V> struct mp_count;
+template<template<class...> class L, class... T, class V>
+  struct mp_count<L<T...>, V>
+{
+  using type = typename mp_plus<std::is_same<T, V>...>::type;
+};
+
 template<typename M0, typename M1, typename M2, typename M3, typename M4,
          typename M5, typename M6, typename M7, typename M8>
 struct PolicyBase
 {
-  typedef mpl::vector<M0, M1, M2, M3, M4, M5, M6, M7, M8> Messages;
+  typedef typename mp_count<std::tuple<M0, M1, M2, M3, M4, M5, M6, M7, M8>, NullType>::type RealTypeCount;
+  typedef std::tuple<M0, M1, M2, M3, M4, M5, M6, M7, M8> Messages;
   typedef Signal9<M0, M1, M2, M3, M4, M5, M6, M7, M8> Signal;
-  typedef mpl::vector<ros::MessageEvent<M0 const>, ros::MessageEvent<M1 const>, ros::MessageEvent<M2 const>, ros::MessageEvent<M3 const>,
-                      ros::MessageEvent<M4 const>, ros::MessageEvent<M5 const>, ros::MessageEvent<M6 const>, ros::MessageEvent<M7 const>,
-                      ros::MessageEvent<M8 const> > Events;
-  typedef typename mpl::fold<Messages, mpl::int_<0>, mpl::if_<mpl::not_<boost::is_same<mpl::_2, NullType> >, mpl::next<mpl::_1>, mpl::_1> >::type RealTypeCount;
-  typedef typename mpl::at_c<Events, 0>::type M0Event;
-  typedef typename mpl::at_c<Events, 1>::type M1Event;
-  typedef typename mpl::at_c<Events, 2>::type M2Event;
-  typedef typename mpl::at_c<Events, 3>::type M3Event;
-  typedef typename mpl::at_c<Events, 4>::type M4Event;
-  typedef typename mpl::at_c<Events, 5>::type M5Event;
-  typedef typename mpl::at_c<Events, 6>::type M6Event;
-  typedef typename mpl::at_c<Events, 7>::type M7Event;
-  typedef typename mpl::at_c<Events, 8>::type M8Event;
+  typedef std::tuple<MessageEvent<M0 const>, MessageEvent<M1 const>, MessageEvent<M2 const>,
+                     MessageEvent<M3 const>, MessageEvent<M4 const>, MessageEvent<M5 const>,
+                     MessageEvent<M6 const>, MessageEvent<M7 const>, MessageEvent<M8 const> > Events;
+
+  typedef typename std::tuple_element<0, Events>::type M0Event;
+  typedef typename std::tuple_element<1, Events>::type M1Event;
+  typedef typename std::tuple_element<2, Events>::type M2Event;
+  typedef typename std::tuple_element<3, Events>::type M3Event;
+  typedef typename std::tuple_element<4, Events>::type M4Event;
+  typedef typename std::tuple_element<5, Events>::type M5Event;
+  typedef typename std::tuple_element<6, Events>::type M6Event;
+  typedef typename std::tuple_element<7, Events>::type M7Event;
+  typedef typename std::tuple_element<8, Events>::type M8Event;
 };
 
 } // namespace message_filters

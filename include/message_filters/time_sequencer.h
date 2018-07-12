@@ -35,10 +35,11 @@
 #ifndef MESSAGE_FILTERS_TIME_SEQUENCER_H
 #define MESSAGE_FILTERS_TIME_SEQUENCER_H
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include "connection.h"
 #include "simple_filter.h"
+#include "message_traits.h"
 
 namespace message_filters
 {
@@ -67,7 +68,7 @@ namespace message_filters
  *
  * TimeSequencer's input and output connections are both of the same signature as roscpp subscription callbacks, ie.
 \verbatim
-void callback(const boost::shared_ptr<M const>&);
+void callback(const std::shared_ptr<M const>&);
 \endverbatim
  *
  */
@@ -75,8 +76,8 @@ template<class M>
 class TimeSequencer : public SimpleFilter<M>
 {
 public:
-  typedef boost::shared_ptr<M const> MConstPtr;
-  typedef ros::MessageEvent<M const> EventType;
+  typedef std::shared_ptr<M const> MConstPtr;
+  typedef MessageEvent<M const> EventType;
 
   /**
    * \brief Constructor
@@ -87,7 +88,7 @@ public:
    * \param nh (optional) The NodeHandle to use to create the ros::SteadyTimer that runs at update_rate
    */
   template<class F>
-  TimeSequencer(F& f, ros::Duration delay, ros::Duration update_rate, uint32_t queue_size, ros::NodeHandle nh = ros::NodeHandle())
+  TimeSequencer(F& f, rclcpp::Duration delay, rclcpp::Duration update_rate, uint32_t queue_size, rclcpp::Node::SharedPtr nh = std::make_shared<rclcpp::Node>("test_node"))
   : delay_(delay)
   , update_rate_(update_rate)
   , queue_size_(queue_size)
@@ -107,7 +108,7 @@ public:
    * \param queue_size The number of messages to store
    * \param nh (optional) The NodeHandle to use to create the ros::SteadyTimer that runs at update_rate
    */
-  TimeSequencer(ros::Duration delay, ros::Duration update_rate, uint32_t queue_size, ros::NodeHandle nh = ros::NodeHandle())
+  TimeSequencer(rclcpp::Duration delay, rclcpp::Duration update_rate, uint32_t queue_size, rclcpp::Node::SharedPtr nh = std::make_shared<rclcpp::Node>("test_node"))
   : delay_(delay)
   , update_rate_(update_rate)
   , queue_size_(queue_size)
@@ -116,6 +117,7 @@ public:
     init();
   }
 
+
   /**
    * \brief Connect this filter's input to another filter's output.
    */
@@ -123,20 +125,20 @@ public:
   void connectInput(F& f)
   {
     incoming_connection_.disconnect();
-    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(boost::bind(&TimeSequencer::cb, this, _1)));
+    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(std::bind(&TimeSequencer::cb, this, _1)));
   }
 
   ~TimeSequencer()
   {
-    update_timer_.stop();
+    update_timer_->cancel();
     incoming_connection_.disconnect();
   }
 
   void add(const EventType& evt)
   {
-    namespace mt = ros::message_traits;
+    namespace mt = message_filters::message_traits;
 
-    boost::mutex::scoped_lock lock(messages_mutex_);
+    std::lock_guard<std::mutex> lock(messages_mutex_);
     if (mt::TimeStamp<M>::value(*evt.getMessage()) < last_time_)
     {
       return;
@@ -159,13 +161,18 @@ public:
     add(evt);
   }
 
+ rclcpp::Node::SharedPtr get_node(void)
+ {
+   return nh_;
+ }
+
 private:
   class MessageSort
   {
   public:
     bool operator()(const EventType& lhs, const EventType& rhs) const
     {
-      namespace mt = ros::message_traits;
+      namespace mt = message_filters::message_traits;
       return mt::TimeStamp<M>::value(*lhs.getMessage()) < mt::TimeStamp<M>::value(*rhs.getMessage());
     }
   };
@@ -179,18 +186,18 @@ private:
 
   void dispatch()
   {
-    namespace mt = ros::message_traits;
+    namespace mt = message_filters::message_traits;
 
     V_Message to_call;
 
     {
-      boost::mutex::scoped_lock lock(messages_mutex_);
+      std::lock_guard<std::mutex> lock(messages_mutex_);
 
       while (!messages_.empty())
       {
         const EventType& e = *messages_.begin();
-        ros::Time stamp = mt::TimeStamp<M>::value(*e.getMessage());
-        if (stamp + delay_ <= ros::Time::now())
+        rclcpp::Time stamp = mt::TimeStamp<M>::value(*e.getMessage());
+        if ((stamp + delay_) <= rclcpp::Clock().now())
         {
           last_time_ = stamp;
           to_call.push_back(e);
@@ -213,29 +220,31 @@ private:
     }
   }
 
+  #if 0
   void update(const ros::SteadyTimerEvent&)
   {
     dispatch();
   }
+  #endif
 
   void init()
   {
-    update_timer_ = nh_.createSteadyTimer(ros::WallDuration(update_rate_.toSec()), &TimeSequencer::update, this);
+    update_timer_ = nh_->create_wall_timer(std::chrono::nanoseconds(update_rate_.nanoseconds()), [this]() {
+      dispatch();
+      });
   }
 
-  ros::Duration delay_;
-  ros::Duration update_rate_;
+  rclcpp::Duration delay_;
+  rclcpp::Duration update_rate_;
   uint32_t queue_size_;
-  ros::NodeHandle nh_;
-
-  ros::SteadyTimer update_timer_;
-
+  rclcpp::Node::SharedPtr nh_;
+  rclcpp::TimerBase::SharedPtr update_timer_;
   Connection incoming_connection_;
 
 
   S_Message messages_;
-  boost::mutex messages_mutex_;
-  ros::Time last_time_;
+  std::mutex messages_mutex_;
+  rclcpp::Time last_time_;
 };
 
 }
