@@ -42,6 +42,15 @@
 namespace message_filters
 {
 
+class noncopyable
+{
+protected:
+  noncopyable() {}
+  ~noncopyable() {}
+  noncopyable( const noncopyable& ) = delete;
+  noncopyable& operator=( const noncopyable& ) = delete;
+};
+
 /**
  * \brief Encapsulates a connection from one filter to another (or to a user-specified callback)
  */
