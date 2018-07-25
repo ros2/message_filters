@@ -85,7 +85,8 @@ public:
 
 TEST(TimeSequencer, simple)
 {
-  TimeSequencer<Msg> seq(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10);
+  rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("test_node");
+  TimeSequencer<Msg> seq(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, node);
   Helper h;
   seq.registerCallback(std::bind(&Helper::cb, &h, _1));
   MsgPtr msg(std::make_shared<Msg>());
@@ -93,19 +94,20 @@ TEST(TimeSequencer, simple)
   seq.add(msg);
 
   rclcpp::Rate(10).sleep();
-  rclcpp::spin_some(seq.get_node());
+  rclcpp::spin_some(node);
   ASSERT_EQ(h.count_, 0);
 
   rclcpp::Rate(1).sleep();
-  rclcpp::spin_some(seq.get_node());
+  rclcpp::spin_some(node);
 
   ASSERT_EQ(h.count_, 1);
 }
 
 TEST(TimeSequencer, compilation)
 {
-  TimeSequencer<Msg> seq(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10);
-  TimeSequencer<Msg> seq2(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10);
+  rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("test_node");
+  TimeSequencer<Msg> seq(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, node);
+  TimeSequencer<Msg> seq2(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, node);
   seq2.connectInput(seq);
 }
 
@@ -148,5 +150,3 @@ int main(int argc, char **argv){
 
   return RUN_ALL_TESTS();
 }
-
-
