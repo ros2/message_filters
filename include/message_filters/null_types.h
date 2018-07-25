@@ -43,9 +43,15 @@
 
 namespace message_filters
 {
+struct MsgHeader
+{
+  rclcpp::Time stamp;
+};
+
 
 struct NullType
 {
+  static MsgHeader header;
 };
 
 typedef std::shared_ptr<NullType const> NullTypeConstPtr;
