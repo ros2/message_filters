@@ -160,6 +160,11 @@ public:
     add(evt);
   }
 
+ rclcpp::Node::SharedPtr get_node(void)
+ {
+   return nh_;
+ }
+
 private:
   class MessageSort
   {
@@ -214,10 +219,12 @@ private:
     }
   }
 
+  #if 0
   void update(const ros::SteadyTimerEvent&)
   {
     dispatch();
   }
+  #endif
 
   void init()
   {
