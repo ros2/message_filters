@@ -36,17 +36,18 @@
 #define MESSAGE_FILTERS_CACHE_H_
 
 #include <deque>
-#include "boost/thread.hpp"
-#include "boost/shared_ptr.hpp"
+#include <memory>
+#include <functional>
 
-#include "ros/time.h"
+#include <rclcpp/rclcpp.hpp>
 
 #include "connection.h"
 #include "simple_filter.h"
+#include "message_traits.h"
 
 namespace message_filters
 {
-
+using namespace std::placeholders;
 /**
  * \brief Stores a time history of messages
  *
@@ -59,15 +60,15 @@ namespace message_filters
  *
  * Cache's input and output connections are both of the same signature as roscpp subscription callbacks, ie.
 \verbatim
-void callback(const boost::shared_ptr<M const>&);
+void callback(const std::shared_ptr<M const>&);
 \endverbatim
  */
 template<class M>
 class Cache : public SimpleFilter<M>
 {
 public:
-  typedef boost::shared_ptr<M const> MConstPtr;
-  typedef ros::MessageEvent<M const> EventType;
+  typedef std::shared_ptr<M const> MConstPtr;
+  typedef MessageEvent<M const> EventType;
 
   template<class F>
   Cache(F& f, unsigned int cache_size = 1)
@@ -89,7 +90,7 @@ public:
   template<class F>
   void connectInput(F& f)
   {
-    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(boost::bind(&Cache::callback, this, _1)));
+    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(std::bind(&Cache::callback, this, _1)));
   }
 
   ~Cache()
@@ -127,11 +128,11 @@ public:
    */
   void add(const EventType& evt)
   {
-    namespace mt = ros::message_traits;
+    namespace mt = message_filters::message_traits;
 
     //printf("  Cache Size: %u\n", cache_.size()) ;
     {
-      boost::mutex::scoped_lock lock(cache_lock_);
+      std::lock_guard<std::mutex> lock(cache_lock_);
 
       while (cache_.size() >= cache_size_)                       // Keep popping off old data until we have space for a new msg
         cache_.pop_front() ;                                     // The front of the deque has the oldest elem, so we can get rid of it
@@ -143,7 +144,7 @@ public:
 
       // Keep walking backwards along deque until we hit the beginning,
       //   or until we find a timestamp that's smaller than (or equal to) msg's timestamp
-      ros::Time evt_stamp = mt::TimeStamp<M>::value(*evt.getMessage());
+      rclcpp::Time evt_stamp = mt::TimeStamp<M>::value(*evt.getMessage());
       while(rev_it != cache_.rend() && mt::TimeStamp<M>::value(*(*rev_it).getMessage()) > evt_stamp)
         rev_it++;
 
@@ -163,11 +164,10 @@ public:
    * \param start The start of the requested interval
    * \param end The end of the requested interval
    */
-  std::vector<MConstPtr> getInterval(const ros::Time& start, const ros::Time& end) const
+  std::vector<MConstPtr> getInterval(const rclcpp::Time& start, const rclcpp::Time& end) const
   {
-    namespace mt = ros::message_traits;
-
-    boost::mutex::scoped_lock lock(cache_lock_);
+    namespace mt = message_filters::message_traits;
+    std::lock_guard<std::mutex> lock(cache_lock_);
 
     // Find the starting index. (Find the first index after [or at] the start of the interval)
     unsigned int start_index = 0 ;
@@ -202,11 +202,11 @@ public:
    * If the messages in the cache do not surround (start,end), then this will return the interval
    * that gets closest to surrounding (start,end)
    */
-  std::vector<MConstPtr> getSurroundingInterval(const ros::Time& start, const ros::Time& end) const
+  std::vector<MConstPtr> getSurroundingInterval(const rclcpp::Time& start, const rclcpp::Time& end) const
   {
-    namespace mt = ros::message_traits;
+    namespace mt = message_filters::message_traits;
 
-    boost::mutex::scoped_lock lock(cache_lock_);
+    std::lock_guard<std::mutex> lock(cache_lock_);
     // Find the starting index. (Find the first index after [or at] the start of the interval)
     unsigned int start_index = cache_.size()-1;
     while(start_index > 0 &&
@@ -236,11 +236,11 @@ public:
    * \param time Time that must occur right after the returned elem
    * \returns shared_ptr to the newest elem that occurs before 'time'. NULL if doesn't exist
    */
-  MConstPtr getElemBeforeTime(const ros::Time& time) const
+  MConstPtr getElemBeforeTime(const rclcpp::Time& time) const
   {
-    namespace mt = ros::message_traits;
+    namespace mt = message_filters::message_traits;
 
-    boost::mutex::scoped_lock lock(cache_lock_);
+    std::lock_guard<std::mutex> lock(cache_lock_);
 
     MConstPtr out ;
 
@@ -264,11 +264,11 @@ public:
    * \param time Time that must occur right before the returned elem
    * \returns shared_ptr to the oldest elem that occurs after 'time'. NULL if doesn't exist
    */
-  MConstPtr getElemAfterTime(const ros::Time& time) const
+  MConstPtr getElemAfterTime(const rclcpp::Time& time) const
   {
-    namespace mt = ros::message_traits;
+    namespace mt = message_filters::message_traits;
 
-    boost::mutex::scoped_lock lock(cache_lock_);
+    std::lock_guard<std::mutex> lock(cache_lock_);
 
     MConstPtr out ;
 
@@ -292,13 +292,13 @@ public:
   /**
    * \brief Returns the timestamp associated with the newest packet cache
    */
-  ros::Time getLatestTime() const
+  rclcpp::Time getLatestTime() const
   {
-    namespace mt = ros::message_traits;
+    namespace mt = message_filters::message_traits;
 
-    boost::mutex::scoped_lock lock(cache_lock_);
+    std::lock_guard<std::mutex> lock(cache_lock_);
 
-    ros::Time latest_time;
+    rclcpp::Time latest_time;
 
     if (cache_.size() > 0)
       latest_time = mt::TimeStamp<M>::value(*cache_.back().getMessage());
@@ -309,13 +309,13 @@ public:
   /**
    * \brief Returns the timestamp associated with the oldest packet cache
    */
-  ros::Time getOldestTime() const
+  rclcpp::Time getOldestTime() const
   {
-    namespace mt = ros::message_traits;
+    namespace mt = message_filters::message_traits;
 
-    boost::mutex::scoped_lock lock(cache_lock_);
+    std::lock_guard<std::mutex> lock(cache_lock_);
 
-    ros::Time oldest_time;
+    rclcpp::Time oldest_time;
 
     if (cache_.size() > 0)
       oldest_time = mt::TimeStamp<M>::value(*cache_.front().getMessage());
@@ -330,7 +330,7 @@ private:
     add(evt);
   }
 
-  mutable boost::mutex cache_lock_ ;            //!< Lock for cache_
+  mutable std::mutex cache_lock_ ;            //!< Lock for cache_
   std::deque<EventType> cache_ ;        //!< Cache for the messages
   unsigned int cache_size_ ;            //!< Maximum number of elements allowed in the cache.
 

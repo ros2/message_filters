@@ -35,14 +35,12 @@
 #ifndef MESSAGE_FILTERS_SIGNAL1_H
 #define MESSAGE_FILTERS_SIGNAL1_H
 
-#include <boost/noncopyable.hpp>
-
+#include <memory>
 #include "connection.h"
-#include <ros/message_event.h>
-#include <ros/parameter_adapter.h>
+#include "message_event.h"
+#include "parameter_adapter.h"
 
-#include <boost/bind.hpp>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 namespace message_filters
 {
@@ -52,17 +50,17 @@ class CallbackHelper1
 public:
   virtual ~CallbackHelper1() {}
 
-  virtual void call(const ros::MessageEvent<M const>& event, bool nonconst_need_copy) = 0;
+  virtual void call(const MessageEvent<M const>& event, bool nonconst_need_copy) = 0;
 
-  typedef boost::shared_ptr<CallbackHelper1<M> > Ptr;
+  typedef std::shared_ptr<CallbackHelper1<M> > Ptr;
 };
 
 template<typename P, typename M>
 class CallbackHelper1T : public CallbackHelper1<M>
 {
 public:
-  typedef ros::ParameterAdapter<P> Adapter;
-  typedef boost::function<void(typename Adapter::Parameter)> Callback;
+  typedef ParameterAdapter<P> Adapter;
+  typedef std::function<void(typename Adapter::Parameter)> Callback;
   typedef typename Adapter::Event Event;
 
   CallbackHelper1T(const Callback& cb)
@@ -70,7 +68,7 @@ public:
   {
   }
 
-  virtual void call(const ros::MessageEvent<M const>& event, bool nonconst_force_copy)
+  virtual void call(const MessageEvent<M const>& event, bool nonconst_force_copy)
   {
     Event my_event(event, nonconst_force_copy || event.nonConstWillCopy());
     callback_(Adapter::getParameter(my_event));
@@ -83,23 +81,23 @@ private:
 template<class M>
 class Signal1
 {
-  typedef boost::shared_ptr<CallbackHelper1<M> > CallbackHelper1Ptr;
+  typedef std::shared_ptr<CallbackHelper1<M> > CallbackHelper1Ptr;
   typedef std::vector<CallbackHelper1Ptr> V_CallbackHelper1;
 
 public:
   template<typename P>
-  CallbackHelper1Ptr addCallback(const boost::function<void(P)>& callback)
+  CallbackHelper1Ptr addCallback(const std::function<void(P)>& callback)
   {
     CallbackHelper1T<P, M>* helper = new CallbackHelper1T<P, M>(callback);
 
-    boost::mutex::scoped_lock lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     callbacks_.push_back(CallbackHelper1Ptr(helper));
     return callbacks_.back();
   }
 
   void removeCallback(const CallbackHelper1Ptr& helper)
   {
-    boost::mutex::scoped_lock lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     typename V_CallbackHelper1::iterator it = std::find(callbacks_.begin(), callbacks_.end(), helper);
     if (it != callbacks_.end())
     {
@@ -107,9 +105,9 @@ public:
     }
   }
 
-  void call(const ros::MessageEvent<M const>& event)
+  void call(const MessageEvent<M const>& event)
   {
-    boost::mutex::scoped_lock lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     bool nonconst_force_copy = callbacks_.size() > 1;
     typename V_CallbackHelper1::iterator it = callbacks_.begin();
     typename V_CallbackHelper1::iterator end = callbacks_.end();
@@ -121,7 +119,7 @@ public:
   }
 
 private:
-  boost::mutex mutex_;
+  std::mutex mutex_;
   V_CallbackHelper1 callbacks_;
 };
 
