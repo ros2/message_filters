@@ -39,34 +39,18 @@
 #include "message_filters/connection.h"
 #include "message_filters/null_types.h"
 #include "message_filters/signal9.h"
+#include "message_filters/message_traits.h"
 
-#include <boost/tuple/tuple.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/function.hpp>
-#include <boost/thread/mutex.hpp>
-
-#include <boost/bind.hpp>
-#include <boost/type_traits/is_same.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/mpl/or.hpp>
-#include <boost/mpl/at.hpp>
-#include <boost/mpl/vector.hpp>
-
-#include <ros/assert.h>
-#include <ros/message_traits.h>
-#include <ros/message_event.h>
-
+#include <rclcpp/rclcpp.hpp>
+#include <cassert>
 #include <deque>
-#include <vector>
 #include <string>
+#include <tuple>
 
 namespace message_filters
 {
 namespace sync_policies
 {
-
-namespace mpl = boost::mpl;
-
 
 template<typename M0, typename M1, typename M2 = NullType, typename M3 = NullType, typename M4 = NullType,
          typename M5 = NullType, typename M6 = NullType, typename M7 = NullType, typename M8 = NullType>
@@ -87,7 +71,7 @@ struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   typedef typename Super::M6Event M6Event;
   typedef typename Super::M7Event M7Event;
   typedef typename Super::M8Event M8Event;
-  typedef boost::tuple<M0Event, M1Event, M2Event, M3Event, M4Event, M5Event, M6Event, M7Event, M8Event> Tuple;
+  typedef Events Tuple;
 
   ExactTime(uint32_t queue_size)
   : parent_(0)
@@ -116,16 +100,16 @@ struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   }
 
   template<int i>
-  void add(const typename mpl::at_c<Events, i>::type& evt)
+  void add(const typename std::tuple_element<i, Events>::type& evt)
   {
-    ROS_ASSERT(parent_);
+    assert(parent_);
 
-    namespace mt = ros::message_traits;
+    namespace mt = message_filters::message_traits;
 
-    boost::mutex::scoped_lock lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
 
-    Tuple& t = tuples_[mt::TimeStamp<typename mpl::at_c<Messages, i>::type>::value(*evt.getMessage())];
-    boost::get<i>(t) = evt;
+    Tuple& t = tuples_[mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(*evt.getMessage())];
+    std::get<i>(t) = evt;
 
     checkTuple(t);
   }
@@ -159,26 +143,26 @@ private:
   // assumes mutex_ is already locked
   void checkTuple(Tuple& t)
   {
-    namespace mt = ros::message_traits;
+    namespace mt = message_filters::message_traits;
 
     bool full = true;
-    full = full && (bool)boost::get<0>(t).getMessage();
-    full = full && (bool)boost::get<1>(t).getMessage();
-    full = full && (RealTypeCount::value > 2 ? (bool)boost::get<2>(t).getMessage() : true);
-    full = full && (RealTypeCount::value > 3 ? (bool)boost::get<3>(t).getMessage() : true);
-    full = full && (RealTypeCount::value > 4 ? (bool)boost::get<4>(t).getMessage() : true);
-    full = full && (RealTypeCount::value > 5 ? (bool)boost::get<5>(t).getMessage() : true);
-    full = full && (RealTypeCount::value > 6 ? (bool)boost::get<6>(t).getMessage() : true);
-    full = full && (RealTypeCount::value > 7 ? (bool)boost::get<7>(t).getMessage() : true);
-    full = full && (RealTypeCount::value > 8 ? (bool)boost::get<8>(t).getMessage() : true);
+    full = full && (bool)std::get<0>(t).getMessage();
+    full = full && (bool)std::get<1>(t).getMessage();
+    full = full && (RealTypeCount::value > 2 ? (bool)std::get<2>(t).getMessage() : true);
+    full = full && (RealTypeCount::value > 3 ? (bool)std::get<3>(t).getMessage() : true);
+    full = full && (RealTypeCount::value > 4 ? (bool)std::get<4>(t).getMessage() : true);
+    full = full && (RealTypeCount::value > 5 ? (bool)std::get<5>(t).getMessage() : true);
+    full = full && (RealTypeCount::value > 6 ? (bool)std::get<6>(t).getMessage() : true);
+    full = full && (RealTypeCount::value > 7 ? (bool)std::get<7>(t).getMessage() : true);
+    full = full && (RealTypeCount::value > 8 ? (bool)std::get<8>(t).getMessage() : true);
 
     if (full)
     {
-      parent_->signal(boost::get<0>(t), boost::get<1>(t), boost::get<2>(t),
-                       boost::get<3>(t), boost::get<4>(t), boost::get<5>(t),
-                       boost::get<6>(t), boost::get<7>(t), boost::get<8>(t));
+      parent_->signal(std::get<0>(t), std::get<1>(t), std::get<2>(t),
+                       std::get<3>(t), std::get<4>(t), std::get<5>(t),
+                       std::get<6>(t), std::get<7>(t), std::get<8>(t));
 
-      last_signal_time_ = mt::TimeStamp<M0>::value(*boost::get<0>(t).getMessage());
+      last_signal_time_ = mt::TimeStamp<M0>::value(*std::get<0>(t).getMessage());
 
       tuples_.erase(last_signal_time_);
 
@@ -190,9 +174,9 @@ private:
       while (tuples_.size() > queue_size_)
       {
         Tuple& t2 = tuples_.begin()->second;
-        drop_signal_.call(boost::get<0>(t2), boost::get<1>(t2), boost::get<2>(t2),
-                          boost::get<3>(t2), boost::get<4>(t2), boost::get<5>(t2),
-                          boost::get<6>(t2), boost::get<7>(t2), boost::get<8>(t2));
+        drop_signal_.call(std::get<0>(t2), std::get<1>(t2), std::get<2>(t2),
+                          std::get<3>(t2), std::get<4>(t2), std::get<5>(t2),
+                          std::get<6>(t2), std::get<7>(t2), std::get<8>(t2));
         tuples_.erase(tuples_.begin());
       }
     }
@@ -211,9 +195,9 @@ private:
         ++it;
 
         Tuple& t = old->second;
-        drop_signal_.call(boost::get<0>(t), boost::get<1>(t), boost::get<2>(t),
-                          boost::get<3>(t), boost::get<4>(t), boost::get<5>(t),
-                          boost::get<6>(t), boost::get<7>(t), boost::get<8>(t));
+        drop_signal_.call(std::get<0>(t), std::get<1>(t), std::get<2>(t),
+                          std::get<3>(t), std::get<4>(t), std::get<5>(t),
+                          std::get<6>(t), std::get<7>(t), std::get<8>(t));
         tuples_.erase(old);
       }
       else
@@ -228,13 +212,13 @@ private:
   Sync* parent_;
 
   uint32_t queue_size_;
-  typedef std::map<ros::Time, Tuple> M_TimeToTuple;
+  typedef std::map<rclcpp::Time, Tuple> M_TimeToTuple;
   M_TimeToTuple tuples_;
-  ros::Time last_signal_time_;
+  rclcpp::Time last_signal_time_;
 
   Signal drop_signal_;
 
-  boost::mutex mutex_;
+  std::mutex mutex_;
 };
 
 } // namespace sync

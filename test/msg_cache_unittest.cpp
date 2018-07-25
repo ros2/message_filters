@@ -34,16 +34,18 @@
 
 #include <gtest/gtest.h>
 
-#include "ros/time.h"
-#include <ros/init.h>
+#include <rclcpp/rclcpp.hpp>
+#include <memory>
+#include <functional>
 #include "message_filters/cache.h"
+#include "message_filters/message_traits.h"
 
 using namespace std ;
 using namespace message_filters ;
 
 struct Header
 {
-  ros::Time stamp ;
+  rclcpp::Time stamp ;
 } ;
 
 
@@ -52,16 +54,15 @@ struct Msg
   Header header ;
   int data ;
 } ;
-typedef boost::shared_ptr<Msg const> MsgConstPtr;
-
-namespace ros
+typedef std::shared_ptr<Msg const> MsgConstPtr;
+namespace message_filters
 {
 namespace message_traits
 {
 template<>
 struct TimeStamp<Msg>
 {
-  static ros::Time value(const Msg& m)
+  static rclcpp::Time value(const Msg& m)
   {
     return m.header.stamp;
   }
@@ -77,9 +78,9 @@ void fillCacheEasy(Cache<Msg>& cache, unsigned int start, unsigned int end)
   {
     Msg* msg = new Msg ;
     msg->data = i ;
-    msg->header.stamp.fromSec(i*10) ;
+    msg->header.stamp= rclcpp::Time(i*10, 0) ;
 
-    boost::shared_ptr<Msg const> msg_ptr(msg) ;
+    std::shared_ptr<Msg const> msg_ptr(msg) ;
     cache.add(msg_ptr) ;
   }
 }
@@ -89,7 +90,7 @@ TEST(Cache, easyInterval)
   Cache<Msg> cache(10) ;
   fillCacheEasy(cache, 0, 5) ;
 
-  vector<boost::shared_ptr<Msg const> > interval_data = cache.getInterval(ros::Time().fromSec(5), ros::Time().fromSec(35)) ;
+  vector<std::shared_ptr<Msg const> > interval_data = cache.getInterval(rclcpp::Time(5, 0), rclcpp::Time(35, 0)) ;
 
   ASSERT_EQ(interval_data.size(), (unsigned int) 3) ;
   EXPECT_EQ(interval_data[0]->data, 1) ;
@@ -97,12 +98,12 @@ TEST(Cache, easyInterval)
   EXPECT_EQ(interval_data[2]->data, 3) ;
 
   // Look for an interval past the end of the cache
-  interval_data = cache.getInterval(ros::Time().fromSec(55), ros::Time().fromSec(65)) ;
+  interval_data = cache.getInterval(rclcpp::Time(55, 0), rclcpp::Time(65, 0)) ;
   EXPECT_EQ(interval_data.size(), (unsigned int) 0) ;
 
   // Look for an interval that fell off the back of the cache
   fillCacheEasy(cache, 5, 20) ;
-  interval_data = cache.getInterval(ros::Time().fromSec(5), ros::Time().fromSec(35)) ;
+  interval_data = cache.getInterval(rclcpp::Time(5, 0), rclcpp::Time(35, 0)) ;
   EXPECT_EQ(interval_data.size(), (unsigned int) 0) ;
 }
 
@@ -111,36 +112,36 @@ TEST(Cache, easySurroundingInterval)
   Cache<Msg> cache(10);
   fillCacheEasy(cache, 1, 6);
 
-  vector<boost::shared_ptr<Msg const> > interval_data;
-  interval_data = cache.getSurroundingInterval(ros::Time(15,0), ros::Time(35,0)) ;
+  vector<std::shared_ptr<Msg const> > interval_data;
+  interval_data = cache.getSurroundingInterval(rclcpp::Time(15,0), rclcpp::Time(35,0)) ;
   ASSERT_EQ(interval_data.size(), (unsigned int) 4);
   EXPECT_EQ(interval_data[0]->data, 1);
   EXPECT_EQ(interval_data[1]->data, 2);
   EXPECT_EQ(interval_data[2]->data, 3);
   EXPECT_EQ(interval_data[3]->data, 4);
 
-  interval_data = cache.getSurroundingInterval(ros::Time(0,0), ros::Time(35,0)) ;
+  interval_data = cache.getSurroundingInterval(rclcpp::Time(0,0), rclcpp::Time(35,0)) ;
   ASSERT_EQ(interval_data.size(), (unsigned int) 4);
   EXPECT_EQ(interval_data[0]->data, 1);
 
-  interval_data = cache.getSurroundingInterval(ros::Time(35,0), ros::Time(35,0)) ;
+  interval_data = cache.getSurroundingInterval(rclcpp::Time(35,0), rclcpp::Time(35,0)) ;
   ASSERT_EQ(interval_data.size(), (unsigned int) 2);
   EXPECT_EQ(interval_data[0]->data, 3);
   EXPECT_EQ(interval_data[1]->data, 4);
 
-  interval_data = cache.getSurroundingInterval(ros::Time(55,0), ros::Time(55,0)) ;
+  interval_data = cache.getSurroundingInterval(rclcpp::Time(55,0), rclcpp::Time(55,0)) ;
   ASSERT_EQ(interval_data.size(), (unsigned int) 1);
   EXPECT_EQ(interval_data[0]->data, 5);
 }
 
 
-boost::shared_ptr<Msg const> buildMsg(double time, int data)
+std::shared_ptr<Msg const> buildMsg(double time, int data)
 {
   Msg* msg = new Msg ;
   msg->data = data ;
-  msg->header.stamp.fromSec(time) ;
+  msg->header.stamp = rclcpp::Time(time, 0) ;
 
-  boost::shared_ptr<Msg const> msg_ptr(msg) ;
+  std::shared_ptr<Msg const> msg_ptr(msg) ;
   return msg_ptr ;
 }
 
@@ -154,14 +155,14 @@ TEST(Cache, easyUnsorted)
   cache.add(buildMsg( 5.0, 0)) ;
   cache.add(buildMsg(20.0, 2)) ;
 
-  vector<boost::shared_ptr<Msg const> > interval_data = cache.getInterval(ros::Time().fromSec(3), ros::Time().fromSec(15)) ;
+  vector<std::shared_ptr<Msg const> > interval_data = cache.getInterval(rclcpp::Time(3, 0), rclcpp::Time(15, 0)) ;
 
   ASSERT_EQ(interval_data.size(), (unsigned int) 2) ;
   EXPECT_EQ(interval_data[0]->data, 0) ;
   EXPECT_EQ(interval_data[1]->data, 1) ;
 
   // Grab all the data
-  interval_data = cache.getInterval(ros::Time().fromSec(0), ros::Time().fromSec(80)) ;
+  interval_data = cache.getInterval(rclcpp::Time(0, 0), rclcpp::Time(80, 0)) ;
   ASSERT_EQ(interval_data.size(), (unsigned int) 5) ;
   EXPECT_EQ(interval_data[0]->data, 0) ;
   EXPECT_EQ(interval_data[1]->data, 1) ;
@@ -174,32 +175,32 @@ TEST(Cache, easyUnsorted)
 TEST(Cache, easyElemBeforeAfter)
 {
   Cache<Msg> cache(10) ;
-  boost::shared_ptr<Msg const> elem_ptr ;
+  std::shared_ptr<Msg const> elem_ptr ;
 
   fillCacheEasy(cache, 5, 10) ;
 
-  elem_ptr = cache.getElemAfterTime( ros::Time().fromSec(85.0)) ;
+  elem_ptr = cache.getElemAfterTime( rclcpp::Time(85.0, 0)) ;
 
   ASSERT_FALSE(!elem_ptr) ;
   EXPECT_EQ(elem_ptr->data, 9) ;
 
-  elem_ptr = cache.getElemBeforeTime( ros::Time().fromSec(85.0)) ;
+  elem_ptr = cache.getElemBeforeTime( rclcpp::Time(85.0, 0)) ;
   ASSERT_FALSE(!elem_ptr) ;
   EXPECT_EQ(elem_ptr->data, 8) ;
 
-  elem_ptr = cache.getElemBeforeTime( ros::Time().fromSec(45.0)) ;
+  elem_ptr = cache.getElemBeforeTime( rclcpp::Time(45.0, 0)) ;
   EXPECT_TRUE(!elem_ptr) ;
 }
 
 struct EventHelper
 {
 public:
-  void cb(const ros::MessageEvent<Msg const>& evt)
+  void cb(const MessageEvent<Msg const>& evt)
   {
     event_ = evt;
   }
 
-  ros::MessageEvent<Msg const> event_;
+  MessageEvent<Msg const> event_;
 };
 
 TEST(Cache, eventInEventOut)
@@ -209,7 +210,7 @@ TEST(Cache, eventInEventOut)
   EventHelper h;
   c1.registerCallback(&EventHelper::cb, &h);
 
-  ros::MessageEvent<Msg const> evt(boost::make_shared<Msg const>(), ros::Time(4));
+  MessageEvent<Msg const> evt(std::make_shared<Msg const>(), rclcpp::Time(4, 0));
   c0.add(evt);
 
   EXPECT_EQ(h.event_.getReceiptTime(), evt.getReceiptTime());
@@ -218,8 +219,7 @@ TEST(Cache, eventInEventOut)
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
-  ros::init(argc, argv, "blah");
-  ros::Time::init();
+  rclcpp::init(argc, argv);
   return RUN_ALL_TESTS();
 }
 

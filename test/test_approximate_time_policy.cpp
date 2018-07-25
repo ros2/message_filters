@@ -34,18 +34,18 @@
 *********************************************************************/
 
 #include <gtest/gtest.h>
+#include <rclcpp/rclcpp.hpp>
 #include "message_filters/synchronizer.h"
 #include "message_filters/sync_policies/approximate_time.h"
+#include "message_filters/message_traits.h"
 #include <vector>
-#include <ros/ros.h>
-//#include <pair>
 
 using namespace message_filters;
 using namespace message_filters::sync_policies;
 
 struct Header
 {
-  ros::Time stamp;
+  rclcpp::Time stamp;
 };
 
 
@@ -54,17 +54,16 @@ struct Msg
   Header header;
   int data;
 };
-typedef boost::shared_ptr<Msg> MsgPtr;
-typedef boost::shared_ptr<Msg const> MsgConstPtr;
-
-namespace ros
+typedef std::shared_ptr<Msg> MsgPtr;
+typedef std::shared_ptr<Msg const> MsgConstPtr;
+namespace message_filters
 {
 namespace message_traits
 {
 template<>
 struct TimeStamp<Msg>
 {
-  static ros::Time value(const Msg& m)
+  static rclcpp::Time value(const Msg& m)
   {
     return m.header.stamp;
   }
@@ -72,18 +71,18 @@ struct TimeStamp<Msg>
 }
 }
 
-typedef std::pair<ros::Time, ros::Time> TimePair;
-typedef std::pair<ros::Time, unsigned int> TimeAndTopic;
+typedef std::pair<rclcpp::Time, rclcpp::Time> TimePair;
+typedef std::pair<rclcpp::Time, unsigned int> TimeAndTopic;
 struct TimeQuad
 {
-  TimeQuad(ros::Time p, ros::Time q, ros::Time r, ros::Time s)
+  TimeQuad(rclcpp::Time p, rclcpp::Time q, rclcpp::Time r, rclcpp::Time s)
   {
     time[0] = p;
     time[1] = q;
     time[2] = r;
     time[3] = s;
   }
-  ros::Time time[4];
+  rclcpp::Time time[4];
 };
 
 
@@ -99,7 +98,7 @@ public:
 				  uint32_t queue_size) :
     input_(input), output_(output), output_position_(0), sync_(queue_size)
   {
-    sync_.registerCallback(boost::bind(&ApproximateTimeSynchronizerTest::callback, this, _1, _2));
+    sync_.registerCallback(std::bind(&ApproximateTimeSynchronizerTest::callback, this, _1, _2));
   }
 
   void callback(const MsgConstPtr& p, const MsgConstPtr& q)
@@ -120,13 +119,13 @@ public:
     {
       if (input_[i].second == 0)
       {
-        MsgPtr p(boost::make_shared<Msg>());
+        MsgPtr p(std::make_shared<Msg>());
         p->header.stamp = input_[i].first;
         sync_.add<0>(p);
       }
       else
       {
-        MsgPtr q(boost::make_shared<Msg>());
+        MsgPtr q(std::make_shared<Msg>());
         q->header.stamp = input_[i].first;
         sync_.add<1>(q);
       }
@@ -157,7 +156,7 @@ public:
 				      uint32_t queue_size) :
     input_(input), output_(output), output_position_(0), sync_(queue_size)
   {
-    sync_.registerCallback(boost::bind(&ApproximateTimeSynchronizerTestQuad::callback, this, _1, _2, _3, _4));
+    sync_.registerCallback(std::bind(&ApproximateTimeSynchronizerTestQuad::callback, this, _1, _2, _3, _4));
   }
 
     void callback(const MsgConstPtr& p, const MsgConstPtr& q, const MsgConstPtr& r, const MsgConstPtr& s)
@@ -180,7 +179,7 @@ public:
   {
     for (unsigned int i = 0; i < input_.size(); i++)
     {
-      MsgPtr p(boost::make_shared<Msg>());
+      MsgPtr p(std::make_shared<Msg>());
       p->header.stamp = input_[i].first;
       switch (input_[i].second)
       {
@@ -223,8 +222,8 @@ TEST(ApproxTimeSync, ExactMatch) {
   std::vector<TimeAndTopic> input;
   std::vector<TimePair> output;
 
-  ros::Time t(0, 0);
-  ros::Duration s(1, 0);
+  rclcpp::Time t(0, 0);
+  rclcpp::Duration s(1, 0);
 
   input.push_back(TimeAndTopic(t,0));     // a
   input.push_back(TimeAndTopic(t,1));   // A
@@ -249,8 +248,8 @@ TEST(ApproxTimeSync, PerfectMatch) {
   std::vector<TimeAndTopic> input;
   std::vector<TimePair> output;
 
-  ros::Time t(0, 0);
-  ros::Duration s(1, 0);
+  rclcpp::Time t(0, 0);
+  rclcpp::Duration s(1, 0);
 
   input.push_back(TimeAndTopic(t,0));     // a
   input.push_back(TimeAndTopic(t+s,1));   // A
@@ -274,8 +273,8 @@ TEST(ApproxTimeSync, ImperfectMatch) {
   std::vector<TimeAndTopic> input;
   std::vector<TimePair> output;
 
-  ros::Time t(0, 0);
-  ros::Duration s(1, 0);
+  rclcpp::Time t(0, 0);
+  rclcpp::Duration s(1, 0);
 
   input.push_back(TimeAndTopic(t,0));     // a
   input.push_back(TimeAndTopic(t+s,1));   // A
@@ -301,8 +300,8 @@ TEST(ApproxTimeSync, Acceleration) {
   std::vector<TimeAndTopic> input;
   std::vector<TimePair> output;
 
-  ros::Time t(0, 0);
-  ros::Duration s(1, 0);
+  rclcpp::Time t(0, 0);
+  rclcpp::Duration s(1, 0);
 
   input.push_back(TimeAndTopic(t,0));      // a
   input.push_back(TimeAndTopic(t+s*7,1));  // A
@@ -328,8 +327,8 @@ TEST(ApproxTimeSync, DroppedMessages) {
   std::vector<TimeAndTopic> input;
   std::vector<TimePair> output;
 
-  ros::Time t(0, 0);
-  ros::Duration s(1, 0);
+  rclcpp::Time t(0, 0);
+  rclcpp::Duration s(1, 0);
 
   input.push_back(TimeAndTopic(t,0));     // a
   input.push_back(TimeAndTopic(t+s,1));   // A
@@ -374,26 +373,26 @@ TEST(ApproxTimeSync, LongQueue) {
   std::vector<TimeAndTopic> input;
   std::vector<TimePair> output;
 
-  ros::Time t(0, 0);
-  ros::Duration s(1, 0);
+  rclcpp::Time t(0, 0);
+  rclcpp::Duration s(1, 0);
 
-  input.push_back(TimeAndTopic(t,0));     // a
-  input.push_back(TimeAndTopic(t+s,0));   // b
-  input.push_back(TimeAndTopic(t+s*2,0));   // c
-  input.push_back(TimeAndTopic(t+s*3,0));   // d
-  input.push_back(TimeAndTopic(t+s*4,0));   // e
-  input.push_back(TimeAndTopic(t+s*5,0));   // f
-  input.push_back(TimeAndTopic(t+s*6,0));   // g
-  input.push_back(TimeAndTopic(t+s*7,0));   // h
-  input.push_back(TimeAndTopic(t+s*8,0));   // i
-  input.push_back(TimeAndTopic(t+s*3,1));   // j
-  input.push_back(TimeAndTopic(t+s*9,0));   // k
-  input.push_back(TimeAndTopic(t+s*10,0));   // l
-  input.push_back(TimeAndTopic(t+s*11,0));   // m
-  input.push_back(TimeAndTopic(t+s*12,0));   // n
-  input.push_back(TimeAndTopic(t+s*10,1));   // o
-  input.push_back(TimeAndTopic(t+s*13,0));   // l
-  output.push_back(TimePair(t+s*10, t+s*10));
+  input.push_back(TimeAndTopic(t, 0));     // a
+  input.push_back(TimeAndTopic(t + rclcpp::Duration(1, 0), 0));   // b
+  input.push_back(TimeAndTopic(t + rclcpp::Duration(2, 0), 0));   // c
+  input.push_back(TimeAndTopic(t + rclcpp::Duration(3, 0), 0));   // d
+  input.push_back(TimeAndTopic(t + rclcpp::Duration(4, 0), 0));   // e
+  input.push_back(TimeAndTopic(t + rclcpp::Duration(5, 0), 0));   // f
+  input.push_back(TimeAndTopic(t + rclcpp::Duration(6, 0), 0));   // g
+  input.push_back(TimeAndTopic(t + rclcpp::Duration(7, 0), 0));   // h
+  input.push_back(TimeAndTopic(t + rclcpp::Duration(8, 0), 0));   // i
+  input.push_back(TimeAndTopic(t + rclcpp::Duration(3, 0), 1));   // j
+  input.push_back(TimeAndTopic(t + rclcpp::Duration(9, 0), 0));   // k
+  input.push_back(TimeAndTopic(t + rclcpp::Duration(10, 0), 0));   // l
+  input.push_back(TimeAndTopic(t + rclcpp::Duration(11, 0), 0));   // m
+  input.push_back(TimeAndTopic(t + rclcpp::Duration(12, 0), 0));   // n
+  input.push_back(TimeAndTopic(t + rclcpp::Duration(10, 0), 1));   // o
+  input.push_back(TimeAndTopic(t + rclcpp::Duration(13, 0), 0));   // l
+  output.push_back(TimePair(t + rclcpp::Duration(10, 0), t + rclcpp::Duration(10, 0)));
 
   ApproximateTimeSynchronizerTest sync_test(input, output, 5);
   sync_test.run();
@@ -411,15 +410,15 @@ TEST(ApproxTimeSync, DoublePublish) {
   std::vector<TimeAndTopic> input;
   std::vector<TimePair> output;
 
-  ros::Time t(0, 0);
-  ros::Duration s(1, 0);
+  rclcpp::Time t(0, 0);
+  rclcpp::Duration s(1, 0);
 
   input.push_back(TimeAndTopic(t,0));     // a
   input.push_back(TimeAndTopic(t+s,1));   // A
-  input.push_back(TimeAndTopic(t+s*3,1)); // B
-  input.push_back(TimeAndTopic(t+s*3,0)); // b
+  input.push_back(TimeAndTopic(t+rclcpp::Duration(3, 0), 1)); // B
+  input.push_back(TimeAndTopic(t+rclcpp::Duration(3, 0), 0)); // b
   output.push_back(TimePair(t, t+s));
-  output.push_back(TimePair(t+s*3, t+s*3));
+  output.push_back(TimePair(t+rclcpp::Duration(3, 0), t+rclcpp::Duration(3, 0)));
 
   ApproximateTimeSynchronizerTest sync_test(input, output, 10);
   sync_test.run();
@@ -439,27 +438,27 @@ TEST(ApproxTimeSync, FourTopics) {
   std::vector<TimeAndTopic> input;
   std::vector<TimeQuad> output;
 
-  ros::Time t(0, 0);
-  ros::Duration s(1, 0);
+  rclcpp::Time t(0, 0);
+  rclcpp::Duration s(1, 0);
 
   input.push_back(TimeAndTopic(t,0));     // a
   input.push_back(TimeAndTopic(t+s,1));   // b
-  input.push_back(TimeAndTopic(t+s*2,2));   // c
-  input.push_back(TimeAndTopic(t+s*3,3));   // d 
-  input.push_back(TimeAndTopic(t+s*5,0));   // e
-  input.push_back(TimeAndTopic(t+s*5,3));   // f
-  input.push_back(TimeAndTopic(t+s*6,1));   // g
-  input.push_back(TimeAndTopic(t+s*6,2));   // h
-  input.push_back(TimeAndTopic(t+s*8,0));   // i
-  input.push_back(TimeAndTopic(t+s*9,1));   // j
-  input.push_back(TimeAndTopic(t+s*10,2));   // k
-  input.push_back(TimeAndTopic(t+s*11,3));   // l
-  input.push_back(TimeAndTopic(t+s*10,0));   // m
-  input.push_back(TimeAndTopic(t+s*13,0));   // n
-  input.push_back(TimeAndTopic(t+s*14,1));   // o
-  output.push_back(TimeQuad(t, t+s, t+s*2, t+s*3));
-  output.push_back(TimeQuad(t+s*5, t+s*6, t+s*6, t+s*5));
-  output.push_back(TimeQuad(t+s*10, t+s*9, t+s*10, t+s*11));
+  input.push_back(TimeAndTopic(t+rclcpp::Duration(2, 0),2));   // c
+  input.push_back(TimeAndTopic(t+rclcpp::Duration(3, 0),3));   // d
+  input.push_back(TimeAndTopic(t+rclcpp::Duration(5, 0),0));   // e
+  input.push_back(TimeAndTopic(t+rclcpp::Duration(5, 0),3));   // f
+  input.push_back(TimeAndTopic(t+rclcpp::Duration(6, 0),1));   // g
+  input.push_back(TimeAndTopic(t+rclcpp::Duration(6, 0),2));   // h
+  input.push_back(TimeAndTopic(t+rclcpp::Duration(8, 0),0));   // i
+  input.push_back(TimeAndTopic(t+rclcpp::Duration(9, 0),1));   // j
+  input.push_back(TimeAndTopic(t+rclcpp::Duration(10, 0),2));   // k
+  input.push_back(TimeAndTopic(t+rclcpp::Duration(11, 0),3));   // l
+  input.push_back(TimeAndTopic(t+rclcpp::Duration(10, 0),0));   // m
+  input.push_back(TimeAndTopic(t+rclcpp::Duration(13, 0),0));   // n
+  input.push_back(TimeAndTopic(t+rclcpp::Duration(14, 0),1));   // o
+  output.push_back(TimeQuad(t, t+s, t+rclcpp::Duration(2, 0), t+rclcpp::Duration(3, 0)));
+  output.push_back(TimeQuad(t+rclcpp::Duration(5, 0), t+rclcpp::Duration(6, 0), t+rclcpp::Duration(6, 0), t+rclcpp::Duration(5, 0)));
+  output.push_back(TimeQuad(t+rclcpp::Duration(10, 0), t+rclcpp::Duration(9, 0), t+rclcpp::Duration(10, 0), t+rclcpp::Duration(11, 0)));
 
   ApproximateTimeSynchronizerTestQuad sync_test(input, output, 10);
   sync_test.run();
@@ -479,8 +478,8 @@ TEST(ApproxTimeSync, EarlyPublish) {
   std::vector<TimeAndTopic> input;
   std::vector<TimeQuad> output;
 
-  ros::Time t(0, 0);
-  ros::Duration s(1, 0);
+  rclcpp::Time t(0, 0);
+  rclcpp::Duration s(1, 0);
 
   input.push_back(TimeAndTopic(t,0));     // a
   input.push_back(TimeAndTopic(t+s,1));   // b
@@ -503,8 +502,8 @@ TEST(ApproxTimeSync, RateBound) {
   std::vector<TimeAndTopic> input;
   std::vector<TimePair> output;
 
-  ros::Time t(0, 0);
-  ros::Duration s(1, 0);
+  rclcpp::Time t(0, 0);
+  rclcpp::Duration s(1, 0);
 
   input.push_back(TimeAndTopic(t,0));     // a
   input.push_back(TimeAndTopic(t+s,1));   // A
@@ -536,8 +535,7 @@ TEST(ApproxTimeSync, RateBound) {
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
-  ros::init(argc, argv, "blah");
-  ros::Time::init();
+  rclcpp::init(argc, argv);
 
   return RUN_ALL_TESTS();
 }

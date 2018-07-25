@@ -34,7 +34,7 @@
 
 #include <gtest/gtest.h>
 
-#include "ros/ros.h"
+#include <rclcpp/rclcpp.hpp>
 #include "message_filters/synchronizer.h"
 #include "message_filters/sync_policies/exact_time.h"
 
@@ -43,7 +43,7 @@ using namespace message_filters::sync_policies;
 
 struct Header
 {
-  ros::Time stamp;
+  rclcpp::Time stamp;
 };
 
 
@@ -52,17 +52,17 @@ struct Msg
   Header header;
   int data;
 };
-typedef boost::shared_ptr<Msg> MsgPtr;
-typedef boost::shared_ptr<Msg const> MsgConstPtr;
+typedef std::shared_ptr<Msg> MsgPtr;
+typedef std::shared_ptr<Msg const> MsgConstPtr;
 
-namespace ros
+namespace message_filters
 {
 namespace message_traits
 {
 template<>
 struct TimeStamp<Msg>
 {
-  static ros::Time value(const Msg& m)
+  static rclcpp::Time value(const Msg& m)
   {
     return m.header.stamp;
   }
@@ -105,15 +105,15 @@ TEST(ExactTime, multipleTimes)
 {
   Sync3 sync(2);
   Helper h;
-  sync.registerCallback(boost::bind(&Helper::cb, &h));
-  MsgPtr m(boost::make_shared<Msg>());
-  m->header.stamp = ros::Time();
+  sync.registerCallback(std::bind(&Helper::cb, &h));
+  MsgPtr m(std::make_shared<Msg>());
+  m->header.stamp = rclcpp::Time();
 
   sync.add<0>(m);
   ASSERT_EQ(h.count_, 0);
 
-  m = boost::make_shared<Msg>();
-  m->header.stamp = ros::Time(0.1);
+  m = std::make_shared<Msg>();
+  m->header.stamp = rclcpp::Time(100000000);
   sync.add<1>(m);
   ASSERT_EQ(h.count_, 0);
   sync.add<0>(m);
@@ -126,22 +126,22 @@ TEST(ExactTime, queueSize)
 {
   Sync3 sync(1);
   Helper h;
-  sync.registerCallback(boost::bind(&Helper::cb, &h));
-  MsgPtr m(boost::make_shared<Msg>());
-  m->header.stamp = ros::Time();
+  sync.registerCallback(std::bind(&Helper::cb, &h));
+  MsgPtr m(std::make_shared<Msg>());
+  m->header.stamp = rclcpp::Time();
 
   sync.add<0>(m);
   ASSERT_EQ(h.count_, 0);
   sync.add<1>(m);
   ASSERT_EQ(h.count_, 0);
 
-  m = boost::make_shared<Msg>();
-  m->header.stamp = ros::Time(0.1);
+  m = std::make_shared<Msg>();
+  m->header.stamp = rclcpp::Time(100000000);
   sync.add<1>(m);
   ASSERT_EQ(h.count_, 0);
 
-  m = boost::make_shared<Msg>();
-  m->header.stamp = ros::Time(0);
+  m = std::make_shared<Msg>();
+  m->header.stamp = rclcpp::Time();
   sync.add<1>(m);
   ASSERT_EQ(h.count_, 0);
   sync.add<2>(m);
@@ -152,14 +152,14 @@ TEST(ExactTime, dropCallback)
 {
   Sync2 sync(1);
   Helper h;
-  sync.registerCallback(boost::bind(&Helper::cb, &h));
-  sync.getPolicy()->registerDropCallback(boost::bind(&Helper::dropcb, &h));
-  MsgPtr m(boost::make_shared<Msg>());
-  m->header.stamp = ros::Time();
+  sync.registerCallback(std::bind(&Helper::cb, &h));
+  sync.getPolicy()->registerDropCallback(std::bind(&Helper::dropcb, &h));
+  MsgPtr m(std::make_shared<Msg>());
+  m->header.stamp = rclcpp::Time();
 
   sync.add<0>(m);
   ASSERT_EQ(h.drop_count_, 0);
-  m->header.stamp = ros::Time(0.1);
+  m->header.stamp = rclcpp::Time(100000000);
   sync.add<0>(m);
 
   ASSERT_EQ(h.drop_count_, 1);
@@ -167,14 +167,14 @@ TEST(ExactTime, dropCallback)
 
 struct EventHelper
 {
-  void callback(const ros::MessageEvent<Msg const>& e1, const ros::MessageEvent<Msg const>& e2)
+  void callback(const MessageEvent<Msg const>& e1, const MessageEvent<Msg const>& e2)
   {
     e1_ = e1;
     e2_ = e2;
   }
 
-  ros::MessageEvent<Msg const> e1_;
-  ros::MessageEvent<Msg const> e2_;
+  MessageEvent<Msg const> e1_;
+  MessageEvent<Msg const> e2_;
 };
 
 TEST(ExactTime, eventInEventOut)
@@ -182,7 +182,7 @@ TEST(ExactTime, eventInEventOut)
   Sync2 sync(2);
   EventHelper h;
   sync.registerCallback(&EventHelper::callback, &h);
-  ros::MessageEvent<Msg const> evt(boost::make_shared<Msg>(), ros::Time(4));
+  MessageEvent<Msg const> evt(std::make_shared<Msg>(), rclcpp::Time(4, 0));
 
   sync.add<0>(evt);
   sync.add<1>(evt);
@@ -195,11 +195,7 @@ TEST(ExactTime, eventInEventOut)
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
-  ros::init(argc, argv, "blah");
-
-  ros::Time::init();
-  ros::Time::setNow(ros::Time());
-
+  rclcpp::init(argc, argv);
   return RUN_ALL_TESTS();
 }
 
