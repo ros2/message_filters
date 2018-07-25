@@ -149,13 +149,14 @@ TEST(Subscriber, singleNonConstCallback)
   Subscriber<Msg> sub(node, "test_topic");
   sub.registerCallback(&NonConstHelper::cb, &h);
   auto pub = node->create_publisher<Msg>("test_topic");
-  pub->publish(std::make_shared<Msg>());
+  auto msg = std::make_shared<Msg>();
+  pub->publish(msg);
 
   rclcpp::Rate(50).sleep();
   rclcpp::spin_some(node);
 
   ASSERT_TRUE(h.msg_);
-  // ASSERT_EQ(msg.get(), h.msg_.get());
+  ASSERT_EQ(*msg.get(), *h.msg_.get());
 }
 
 TEST(Subscriber, multipleNonConstCallbacksFilterSubscriber)
@@ -166,7 +167,8 @@ TEST(Subscriber, multipleNonConstCallbacksFilterSubscriber)
   sub.registerCallback(&NonConstHelper::cb, &h);
   sub.registerCallback(&NonConstHelper::cb, &h2);
   auto pub = node->create_publisher<Msg>("test_topic");
-  pub->publish(std::make_shared<Msg>());
+  auto msg = std::make_shared<Msg>();
+  pub->publish(msg);
 
   rclcpp::Rate(50).sleep();
   rclcpp::spin_some(node);
@@ -184,10 +186,14 @@ TEST(Subscriber, multipleCallbacksSomeFilterSomeDirect)
   NonConstHelper h, h2;
   Subscriber<Msg> sub(node, "test_topic");
   sub.registerCallback(&NonConstHelper::cb, &h);
+  auto sub2 = node->create_subscription<Msg>("test_topic", std::bind(&NonConstHelper::cb, &h2, std::placeholders::_1));
 
   auto pub = node->create_publisher<Msg>("test_topic");
-  pub->publish(std::make_shared<Msg>());
+  auto msg = std::make_shared<Msg>();
+  pub->publish(msg);
 
+  rclcpp::Rate(50).sleep();
+  rclcpp::spin_some(node);
   rclcpp::Rate(50).sleep();
   rclcpp::spin_some(node);
 
