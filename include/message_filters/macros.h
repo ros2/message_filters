@@ -28,15 +28,14 @@
 #ifndef MESSAGE_FILTERS_MACROS_H_
 #define MESSAGE_FILTERS_MACROS_H_
 
-#include <ros/macros.h> // for the DECL's
-
+#include <rclcpp/visibility_control.hpp>
 // Import/export for windows dll's and visibility for gcc shared libraries.
 
 #ifdef ROS_BUILD_SHARED_LIBS // ros is being built around shared libraries
   #ifdef message_filters_EXPORTS // we are building a shared lib/dll
-    #define MESSAGE_FILTERS_DECL ROS_HELPER_EXPORT
+    #define MESSAGE_FILTERS_DECL RCLCPP_EXPORT
   #else // we are using shared lib/dll
-    #define MESSAGE_FILTERS_DECL ROS_HELPER_IMPORT
+    #define MESSAGE_FILTERS_DECL RCLCPP_IMPORT
   #endif
 #else // ros is being built around static libraries
   #define MESSAGE_FILTERS_DECL
