@@ -77,8 +77,8 @@ static void fuzz_msg(MsgPtr msg) {
 
 TEST(TimeSequencer, fuzz_sequencer)
 {
-  rclcpp::Node::SharedPtr nh = std::make_shared<rclcpp::Node>("test_node");
-  TimeSequencer<Msg> seq(rclcpp::Duration(0, 10000000), rclcpp::Duration(0, 1000000), 10, nh);
+  rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("test_node");
+  TimeSequencer<Msg> seq(rclcpp::Duration(0, 10000000), rclcpp::Duration(0, 1000000), 10, node);
   Helper h;
   seq.registerCallback(std::bind(&Helper::cb, &h, _1));
   rclcpp::Clock ros_clock;
@@ -92,9 +92,9 @@ TEST(TimeSequencer, fuzz_sequencer)
 
     rclcpp::Rate(20).sleep();
     ASSERT_EQ(h.count_, 0);
-    rclcpp::spin_some(seq.get_node());
+    rclcpp::spin_some(node);
     rclcpp::Rate(100).sleep();
-    rclcpp::spin_some(seq.get_node());
+    rclcpp::spin_some(node);
     ASSERT_EQ(h.count_, 1);
   }
 }
@@ -154,5 +154,3 @@ int main(int argc, char **argv){
 
   return RUN_ALL_TESTS();
 }
-
-

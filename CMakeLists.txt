@@ -74,6 +74,11 @@ if(BUILD_TESTING)
     target_link_libraries(${PROJECT_NAME}-test_chain ${PROJECT_NAME})
   endif()
 
+  ament_add_gtest(${PROJECT_NAME}-test_time_sequencer test/time_sequencer_unittest.cpp)
+  if(TARGET ${PROJECT_NAME}-test_time_sequencer)
+    target_link_libraries(${PROJECT_NAME}-test_time_sequencer ${PROJECT_NAME})
+  endif()
+
   ament_add_gtest(${PROJECT_NAME}-test_subscriber test/test_subscriber.cpp)
   if(TARGET ${PROJECT_NAME}-test_subscriber)
     target_link_libraries(${PROJECT_NAME}-test_subscriber ${PROJECT_NAME})
