@@ -34,21 +34,24 @@
 
 #include <gtest/gtest.h>
 
-#include "ros/time.h"
-#include <ros/init.h>
+#include <rclcpp/rclcpp.hpp>
+#include <functional>
+#include <memory>
+#include <array>
 #include "message_filters/simple_filter.h"
 
 using namespace message_filters;
+using namespace std::placeholders;
 
 struct Msg
 {
 };
-typedef boost::shared_ptr<Msg> MsgPtr;
-typedef boost::shared_ptr<Msg const> MsgConstPtr;
+typedef std::shared_ptr<Msg> MsgPtr;
+typedef std::shared_ptr<Msg const> MsgConstPtr;
 
 struct Filter : public SimpleFilter<Msg>
 {
-  typedef ros::MessageEvent<Msg const> EventType;
+  typedef MessageEvent<Msg const> EventType;
 
   void add(const EventType& evt)
   {
@@ -61,7 +64,7 @@ class Helper
 public:
   Helper()
   {
-    counts_.assign(0);
+    counts_.fill(0);
   }
 
   void cb0(const MsgConstPtr&)
@@ -79,7 +82,7 @@ public:
     ++counts_[2];
   }
 
-  void cb3(const ros::MessageEvent<Msg const>&)
+  void cb3(const MessageEvent<Msg const>&)
   {
     ++counts_[3];
   }
@@ -99,28 +102,28 @@ public:
     ++counts_[6];
   }
 
-  void cb7(const ros::MessageEvent<Msg>&)
+  void cb7(const MessageEvent<Msg>&)
   {
     ++counts_[7];
   }
 
-  boost::array<int32_t, 30> counts_;
+  std::array<int32_t, 30> counts_;
 };
 
 TEST(SimpleFilter, callbackTypes)
 {
   Helper h;
   Filter f;
-  f.registerCallback(boost::bind(&Helper::cb0, &h, _1));
-  f.registerCallback<const Msg&>(boost::bind(&Helper::cb1, &h, _1));
-  f.registerCallback<MsgConstPtr>(boost::bind(&Helper::cb2, &h, _1));
-  f.registerCallback<const ros::MessageEvent<Msg const>&>(boost::bind(&Helper::cb3, &h, _1));
-  f.registerCallback<Msg>(boost::bind(&Helper::cb4, &h, _1));
-  f.registerCallback<const MsgPtr&>(boost::bind(&Helper::cb5, &h, _1));
-  f.registerCallback<MsgPtr>(boost::bind(&Helper::cb6, &h, _1));
-  f.registerCallback<const ros::MessageEvent<Msg>&>(boost::bind(&Helper::cb7, &h, _1));
+  f.registerCallback(std::bind(&Helper::cb0, &h, _1));
+  f.registerCallback<const Msg&>(std::bind(&Helper::cb1, &h, _1));
+  f.registerCallback<MsgConstPtr>(std::bind(&Helper::cb2, &h, _1));
+  f.registerCallback<const MessageEvent<Msg const>&>(std::bind(&Helper::cb3, &h, _1));
+  f.registerCallback<Msg>(std::bind(&Helper::cb4, &h, _1));
+  f.registerCallback<const MsgPtr&>(std::bind(&Helper::cb5, &h, _1));
+  f.registerCallback<MsgPtr>(std::bind(&Helper::cb6, &h, _1));
+  f.registerCallback<const MessageEvent<Msg>&>(std::bind(&Helper::cb7, &h, _1));
 
-  f.add(Filter::EventType(boost::make_shared<Msg>()));
+  f.add(Filter::EventType(std::make_shared<Msg>()));
   EXPECT_EQ(h.counts_[0], 1);
   EXPECT_EQ(h.counts_[1], 1);
   EXPECT_EQ(h.counts_[2], 1);
@@ -133,7 +136,7 @@ TEST(SimpleFilter, callbackTypes)
 
 struct OldFilter
 {
-  Connection registerCallback(const boost::function<void(const MsgConstPtr&)>&)
+  Connection registerCallback(const std::function<void(const MsgConstPtr&)>&)
   {
     return Connection();
   }
@@ -143,14 +146,12 @@ TEST(SimpleFilter, oldRegisterWithNewFilter)
 {
   OldFilter f;
   Helper h;
-  f.registerCallback(boost::bind(&Helper::cb3, &h, _1));
+  f.registerCallback(std::bind(&Helper::cb3, &h, _1));
 }
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
-  ros::init(argc, argv, "blah");
-  ros::Time::init();
-
+  rclcpp::init(argc, argv);
   return RUN_ALL_TESTS();
 }
 

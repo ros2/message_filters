@@ -34,14 +34,14 @@
 
 #include <gtest/gtest.h>
 
-#include "ros/time.h"
+#include <rclcpp/rclcpp.hpp>
 #include "message_filters/time_sequencer.h"
 
 using namespace message_filters;
 
 struct Header
 {
-  ros::Time stamp;
+  rclcpp::Time stamp;
 };
 
 
@@ -50,17 +50,17 @@ struct Msg
   Header header;
   int data;
 };
-typedef boost::shared_ptr<Msg> MsgPtr;
-typedef boost::shared_ptr<Msg const> MsgConstPtr;
+typedef std::shared_ptr<Msg> MsgPtr;
+typedef std::shared_ptr<Msg const> MsgConstPtr;
 
-namespace ros
+namespace message_filters
 {
 namespace message_traits
 {
 template<>
 struct TimeStamp<Msg>
 {
-  static ros::Time value(const Msg& m)
+  static rclcpp::Time value(const Msg& m)
   {
     return m.header.stamp;
   }
@@ -85,58 +85,56 @@ public:
 
 TEST(TimeSequencer, simple)
 {
-  TimeSequencer<Msg> seq(ros::Duration(1.0), ros::Duration(0.01), 10);
+  TimeSequencer<Msg> seq(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10);
   Helper h;
-  seq.registerCallback(boost::bind(&Helper::cb, &h, _1));
-  MsgPtr msg(boost::make_shared<Msg>());
-  msg->header.stamp = ros::Time::now();
+  seq.registerCallback(std::bind(&Helper::cb, &h, _1));
+  MsgPtr msg(std::make_shared<Msg>());
+  msg->header.stamp = rclcpp::Clock().now();
   seq.add(msg);
 
-  ros::WallDuration(0.1).sleep();
-  ros::spinOnce();
+  rclcpp::Rate(10).sleep();
+  rclcpp::spin_some(seq.get_node());
   ASSERT_EQ(h.count_, 0);
 
-  ros::Time::setNow(ros::Time::now() + ros::Duration(2.0));
-
-  ros::WallDuration(0.1).sleep();
-  ros::spinOnce();
+  rclcpp::Rate(1).sleep();
+  rclcpp::spin_some(seq.get_node());
 
   ASSERT_EQ(h.count_, 1);
 }
 
 TEST(TimeSequencer, compilation)
 {
-  TimeSequencer<Msg> seq(ros::Duration(1.0), ros::Duration(0.01), 10);
-  TimeSequencer<Msg> seq2(ros::Duration(1.0), ros::Duration(0.01), 10);
+  TimeSequencer<Msg> seq(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10);
+  TimeSequencer<Msg> seq2(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10);
   seq2.connectInput(seq);
 }
 
 struct EventHelper
 {
 public:
-  void cb(const ros::MessageEvent<Msg const>& evt)
+  void cb(const MessageEvent<Msg const>& evt)
   {
     event_ = evt;
   }
 
-  ros::MessageEvent<Msg const> event_;
+  MessageEvent<Msg const> event_;
 };
 
 TEST(TimeSequencer, eventInEventOut)
 {
-  TimeSequencer<Msg> seq(ros::Duration(1.0), ros::Duration(0.01), 10);
-  TimeSequencer<Msg> seq2(seq, ros::Duration(1.0), ros::Duration(0.01), 10);
+  rclcpp::Node::SharedPtr nh = std::make_shared<rclcpp::Node>("test_node");
+  TimeSequencer<Msg> seq(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, nh);
+  TimeSequencer<Msg> seq2(seq, rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, nh);
   EventHelper h;
   seq2.registerCallback(&EventHelper::cb, &h);
 
-  ros::MessageEvent<Msg const> evt(boost::make_shared<Msg const>(), ros::Time::now());
+  MessageEvent<Msg const> evt(std::make_shared<Msg const>(), rclcpp::Clock().now());
   seq.add(evt);
 
-  ros::Time::setNow(ros::Time::now() + ros::Duration(2));
   while (!h.event_.getMessage())
   {
-    ros::WallDuration(0.01).sleep();
-    ros::spinOnce();
+    rclcpp::Rate(100).sleep();
+    rclcpp::spin_some(nh);
   }
 
   EXPECT_EQ(h.event_.getReceiptTime(), evt.getReceiptTime());
@@ -146,9 +144,7 @@ TEST(TimeSequencer, eventInEventOut)
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
 
-  ros::init(argc, argv, "time_sequencer_test");
-  ros::NodeHandle nh;
-  ros::Time::setNow(ros::Time());
+  rclcpp::init(argc, argv);
 
   return RUN_ALL_TESTS();
 }

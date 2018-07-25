@@ -34,16 +34,16 @@
 
 #include <gtest/gtest.h>
 
-#include "ros/time.h"
 #include "message_filters/time_synchronizer.h"
 #include "message_filters/pass_through.h"
-#include <ros/init.h>
+#include "message_filters/message_traits.h"
+#include <rclcpp/rclcpp.hpp>
 
 using namespace message_filters;
 
 struct Header
 {
-  ros::Time stamp;
+  rclcpp::Time stamp;
 };
 
 
@@ -52,17 +52,17 @@ struct Msg
   Header header;
   int data;
 };
-typedef boost::shared_ptr<Msg> MsgPtr;
-typedef boost::shared_ptr<Msg const> MsgConstPtr;
+typedef std::shared_ptr<Msg> MsgPtr;
+typedef std::shared_ptr<Msg const> MsgConstPtr;
 
-namespace ros
+namespace message_filters
 {
 namespace message_traits
 {
 template<>
 struct TimeStamp<Msg>
 {
-  static ros::Time value(const Msg& m)
+  static rclcpp::Time value(const Msg& m)
   {
     return m.header.stamp;
   }
@@ -147,7 +147,7 @@ void function5(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const
 void function6(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
 void function7(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
 void function8(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function9(const MsgConstPtr&, MsgConstPtr, const MsgPtr&, MsgPtr, const Msg&, Msg, const ros::MessageEvent<Msg const>&, const ros::MessageEvent<Msg>&, const MsgConstPtr&) {}
+void function9(const MsgConstPtr&, MsgConstPtr, const MsgPtr&, MsgPtr, const Msg&, Msg, const MessageEvent<Msg const>&, const MessageEvent<Msg>&, const MsgConstPtr&) {}
 
 TEST(TimeSynchronizer, compileFunction2)
 {
@@ -205,7 +205,7 @@ struct MethodHelper
   void method5(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
   void method6(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
   void method7(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-  void method8(const MsgConstPtr&, MsgConstPtr, const MsgPtr&, MsgPtr, const Msg&, Msg, const ros::MessageEvent<Msg const>&, const ros::MessageEvent<Msg>&) {}
+  void method8(const MsgConstPtr&, MsgConstPtr, const MsgPtr&, MsgPtr, const Msg&, Msg, const MessageEvent<Msg const>&, const MessageEvent<Msg>&) {}
   // Can only do 8 here because the object instance counts as a parameter and bind only supports 9
 };
 
@@ -262,9 +262,9 @@ TEST(TimeSynchronizer, immediate2)
 {
   TimeSynchronizer<Msg, Msg> sync(1);
   Helper h;
-  sync.registerCallback(boost::bind(&Helper::cb, &h));
-  MsgPtr m(boost::make_shared<Msg>());
-  m->header.stamp = ros::Time::now();
+  sync.registerCallback(std::bind(&Helper::cb, &h));
+  MsgPtr m(std::make_shared<Msg>());
+  m->header.stamp = rclcpp::Clock().now();
 
   sync.add0(m);
   ASSERT_EQ(h.count_, 0);
@@ -276,9 +276,9 @@ TEST(TimeSynchronizer, immediate3)
 {
   TimeSynchronizer<Msg, Msg, Msg> sync(1);
   Helper h;
-  sync.registerCallback(boost::bind(&Helper::cb, &h));
-  MsgPtr m(boost::make_shared<Msg>());
-  m->header.stamp = ros::Time::now();
+  sync.registerCallback(std::bind(&Helper::cb, &h));
+  MsgPtr m(std::make_shared<Msg>());
+  m->header.stamp = rclcpp::Clock().now();
 
   sync.add0(m);
   ASSERT_EQ(h.count_, 0);
@@ -292,9 +292,9 @@ TEST(TimeSynchronizer, immediate4)
 {
   TimeSynchronizer<Msg, Msg, Msg, Msg> sync(1);
   Helper h;
-  sync.registerCallback(boost::bind(&Helper::cb, &h));
-  MsgPtr m(boost::make_shared<Msg>());
-  m->header.stamp = ros::Time::now();
+  sync.registerCallback(std::bind(&Helper::cb, &h));
+  MsgPtr m(std::make_shared<Msg>());
+  m->header.stamp = rclcpp::Clock().now();
 
   sync.add0(m);
   ASSERT_EQ(h.count_, 0);
@@ -310,9 +310,9 @@ TEST(TimeSynchronizer, immediate5)
 {
   TimeSynchronizer<Msg, Msg, Msg, Msg, Msg> sync(1);
   Helper h;
-  sync.registerCallback(boost::bind(&Helper::cb, &h));
-  MsgPtr m(boost::make_shared<Msg>());
-  m->header.stamp = ros::Time::now();
+  sync.registerCallback(std::bind(&Helper::cb, &h));
+  MsgPtr m(std::make_shared<Msg>());
+  m->header.stamp = rclcpp::Clock().now();
 
   sync.add0(m);
   ASSERT_EQ(h.count_, 0);
@@ -330,9 +330,9 @@ TEST(TimeSynchronizer, immediate6)
 {
   TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
   Helper h;
-  sync.registerCallback(boost::bind(&Helper::cb, &h));
-  MsgPtr m(boost::make_shared<Msg>());
-  m->header.stamp = ros::Time::now();
+  sync.registerCallback(std::bind(&Helper::cb, &h));
+  MsgPtr m(std::make_shared<Msg>());
+  m->header.stamp = rclcpp::Clock().now();
 
   sync.add0(m);
   ASSERT_EQ(h.count_, 0);
@@ -352,9 +352,9 @@ TEST(TimeSynchronizer, immediate7)
 {
   TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
   Helper h;
-  sync.registerCallback(boost::bind(&Helper::cb, &h));
-  MsgPtr m(boost::make_shared<Msg>());
-  m->header.stamp = ros::Time::now();
+  sync.registerCallback(std::bind(&Helper::cb, &h));
+  MsgPtr m(std::make_shared<Msg>());
+  m->header.stamp = rclcpp::Clock().now();
 
   sync.add0(m);
   ASSERT_EQ(h.count_, 0);
@@ -376,9 +376,9 @@ TEST(TimeSynchronizer, immediate8)
 {
   TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
   Helper h;
-  sync.registerCallback(boost::bind(&Helper::cb, &h));
-  MsgPtr m(boost::make_shared<Msg>());
-  m->header.stamp = ros::Time::now();
+  sync.registerCallback(std::bind(&Helper::cb, &h));
+  MsgPtr m(std::make_shared<Msg>());
+  m->header.stamp = rclcpp::Clock().now();
 
   sync.add0(m);
   ASSERT_EQ(h.count_, 0);
@@ -402,9 +402,9 @@ TEST(TimeSynchronizer, immediate9)
 {
   TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
   Helper h;
-  sync.registerCallback(boost::bind(&Helper::cb, &h));
-  MsgPtr m(boost::make_shared<Msg>());
-  m->header.stamp = ros::Time::now();
+  sync.registerCallback(std::bind(&Helper::cb, &h));
+  MsgPtr m(std::make_shared<Msg>());
+  m->header.stamp = rclcpp::Clock().now();
 
   sync.add0(m);
   ASSERT_EQ(h.count_, 0);
@@ -434,15 +434,15 @@ TEST(TimeSynchronizer, multipleTimes)
 {
   TimeSynchronizer<Msg, Msg, Msg> sync(2);
   Helper h;
-  sync.registerCallback(boost::bind(&Helper::cb, &h));
-  MsgPtr m(boost::make_shared<Msg>());
-  m->header.stamp = ros::Time();
+  sync.registerCallback(std::bind(&Helper::cb, &h));
+  MsgPtr m(std::make_shared<Msg>());
+  m->header.stamp = rclcpp::Time();
 
   sync.add0(m);
   ASSERT_EQ(h.count_, 0);
 
-  m = boost::make_shared<Msg>();
-  m->header.stamp = ros::Time(0.1);
+  m = std::make_shared<Msg>();
+  m->header.stamp = rclcpp::Time(100000000);
   sync.add1(m);
   ASSERT_EQ(h.count_, 0);
   sync.add0(m);
@@ -455,22 +455,22 @@ TEST(TimeSynchronizer, queueSize)
 {
   TimeSynchronizer<Msg, Msg, Msg> sync(1);
   Helper h;
-  sync.registerCallback(boost::bind(&Helper::cb, &h));
-  MsgPtr m(boost::make_shared<Msg>());
-  m->header.stamp = ros::Time();
+  sync.registerCallback(std::bind(&Helper::cb, &h));
+  MsgPtr m(std::make_shared<Msg>());
+  m->header.stamp = rclcpp::Time();
 
   sync.add0(m);
   ASSERT_EQ(h.count_, 0);
   sync.add1(m);
   ASSERT_EQ(h.count_, 0);
 
-  m = boost::make_shared<Msg>();
-  m->header.stamp = ros::Time(0.1);
+  m = std::make_shared<Msg>();
+  m->header.stamp = rclcpp::Time(100000000);
   sync.add1(m);
   ASSERT_EQ(h.count_, 0);
 
-  m = boost::make_shared<Msg>();
-  m->header.stamp = ros::Time(0);
+  m = std::make_shared<Msg>();
+  m->header.stamp = rclcpp::Time();
   sync.add1(m);
   ASSERT_EQ(h.count_, 0);
   sync.add2(m);
@@ -481,14 +481,14 @@ TEST(TimeSynchronizer, dropCallback)
 {
   TimeSynchronizer<Msg, Msg> sync(1);
   Helper h;
-  sync.registerCallback(boost::bind(&Helper::cb, &h));
-  sync.registerDropCallback(boost::bind(&Helper::dropcb, &h));
-  MsgPtr m(boost::make_shared<Msg>());
-  m->header.stamp = ros::Time();
+  sync.registerCallback(std::bind(&Helper::cb, &h));
+  sync.registerDropCallback(std::bind(&Helper::dropcb, &h));
+  MsgPtr m(std::make_shared<Msg>());
+  m->header.stamp = rclcpp::Time(0, 0);
 
   sync.add0(m);
   ASSERT_EQ(h.drop_count_, 0);
-  m->header.stamp = ros::Time(0.1);
+  m->header.stamp = rclcpp::Time(100000000);
   sync.add0(m);
 
   ASSERT_EQ(h.drop_count_, 1);
@@ -496,14 +496,14 @@ TEST(TimeSynchronizer, dropCallback)
 
 struct EventHelper
 {
-  void callback(const ros::MessageEvent<Msg const>& e1, const ros::MessageEvent<Msg const>& e2)
+  void callback(const MessageEvent<Msg const>& e1, const MessageEvent<Msg const>& e2)
   {
     e1_ = e1;
     e2_ = e2;
   }
 
-  ros::MessageEvent<Msg const> e1_;
-  ros::MessageEvent<Msg const> e2_;
+  MessageEvent<Msg const> e1_;
+  MessageEvent<Msg const> e2_;
 };
 
 TEST(TimeSynchronizer, eventInEventOut)
@@ -511,7 +511,7 @@ TEST(TimeSynchronizer, eventInEventOut)
   TimeSynchronizer<Msg, Msg> sync(2);
   EventHelper h;
   sync.registerCallback(&EventHelper::callback, &h);
-  ros::MessageEvent<Msg const> evt(boost::make_shared<Msg>(), ros::Time(4));
+  MessageEvent<Msg const> evt(std::make_shared<Msg>(), rclcpp::Time(4, 0));
 
   sync.add<0>(evt);
   sync.add<1>(evt);
@@ -527,9 +527,9 @@ TEST(TimeSynchronizer, connectConstructor)
   PassThrough<Msg> pt1, pt2;
   TimeSynchronizer<Msg, Msg> sync(pt1, pt2, 1);
   Helper h;
-  sync.registerCallback(boost::bind(&Helper::cb, &h));
-  MsgPtr m(boost::make_shared<Msg>());
-  m->header.stamp = ros::Time::now();
+  sync.registerCallback(std::bind(&Helper::cb, &h));
+  MsgPtr m(std::make_shared<Msg>());
+  m->header.stamp = rclcpp::Clock().now();
 
   pt1.add(m);
   ASSERT_EQ(h.count_, 0);
@@ -541,11 +541,7 @@ TEST(TimeSynchronizer, connectConstructor)
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
-  ros::init(argc, argv, "blah");
-
-  ros::Time::init();
-  ros::Time::setNow(ros::Time());
-
+  rclcpp::init(argc, argv);
   return RUN_ALL_TESTS();
 }
 

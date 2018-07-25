@@ -37,10 +37,9 @@
 
 #include "connection.h"
 
-#include <boost/shared_ptr.hpp>
-#include <ros/time.h>
-
-#include <ros/message_traits.h>
+#include "message_filters/message_traits.h"
+#include <rclcpp/rclcpp.hpp>
+#include <memory>
 
 namespace message_filters
 {
@@ -48,8 +47,8 @@ namespace message_filters
 struct NullType
 {
 };
-typedef boost::shared_ptr<NullType const> NullTypeConstPtr;
 
+typedef std::shared_ptr<NullType const> NullTypeConstPtr;
 template<class M>
 struct NullFilter
 {
@@ -60,23 +59,20 @@ struct NullFilter
   }
 
   template<typename P>
-  Connection registerCallback(const boost::function<void(P)>&)
+  Connection registerCallback(const std::function<void(P)>&)
   {
     return Connection();
   }
 };
-}
 
-namespace ros
-{
 namespace message_traits
 {
 template<>
 struct TimeStamp<message_filters::NullType>
 {
-  static ros::Time value(const message_filters::NullType&)
+  static rclcpp::Time value(const message_filters::NullType&)
   {
-    return ros::Time();
+    return rclcpp::Time();
   }
 };
 }
