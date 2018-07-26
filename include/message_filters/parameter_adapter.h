@@ -28,15 +28,11 @@
 #ifndef ROSCPP_PARAMETER_ADAPTER_H
 #define ROSCPP_PARAMETER_ADAPTER_H
 
-#include "ros/forwards.h"
-#include "ros/message_event.h"
-#include <ros/static_assert.h>
+#include "message_event.h"
+#include <memory>
+#include <type_traits>
 
-#include <boost/type_traits/add_const.hpp>
-#include <boost/type_traits/remove_const.hpp>
-#include <boost/type_traits/remove_reference.hpp>
-
-namespace ros
+namespace message_filters
 {
 
 /**
@@ -55,10 +51,10 @@ namespace ros
  *
  *  ParameterAdapter is specialized to allow callbacks of any of the forms:
 \verbatim
-void callback(const boost::shared_ptr<M const>&);
-void callback(const boost::shared_ptr<M>&);
-void callback(boost::shared_ptr<M const>);
-void callback(boost::shared_ptr<M>);
+void callback(const std::shared_ptr<M const>&);
+void callback(const std::shared_ptr<M>&);
+void callback(std::shared_ptr<M const>);
+void callback(std::shared_ptr<M>);
 void callback(const M&);
 void callback(M);
 void callback(const MessageEvent<M const>&);
@@ -68,8 +64,8 @@ void callback(const MessageEvent<M>&);
 template<typename M>
 struct ParameterAdapter
 {
-  typedef typename boost::remove_reference<typename boost::remove_const<M>::type>::type Message;
-  typedef ros::MessageEvent<Message const> Event;
+  typedef typename std::remove_reference<typename std::remove_const<M>::type>::type Message;
+  typedef MessageEvent<Message const> Event;
   typedef M Parameter;
   static const bool is_const = true;
 
@@ -78,13 +74,13 @@ struct ParameterAdapter
     return *event.getMessage();
   }
 };
-
+//struct message_filters::ParameterAdapter<const std::shared_ptr<const Msg>&>
 template<typename M>
-struct ParameterAdapter<const boost::shared_ptr<M const>& >
+struct ParameterAdapter<const std::shared_ptr<M const>& >
 {
-  typedef typename boost::remove_reference<typename boost::remove_const<M>::type>::type Message;
-  typedef ros::MessageEvent<Message const> Event;
-  typedef const boost::shared_ptr<Message const> Parameter;
+  typedef typename std::remove_reference<typename std::remove_const<M>::type>::type Message;
+  typedef MessageEvent<Message const> Event;
+  typedef const std::shared_ptr<Message const> Parameter;
   static const bool is_const = true;
 
   static Parameter getParameter(const Event& event)
@@ -94,24 +90,24 @@ struct ParameterAdapter<const boost::shared_ptr<M const>& >
 };
 
 template<typename M>
-struct ParameterAdapter<const boost::shared_ptr<M>& >
+struct ParameterAdapter<const std::shared_ptr<M>& >
 {
-  typedef typename boost::remove_reference<typename boost::remove_const<M>::type>::type Message;
-  typedef ros::MessageEvent<Message const> Event;
-  typedef boost::shared_ptr<Message> Parameter;
+  typedef typename std::remove_reference<typename std::remove_const<M>::type>::type Message;
+  typedef MessageEvent<Message const> Event;
+  typedef std::shared_ptr<Message> Parameter;
   static const bool is_const = false;
 
   static Parameter getParameter(const Event& event)
   {
-    return ros::MessageEvent<Message>(event).getMessage();
+    return MessageEvent<Message>(event).getMessage();
   }
 };
 
 template<typename M>
 struct ParameterAdapter<const M&>
 {
-  typedef typename boost::remove_reference<typename boost::remove_const<M>::type>::type Message;
-  typedef ros::MessageEvent<Message const> Event;
+  typedef typename std::remove_reference<typename std::remove_const<M>::type>::type Message;
+  typedef MessageEvent<Message const> Event;
   typedef const M& Parameter;
   static const bool is_const = true;
 
@@ -122,11 +118,11 @@ struct ParameterAdapter<const M&>
 };
 
 template<typename M>
-struct ParameterAdapter<boost::shared_ptr<M const> >
+struct ParameterAdapter<std::shared_ptr<M const> >
 {
-  typedef typename boost::remove_reference<typename boost::remove_const<M>::type>::type Message;
-  typedef ros::MessageEvent<Message const> Event;
-  typedef boost::shared_ptr<Message const> Parameter;
+  typedef typename std::remove_reference<typename std::remove_const<M>::type>::type Message;
+  typedef MessageEvent<Message const> Event;
+  typedef std::shared_ptr<Message const> Parameter;
   static const bool is_const = true;
 
   static Parameter getParameter(const Event& event)
@@ -136,25 +132,25 @@ struct ParameterAdapter<boost::shared_ptr<M const> >
 };
 
 template<typename M>
-struct ParameterAdapter<boost::shared_ptr<M> >
+struct ParameterAdapter<std::shared_ptr<M> >
 {
-  typedef typename boost::remove_reference<typename boost::remove_const<M>::type>::type Message;
-  typedef ros::MessageEvent<Message const> Event;
-  typedef boost::shared_ptr<Message> Parameter;
+  typedef typename std::remove_reference<typename std::remove_const<M>::type>::type Message;
+  typedef MessageEvent<Message const> Event;
+  typedef std::shared_ptr<Message> Parameter;
   static const bool is_const = false;
 
   static Parameter getParameter(const Event& event)
   {
-    return ros::MessageEvent<Message>(event).getMessage();
+    return MessageEvent<Message>(event).getMessage();
   }
 };
 
 template<typename M>
-struct ParameterAdapter<const ros::MessageEvent<M const>& >
+struct ParameterAdapter<const MessageEvent<M const>& >
 {
-  typedef typename boost::remove_reference<typename boost::remove_const<M>::type>::type Message;
-  typedef ros::MessageEvent<Message const> Event;
-  typedef const ros::MessageEvent<Message const>& Parameter;
+  typedef typename std::remove_reference<typename std::remove_const<M>::type>::type Message;
+  typedef MessageEvent<Message const> Event;
+  typedef const MessageEvent<Message const>& Parameter;
   static const bool is_const = true;
 
   static Parameter getParameter(const Event& event)
@@ -164,16 +160,16 @@ struct ParameterAdapter<const ros::MessageEvent<M const>& >
 };
 
 template<typename M>
-struct ParameterAdapter<const ros::MessageEvent<M>& >
+struct ParameterAdapter<const MessageEvent<M>& >
 {
-  typedef typename boost::remove_reference<typename boost::remove_const<M>::type>::type Message;
-  typedef ros::MessageEvent<Message const> Event;
-  typedef ros::MessageEvent<Message> Parameter;
+  typedef typename std::remove_reference<typename std::remove_const<M>::type>::type Message;
+  typedef MessageEvent<Message const> Event;
+  typedef MessageEvent<Message> Parameter;
   static const bool is_const = false;
 
   static Parameter getParameter(const Event& event)
   {
-    return ros::MessageEvent<Message>(event);
+    return MessageEvent<Message>(event);
   }
 };
 
