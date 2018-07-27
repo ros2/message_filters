@@ -126,11 +126,11 @@ TEST(TimeSynchronizer, fuzz_synchronizer)
 
 TEST(Subscriber, fuzz_subscriber)
 {
-  auto nh = std::make_shared<rclcpp::Node>("test_node");
+  auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
-  Subscriber<Msg> sub(nh.get(), "test_topic");
+  Subscriber<Msg> sub(node, "test_topic");
   sub.registerCallback(std::bind(&Helper::cb, &h, _1));
-  auto pub = nh->create_publisher<Msg>("test_topic");
+  auto pub = node->create_publisher<Msg>("test_topic");
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
   auto msg = std::make_shared<Msg>();
@@ -141,10 +141,10 @@ TEST(Subscriber, fuzz_subscriber)
     msg->header.stamp = ros_clock.now();
     pub->publish(msg);
     rclcpp::Rate(50).sleep();
-    rclcpp::spin_some(nh);
+    rclcpp::spin_some(node);
     ASSERT_EQ(h.count_, 1);
   }
-  rclcpp::spin_some(nh);
+  rclcpp::spin_some(node);
 }
 
 int main(int argc, char **argv){
