@@ -86,7 +86,7 @@ public:
 TEST(TimeSequencer, simple)
 {
   rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("test_node");
-  TimeSequencer<Msg> seq(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, node);
+  TimeSequencer<Msg> seq(rclcpp::Duration(0, 250000000), rclcpp::Duration(0, 10000000), 10, node);
   Helper h;
   seq.registerCallback(std::bind(&Helper::cb, &h, _1));
   MsgPtr msg(std::make_shared<Msg>());
@@ -97,7 +97,8 @@ TEST(TimeSequencer, simple)
   rclcpp::spin_some(node);
   ASSERT_EQ(h.count_, 0);
 
-  rclcpp::Rate(1).sleep();
+  // Must be longer than the first duration above
+  rclcpp::Rate(3).sleep();
   rclcpp::spin_some(node);
 
   ASSERT_EQ(h.count_, 1);
