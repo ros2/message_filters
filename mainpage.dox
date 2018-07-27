@@ -28,8 +28,8 @@ Here's a simple example of using a Subscriber with a Cache:
 void myCallback(const robot_msgs::Pose::ConstPtr& pose)
 {}
 
-ros::NodeHandle nh;
-message_filters::Subscriber<robot_msgs::Pose> sub(nh, "pose_topic", 1);
+rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("test_node");
+message_filters::Subscriber<robot_msgs::Pose> sub(nh, "pose_topic");
 message_filters::Cache<robot_msgs::Pose> cache(sub, 10);
 cache.registerCallback(myCallback);
 \endverbatim
