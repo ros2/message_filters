@@ -64,7 +64,7 @@ TEST(Subscriber, simple)
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
   Subscriber<Msg> sub(node, "test_topic");
-  sub.registerCallback(std::bind(&Helper::cb, &h, _1));
+  sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic");
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
@@ -83,7 +83,7 @@ TEST(Subscriber, subUnsubSub)
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
   Subscriber<Msg> sub(node, "test_topic");
-  sub.registerCallback(std::bind(&Helper::cb, &h, _1));
+  sub.registerCallback(std::bind(&Helper::cb, &h,  std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic");
 
   sub.unsubscribe();
@@ -107,7 +107,7 @@ TEST(Subscriber, subInChain)
   Helper h;
   Chain<Msg> c;
   c.addFilter(std::make_shared<Subscriber<Msg> >(node, "test_topic"));
-  c.registerCallback(std::bind(&Helper::cb, &h, _1));
+  c.registerCallback(std::bind(&Helper::cb, &h,  std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic");
 
   rclcpp::Clock ros_clock;

@@ -40,6 +40,7 @@
 #include "message_filters/message_traits.h"
 #include <vector>
 
+using namespace std::placeholders;
 using namespace message_filters;
 using namespace message_filters::sync_policies;
 
@@ -484,7 +485,7 @@ TEST(ApproxTimeSync, EarlyPublish) {
   input.push_back(TimeAndTopic(t,0));     // a
   input.push_back(TimeAndTopic(t+s,1));   // b
   input.push_back(TimeAndTopic(t+s*2,2));   // c
-  input.push_back(TimeAndTopic(t+s*3,3));   // d 
+  input.push_back(TimeAndTopic(t+s*3,3));   // d
   input.push_back(TimeAndTopic(t+s*7,0));   // e
   output.push_back(TimeQuad(t, t+s, t+s*2, t+s*3));
 

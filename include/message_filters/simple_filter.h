@@ -43,7 +43,7 @@
 
 namespace message_filters
 {
-using namespace std::placeholders;
+
 /**
  * \brief Convenience base-class for simple filters which output a single message
  *
@@ -88,7 +88,7 @@ public:
   template<typename P>
   Connection registerCallback(void(*callback)(P))
   {
-    typename CallbackHelper1<M>::Ptr helper = signal_.template addCallback<P>(std::bind(callback, _1));
+    typename CallbackHelper1<M>::Ptr helper = signal_.template addCallback<P>(std::bind(callback, std::placeholders::_1));
     return Connection(std::bind(&Signal::removeCallback, &signal_, helper));
   }
 
@@ -99,7 +99,7 @@ public:
   template<typename T, typename P>
   Connection registerCallback(void(T::*callback)(P), T* t)
   {
-    typename CallbackHelper1<M>::Ptr helper = signal_.template addCallback<P>(std::bind(callback, t, _1));
+    typename CallbackHelper1<M>::Ptr helper = signal_.template addCallback<P>(std::bind(callback, t, std::placeholders::_1));
     return Connection(std::bind(&Signal::removeCallback, &signal_, helper));
   }
 
@@ -142,4 +142,3 @@ private:
 }
 
 #endif
-
