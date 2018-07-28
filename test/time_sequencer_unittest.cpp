@@ -88,7 +88,7 @@ TEST(TimeSequencer, simple)
   rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("test_node");
   TimeSequencer<Msg> seq(rclcpp::Duration(0, 250000000), rclcpp::Duration(0, 10000000), 10, node);
   Helper h;
-  seq.registerCallback(std::bind(&Helper::cb, &h, _1));
+  seq.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   MsgPtr msg(std::make_shared<Msg>());
   msg->header.stamp = rclcpp::Clock().now();
   seq.add(msg);

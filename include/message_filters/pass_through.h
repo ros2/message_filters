@@ -65,7 +65,7 @@ public:
   void connectInput(F& f)
   {
     incoming_connection_.disconnect();
-    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(std::bind(&PassThrough::cb, this, _1)));
+    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(std::bind(&PassThrough::cb, this, std::placeholders::_1)));
   }
 
   void add(const MConstPtr& msg)
@@ -90,4 +90,3 @@ private:
 } // namespace message_filters
 
 #endif // MESSAGE_FILTERS_PASSTHROUGH_H
-

@@ -42,6 +42,7 @@
 #include "message_filters/chain.h"
 #include "sensor_msgs/msg/imu.hpp"
 
+using namespace std::placeholders;
 using namespace message_filters;
 typedef sensor_msgs::msg::Imu Msg;
 typedef std::shared_ptr<sensor_msgs::msg::Imu const> MsgConstPtr;

@@ -36,6 +36,7 @@
 #define MESSAGE_FILTERS_SIGNAL9_H
 
 
+#include <functional>
 #include <mutex>
 #include "connection.h"
 #include "null_types.h"
@@ -44,7 +45,7 @@
 
 namespace message_filters
 {
-using namespace std::placeholders;
+
 template<typename M0, typename M1, typename M2, typename M3, typename M4, typename M5, typename M6, typename M7, typename M8>
 class CallbackHelper9
 {
@@ -163,6 +164,7 @@ public:
   typedef std::shared_ptr<M8 const> M8ConstPtr;
   typedef const std::shared_ptr<NullType const>& NullP;
 
+
   template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7, typename P8>
   Connection addCallback(const std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, P8)>& callback)
   {
@@ -176,96 +178,112 @@ public:
   template<typename P0, typename P1>
   Connection addCallback(void(*callback)(P0, P1))
   {
+    using namespace std::placeholders;
     return addCallback(std::function<void(P0, P1, NullP, NullP, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, _1, _2)));
   }
 
   template<typename P0, typename P1, typename P2>
   Connection addCallback(void(*callback)(P0, P1, P2))
   {
+    using namespace std::placeholders;
     return addCallback(std::function<void(P0, P1, P2, NullP, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, _1, _2, _3)));
   }
 
   template<typename P0, typename P1, typename P2, typename P3>
   Connection addCallback(void(*callback)(P0, P1, P2, P3))
   {
+    using namespace std::placeholders;
     return addCallback(std::function<void(P0, P1, P2, P3, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, _1, _2, _3, _4)));
   }
 
   template<typename P0, typename P1, typename P2, typename P3, typename P4>
   Connection addCallback(void(*callback)(P0, P1, P2, P3, P4))
   {
+    using namespace std::placeholders;
     return addCallback(std::function<void(P0, P1, P2, P3, P4, NullP, NullP, NullP, NullP)>(std::bind(callback, _1, _2, _3, _4, _5)));
   }
 
   template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5>
   Connection addCallback(void(*callback)(P0, P1, P2, P3, P4, P5))
   {
+    using namespace std::placeholders;
     return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, NullP, NullP, NullP)>(std::bind(callback, _1, _2, _3, _4, _5, _6)));
   }
 
   template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6>
   Connection addCallback(void(*callback)(P0, P1, P2, P3, P4, P5, P6))
   {
+    using namespace std::placeholders;
     return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, NullP, NullP)>(std::bind(callback, _1, _2, _3, _4, _5, _6, _7)));
   }
 
   template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7>
   Connection addCallback(void(*callback)(P0, P1, P2, P3, P4, P5, P6, P7))
   {
+    using namespace std::placeholders;
     return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, NullP)>(std::bind(callback, _1, _2, _3, _4, _5, _6, _7, _8)));
   }
 
   template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7, typename P8>
   Connection addCallback(void(*callback)(P0, P1, P2, P3, P4, P5, P6, P7, P8))
   {
+    using namespace std::placeholders;
     return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, P8)>(std::bind(callback, _1, _2, _3, _4, _5, _6, _7, _8, _9)));
   }
 
   template<typename T, typename P0, typename P1>
   Connection addCallback(void(T::*callback)(P0, P1), T* t)
   {
+    using namespace std::placeholders;
     return addCallback(std::function<void(P0, P1, NullP, NullP, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, t, _1, _2)));
   }
 
   template<typename T, typename P0, typename P1, typename P2>
   Connection addCallback(void(T::*callback)(P0, P1, P2), T* t)
   {
+    using namespace std::placeholders;
     return addCallback(std::function<void(P0, P1, P2, NullP, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, t, _1, _2, _3)));
   }
 
   template<typename T, typename P0, typename P1, typename P2, typename P3>
   Connection addCallback(void(T::*callback)(P0, P1, P2, P3), T* t)
   {
+    using namespace std::placeholders;
     return addCallback(std::function<void(P0, P1, P2, P3, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, t, _1, _2, _3, _4)));
   }
 
   template<typename T, typename P0, typename P1, typename P2, typename P3, typename P4>
   Connection addCallback(void(T::*callback)(P0, P1, P2, P3, P4), T* t)
   {
+    using namespace std::placeholders;
     return addCallback(std::function<void(P0, P1, P2, P3, P4, NullP, NullP, NullP, NullP)>(std::bind(callback, t, _1, _2, _3, _4, _5)));
   }
 
   template<typename T, typename P0, typename P1, typename P2, typename P3, typename P4, typename P5>
   Connection addCallback(void(T::*callback)(P0, P1, P2, P3, P4, P5), T* t)
   {
+    using namespace std::placeholders;
     return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, NullP, NullP, NullP)>(std::bind(callback, t, _1, _2, _3, _4, _5, _6)));
   }
 
   template<typename T, typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6>
   Connection addCallback(void(T::*callback)(P0, P1, P2, P3, P4, P5, P6), T* t)
   {
+    using namespace std::placeholders;
     return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, NullP, NullP)>(std::bind(callback, t, _1, _2, _3, _4, _5, _6, _7)));
   }
 
   template<typename T, typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7>
   Connection addCallback(void(T::*callback)(P0, P1, P2, P3, P4, P5, P6, P7), T* t)
   {
+    using namespace std::placeholders;
     return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, NullP)>(std::bind(callback, t, _1, _2, _3, _4, _5, _6, _7, _8)));
   }
 
   template<typename C>
   Connection addCallback( C& callback)
   {
+    using namespace std::placeholders;
     return addCallback<const M0ConstPtr&,
                      const M1ConstPtr&,
                      const M2ConstPtr&,
@@ -309,5 +327,3 @@ private:
 } // message_filters
 
 #endif // MESSAGE_FILTERS_SIGNAL9_H
-
-
