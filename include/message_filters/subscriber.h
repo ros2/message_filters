@@ -82,7 +82,7 @@ typedef std::shared_ptr<SubscriberBase> SubscriberBasePtr;
  *
  * Subscriber has no input connection.
  *
- * The output connection for the Subscriber object is the same signature as for roscpp subscription callbacks, ie.
+ * The output connection for the Subscriber object is the same signature as for rclcpp subscription callbacks, ie.
 \verbatim
 void callback(const std::shared_ptr<M const>&);
 \endverbatim
@@ -171,7 +171,7 @@ public:
   }
 
   /**
-   * \brief Returns the internal ros::Subscriber object
+   * \brief Returns the internal rclcpp::Subscription<M>::SharedPtr object
    */
   const typename rclcpp::Subscription<M>::SharedPtr getSubscriber() const { return sub_; }
 

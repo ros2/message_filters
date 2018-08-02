@@ -53,7 +53,7 @@ namespace message_filters
  *
  * \section behavior BEHAVIOR
 
- * At construction, the TimeSequencer takes a ros::Duration
+ * At construction, the TimeSequencer takes a rclcpp::Duration
  * "delay" which specifies how long to queue up messages to
  * provide a time sequencing over them.  As messages arrive they are
  * sorted according to their time stamps.  A callback for a message is
@@ -66,7 +66,7 @@ namespace message_filters
  *
  * \section connections CONNECTIONS
  *
- * TimeSequencer's input and output connections are both of the same signature as roscpp subscription callbacks, ie.
+ * TimeSequencer's input and output connections are both of the same signature as rclcpp subscription callbacks, ie.
 \verbatim
 void callback(const std::shared_ptr<M const>&);
 \endverbatim
@@ -85,7 +85,7 @@ public:
    * \param delay The minimum time to hold a message before passing it through.
    * \param update_rate The rate at which to check for messages which have passed "delay"
    * \param queue_size The number of messages to store
-   * \param node The Node to use to create the ros::SteadyTimer that runs at update_rate
+   * \param node The Node to use to create the rclcpp::SteadyTimer that runs at update_rate
    */
   template<class F>
   TimeSequencer(F& f, rclcpp::Duration delay, rclcpp::Duration update_rate, uint32_t queue_size, rclcpp::Node::SharedPtr node)
@@ -106,7 +106,7 @@ public:
    * \param delay The minimum time to hold a message before passing it through.
    * \param update_rate The rate at which to check for messages which have passed "delay"
    * \param queue_size The number of messages to store
-   * \param node The Node to use to create the ros::SteadyTimer that runs at update_rate
+   * \param node The Node to use to create the rclcpp::SteadyTimer that runs at update_rate
    */
   TimeSequencer(rclcpp::Duration delay, rclcpp::Duration update_rate, uint32_t queue_size, rclcpp::Node::SharedPtr node)
   : delay_(delay)
