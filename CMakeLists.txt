@@ -16,7 +16,6 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcutils)
 find_package(builtin_interfaces REQUIRED)
-find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
 include_directories(include)
@@ -24,7 +23,6 @@ add_library(${PROJECT_NAME} SHARED src/connection.cpp)
 ament_target_dependencies(${PROJECT_NAME}
   "rclcpp"
   "rcutils"
-  "std_msgs"
   "builtin_interfaces"
   "sensor_msgs")
 
@@ -54,6 +52,7 @@ ament_export_libraries(${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
+  find_package(std_msgs REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
   find_package(ament_cmake_gtest)
