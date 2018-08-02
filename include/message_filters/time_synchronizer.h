@@ -56,7 +56,7 @@ namespace message_filters
  *
  * \section connections CONNECTIONS
  *
- * The input connections for the TimeSynchronizer object is the same signature as for roscpp subscription callbacks, ie.
+ * The input connections for the TimeSynchronizer object is the same signature as for rclcpp subscription callbacks, ie.
 \verbatim
 void callback(const std::shared_ptr<M const>&);
 \endverbatim

@@ -58,7 +58,7 @@ using namespace std::placeholders;
  *
  * \section connections CONNECTIONS
  *
- * Cache's input and output connections are both of the same signature as roscpp subscription callbacks, ie.
+ * Cache's input and output connections are both of the same signature as rclcpp subscription callbacks, ie.
 \verbatim
 void callback(const std::shared_ptr<M const>&);
 \endverbatim
