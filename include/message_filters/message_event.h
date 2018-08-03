@@ -97,7 +97,7 @@ public:
 
   MessageEvent(const MessageEvent<void const>& rhs, const CreateFunction& create)
   {
-    init(std::const_pointer_cast<Message>(std::static_pointer_cast<ConstMessage>(rhs.getMessage())), rhs.getConnectionHeaderPtr(), rhs.getReceiptTime(), rhs.nonConstWillCopy(), create);
+    init(std::const_pointer_cast<Message>(std::static_pointer_cast<ConstMessage>(rhs.getMessage())), rhs.getReceiptTime(), rhs.nonConstWillCopy(), create);
   }
 
   /**
@@ -105,28 +105,22 @@ public:
    */
   MessageEvent(const ConstMessagePtr& message)
   {
-    init(message, std::shared_ptr<M_string>(), rclcpp::Clock().now(), true, message_filters::DefaultMessageCreator<Message>());
-  }
-
-  MessageEvent(const ConstMessagePtr& message, const std::shared_ptr<M_string>& connection_header, rclcpp::Time receipt_time)
-  {
-    init(message, connection_header, receipt_time, true, message_filters::DefaultMessageCreator<Message>());
+    init(message, rclcpp::Clock().now(), true, message_filters::DefaultMessageCreator<Message>());
   }
 
   MessageEvent(const ConstMessagePtr& message, rclcpp::Time receipt_time)
   {
-    init(message, std::shared_ptr<M_string>(), receipt_time, true, message_filters::DefaultMessageCreator<Message>());
+    init(message, receipt_time, true, message_filters::DefaultMessageCreator<Message>());
   }
 
-  MessageEvent(const ConstMessagePtr& message, const std::shared_ptr<M_string>& connection_header, rclcpp::Time receipt_time, bool nonconst_need_copy, const CreateFunction& create)
+  MessageEvent(const ConstMessagePtr& message, rclcpp::Time receipt_time, bool nonconst_need_copy, const CreateFunction& create)
   {
-    init(message, connection_header, receipt_time, nonconst_need_copy, create);
+    init(message, receipt_time, nonconst_need_copy, create);
   }
 
-  void init(const ConstMessagePtr& message, const std::shared_ptr<M_string>& connection_header, rclcpp::Time receipt_time, bool nonconst_need_copy, const CreateFunction& create)
+  void init(const ConstMessagePtr& message, rclcpp::Time receipt_time, bool nonconst_need_copy, const CreateFunction& create)
   {
     message_ = message;
-    connection_header_ = connection_header;
     receipt_time_ = receipt_time;
     nonconst_need_copy_ = nonconst_need_copy;
     create_ = create;
@@ -134,13 +128,13 @@ public:
 
   void operator=(const MessageEvent<Message>& rhs)
   {
-    init(std::static_pointer_cast<Message>(rhs.getMessage()), rhs.getConnectionHeaderPtr(), rhs.getReceiptTime(), rhs.nonConstWillCopy(), rhs.getMessageFactory());
+    init(std::static_pointer_cast<Message>(rhs.getMessage()), rhs.getReceiptTime(), rhs.nonConstWillCopy(), rhs.getMessageFactory());
     message_copy_.reset();
   }
 
   void operator=(const MessageEvent<ConstMessage>& rhs)
   {
-    init(std::const_pointer_cast<Message>(std::static_pointer_cast<ConstMessage>(rhs.getMessage())), rhs.getConnectionHeaderPtr(), rhs.getReceiptTime(), rhs.nonConstWillCopy(), rhs.getMessageFactory());
+    init(std::const_pointer_cast<Message>(std::static_pointer_cast<ConstMessage>(rhs.getMessage())), rhs.getReceiptTime(), rhs.nonConstWillCopy(), rhs.getMessageFactory());
     message_copy_.reset();
   }
 
@@ -158,16 +152,6 @@ public:
    * \brief Retrieve a const version of the message
    */
   const std::shared_ptr<ConstMessage>& getConstMessage() const { return message_; }
-  /**
-   * \brief Retrieve the connection header
-   */
-  M_string& getConnectionHeader() const { return *connection_header_; }
-  const std::shared_ptr<M_string>& getConnectionHeaderPtr() const { return connection_header_; }
-
-  /**
-   * \brief Returns the name of the node which published this message
-   */
-  const std::string& getPublisherName() const { return connection_header_ ? (*connection_header_)["callerid"] : s_unknown_publisher_string_; }
 
   /**
    * \brief Returns the time at which this message was received
@@ -234,7 +218,6 @@ private:
   ConstMessagePtr message_;
   // Kind of ugly to make this mutable, but it means we can pass a const MessageEvent to a callback and not worry about other things being modified
   mutable MessagePtr message_copy_;
-  std::shared_ptr<M_string> connection_header_;
   rclcpp::Time receipt_time_;
   bool nonconst_need_copy_;
   CreateFunction create_;
