@@ -51,7 +51,7 @@ public:
   : count_(0)
   {}
 
-  void cb(const MsgConstPtr&)
+  void cb(const MsgConstPtr)
   {
     ++count_;
   }
@@ -124,7 +124,7 @@ TEST(Subscriber, subInChain)
 
 struct ConstHelper
 {
-  void cb(const MsgConstPtr& msg)
+  void cb(const MsgConstPtr msg)
   {
     msg_ = msg;
   }
@@ -134,7 +134,7 @@ struct ConstHelper
 
 struct NonConstHelper
 {
-  void cb(const MsgPtr& msg)
+  void cb(const MsgPtr msg)
   {
     msg_ = msg;
   }
