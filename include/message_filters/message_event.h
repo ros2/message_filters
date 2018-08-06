@@ -33,6 +33,14 @@
 #include <type_traits>
 #include <memory>
 
+#ifndef RCUTILS_ASSERT
+// TODO(tfoote) remove this after it's implemented upstream
+// https://github.com/ros2/rcutils/pull/112
+#define RCUTILS_ASSERT assert
+#endif
+// Uncomment below intead
+//#include <rcutils/assert.h>
+
 namespace message_filters
 {
 typedef std::map< std::string, std::string > 	M_string;
@@ -202,7 +210,7 @@ private:
       return message_copy_;
     }
 
-    assert(create_);
+    RCUTILS_ASSERT(create_);
     message_copy_ = create_();
     *message_copy_ = *message_;
 
