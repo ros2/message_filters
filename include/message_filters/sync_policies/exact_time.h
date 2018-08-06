@@ -42,7 +42,6 @@
 #include "message_filters/message_traits.h"
 
 #include <rclcpp/rclcpp.hpp>
-#include <cassert>
 #include <deque>
 #include <string>
 #include <tuple>
@@ -102,7 +101,7 @@ struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   template<int i>
   void add(const typename std::tuple_element<i, Events>::type& evt)
   {
-    assert(parent_);
+    RCUTILS_ASSERT(parent_);
 
     namespace mt = message_filters::message_traits;
 
