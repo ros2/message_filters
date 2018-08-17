@@ -25,8 +25,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef ROSLIB_MESSAGE_TRAITS_H
-#define ROSLIB_MESSAGE_TRAITS_H
+// File imported from
+// https://github.com/ros/roscpp_core/blob/38b9663/roscpp_traits/include/ros/message_traits.h
+
+#ifndef MESSAGE_FILTERS_MESSAGE_TRAITS_H_
+#define MESSAGE_FILTERS_MESSAGE_TRAITS_H_
 
 #include <type_traits>
 #include <rclcpp/rclcpp.hpp>
@@ -70,4 +73,4 @@ struct TimeStamp<M, typename std::enable_if<HasHeader<M>::value>::type >
 } // namespace message_traits
 } // namespace message_filters
 
-#endif // ROSLIB_MESSAGE_TRAITS_H
+#endif // MESSAGE_FILTERS_MESSAGE_TRAITS_H_

@@ -26,8 +26,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RCLCPP_MESSAGE_EVENT_H
-#define RCLCPP_MESSAGE_EVENT_H
+// File imported from
+// https://github.com/ros/roscpp_core/blob/38b9663/roscpp_traits/include/ros/message_event.h
+
+#ifndef MESSAGE_FILTERS_MESSAGE_EVENT_H_
+#define MESSAGE_FILTERS_MESSAGE_EVENT_H_
 
 #include <rclcpp/rclcpp.hpp>
 #include <type_traits>
@@ -238,4 +241,4 @@ template<typename M> const std::string MessageEvent<M>::s_unknown_publisher_stri
 
 }
 
-#endif // RCLCPP_MESSAGE_EVENT_H
+#endif // MESSAGE_FILTERS_MESSAGE_EVENT_H_
