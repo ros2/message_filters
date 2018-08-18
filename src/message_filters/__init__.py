@@ -30,10 +30,10 @@ Message Filter Objects
 ======================
 """
 
+from functools import reduce
 import itertools
 import threading
-import rospy
-
+import rclpy
 
 class SimpleFilter(object):
 
@@ -67,9 +67,10 @@ class Subscriber(SimpleFilter):
     """
     def __init__(self, *args, **kwargs):
         SimpleFilter.__init__(self)
-        self.topic = args[0]
+        self.node = args[0]
+        self.topic = args[2]
         kwargs['callback'] = self.callback
-        self.sub = rospy.Subscriber(*args, **kwargs)
+        self.sub = self.node.create_subscription(*args[1:], **kwargs)
 
     def callback(self, msg):
         self.signalMessage(msg)
