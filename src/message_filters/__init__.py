@@ -37,6 +37,7 @@ import rclpy
 
 from rclpy.clock import ROSClock
 from rclpy.duration import Duration
+from rclpy.logging import LoggingSeverity
 from rclpy.time import Time
 
 
@@ -119,9 +120,13 @@ class Cache(SimpleFilter):
     def add(self, msg):
         if not hasattr(msg, 'header') or not hasattr(msg.header, 'stamp'):
             if not self.allow_headerless:
-                rospy.logwarn("Cannot use message filters with non-stamped messages. "
-                              "Use the 'allow_headerless' constructor option to "
-                              "auto-assign ROS time to headerless messages.")
+                rclpy.logging._root_logger.log("can not use message filters "
+                              "for messages without timestamp infomation when "
+                              "'allow_headerless' is disabled. auto assign "
+                              "ROSTIME to headerless messages once enabling "
+                              "constructor option of 'allow_headerless'.",
+                              LoggingSeverity.INFO)
+
                 return
 
             stamp = ROSClock().now()
@@ -250,9 +255,12 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
     def add(self, msg, my_queue, my_queue_index=None):
         if not hasattr(msg, 'header') or not hasattr(msg.header, 'stamp'):
             if not self.allow_headerless:
-                rospy.logwarn("Cannot use message filters with non-stamped messages. "
-                              "Use the 'allow_headerless' constructor option to "
-                              "auto-assign ROS time to headerless messages.")
+                rclpy.logging._root_logger.log("can not use message filters "
+                              "for messages without timestamp infomation when "
+                              "'allow_headerless' is disabled. auto assign "
+                              "ROSTIME to headerless messages once enabling "
+                              "constructor option of 'allow_headerless'.",
+                              LoggingSeverity.INFO)
                 return
 
             stamp = ROSClock().now().nanoseconds
