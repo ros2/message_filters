@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Software License Agreement (BSD License)
 #
@@ -32,13 +32,15 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import rostest
-import rospy
-import unittest
-import random
-
 import message_filters
 from message_filters import ApproximateTimeSynchronizer
+
+import random
+import rclpy
+from rclpy.clock import ROSClock
+from rclpy.duration import Duration
+from rclpy.time import Time
+import unittest
 
 class MockHeader:
     pass
@@ -83,8 +85,8 @@ class TestApproxSync(unittest.TestCase):
         for N in range(1, 10):
             m0 = MockFilter()
             m1 = MockFilter()
-            seq0 = [MockMessage(rospy.Time(t), random.random()) for t in range(N)]
-            seq1 = [MockMessage(rospy.Time(t), random.random()) for t in range(N)]
+            seq0 = [MockMessage(Time(seconds=t).nanoseconds, random.random()) for t in range(N)]
+            seq1 = [MockMessage(Time(seconds=t).nanoseconds, random.random()) for t in range(N)]
             # random.shuffle(seq0)
             ts = ApproximateTimeSynchronizer([m0, m1], N, 0.1)
             ts.registerCallback(self.cb_collector_2msg)
@@ -96,32 +98,29 @@ class TestApproxSync(unittest.TestCase):
                 m1.signalMessage(msg)
             self.assertEqual(set(self.collector), set(zip(seq0, seq1)))
 
-        # Scramble sequences of length N of headerless and header-having messages.
-        # Make sure that TimeSequencer recombines them.
-        rospy.rostime.set_rostime_initialized(True)
+        # test headerless scenarios: scramble sequences of length N of
+        # headerless and header-having messages.
         random.seed(0)
         for N in range(1, 10):
             m0 = MockFilter()
             m1 = MockFilter()
-            seq0 = [MockMessage(rospy.Time(t), random.random()) for t in range(N)]
+            currentRosTime = ROSClock().now().nanoseconds
+            seq0 = [MockMessage((currentRosTime + Duration(seconds=t).nanoseconds), random.random()) for t in range(N)]
             seq1 = [MockHeaderlessMessage(random.random()) for t in range(N)]
-            # random.shuffle(seq0)
-            ts = ApproximateTimeSynchronizer([m0, m1], N, 0.1, allow_headerless=True)
+
+            ts = ApproximateTimeSynchronizer([m0, m1], N, 10, allow_headerless=True)
             ts.registerCallback(self.cb_collector_2msg)
             self.collector = []
             for msg in random.sample(seq0, N):
                 m0.signalMessage(msg)
             self.assertEqual(self.collector, [])
-            for i in random.sample(range(N), N):
+
+            for i in range(N):
                 msg = seq1[i]
-                rospy.rostime._set_rostime(rospy.Time(i+0.05))
                 m1.signalMessage(msg)
             self.assertEqual(set(self.collector), set(zip(seq0, seq1)))
 
 if __name__ == '__main__':
-    if 1:
-        rostest.unitrun('camera_calibration', 'testapproxsync', TestApproxSync)
-    else:
-        suite = unittest.TestSuite()
-        suite.addTest(TestApproxSync('test_approx'))
-        unittest.TextTestRunner(verbosity=2).run(suite)
+    suite = unittest.TestSuite()
+    suite.addTest(TestApproxSync('test_approx'))
+    unittest.TextTestRunner(verbosity=2).run(suite)
