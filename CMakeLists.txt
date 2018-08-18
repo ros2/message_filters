@@ -16,6 +16,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcutils)
 find_package(builtin_interfaces REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
 include_directories(include)
@@ -23,6 +24,7 @@ add_library(${PROJECT_NAME} SHARED src/connection.cpp)
 ament_target_dependencies(${PROJECT_NAME}
   "rclcpp"
   "rcutils"
+  "std_msgs"
   "builtin_interfaces"
   "sensor_msgs")
 
@@ -108,6 +110,11 @@ if(BUILD_TESTING)
     target_link_libraries(${PROJECT_NAME}-test_fuzz ${PROJECT_NAME})
   endif()
 
+  # python tests with python interfaces of message filters
+  find_package(ament_cmake_pytest REQUIRED)
+  ament_add_pytest_test(directed.py "test/directed.py")
+  ament_add_pytest_test(test_approxsync.py "test/test_approxsync.py")
+  ament_add_pytest_test(test_message_filters_cache.py "test/test_message_filters_cache.py")
 endif()
 
 ament_package()
