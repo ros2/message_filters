@@ -35,6 +35,11 @@ import itertools
 import threading
 import rclpy
 
+from rclpy.clock import ROSClock
+from rclpy.duration import Duration
+from rclpy.time import Time
+
+
 class SimpleFilter(object):
 
     def __init__(self):
@@ -118,7 +123,8 @@ class Cache(SimpleFilter):
                               "Use the 'allow_headerless' constructor option to "
                               "auto-assign ROS time to headerless messages.")
                 return
-            stamp = rospy.Time.now()
+
+            stamp = ROSClock().now()
         else:
             stamp = msg.header.stamp
 
@@ -238,7 +244,7 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
 
     def __init__(self, fs, queue_size, slop, allow_headerless=False):
         TimeSynchronizer.__init__(self, fs, queue_size)
-        self.slop = rospy.Duration.from_sec(slop)
+        self.slop = Duration(seconds=slop).nanoseconds
         self.allow_headerless = allow_headerless
 
     def add(self, msg, my_queue, my_queue_index=None):
@@ -248,7 +254,8 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
                               "Use the 'allow_headerless' constructor option to "
                               "auto-assign ROS time to headerless messages.")
                 return
-            stamp = rospy.Time.now()
+
+            stamp = ROSClock().now().nanoseconds
         else:
             stamp = msg.header.stamp
 
