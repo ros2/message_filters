@@ -43,7 +43,6 @@ import unittest
 
 PKG = 'message_filters'
 
-
 class AnonymMsg:
     class AnonymHeader:
         stamp = None
@@ -102,11 +101,10 @@ class TestCache(unittest.TestCase):
 
         l = len(cache.getInterval(Time(), Time(seconds=4)))
         self.assertEqual(l, 5, "invalid number of messages" +
-                                " returned in getInterval 3")
+                                " returned in getInterval 5")
 
         s = cache.getElemAfterTime(Time()).header.stamp
-        self.assertEqual(s, Time(),
-                         "invalid msg return by getElemAfterTime")
+        self.assertEqual(s, Time(), "invalid msg return by getElemAfterTime")
 
         s = cache.getElemBeforeTime(Time(seconds=3.5)).header.stamp
         self.assertEqual(s, Time(seconds=3),
@@ -127,8 +125,7 @@ class TestCache(unittest.TestCase):
 
         # Test that it discarded the right one
         s = cache.getOldestTime()
-        self.assertEqual(s, Time(seconds=1),
-                         "wrong message discarded")
+        self.assertEqual(s, Time(seconds=1), "wrong message discarded")
 
     def test_headerless(self):
         sub = Subscriber(self.node, String, "/empty")
@@ -154,11 +151,13 @@ class TestCache(unittest.TestCase):
 
         cache.add(msg)
 
-        s = cache.getInterval(Time(clock_type=ClockType.ROS_TIME), currentRosTime)
+        s = cache.getInterval(Time(clock_type=ClockType.ROS_TIME),
+                              currentRosTime)
         self.assertEqual(s, [msg],
                          "invalid msg returned in headerless scenario")
 
-        s = cache.getInterval(Time(clock_type=ClockType.ROS_TIME), (currentRosTime + Duration(seconds=2)))
+        s = cache.getInterval(Time(clock_type=ClockType.ROS_TIME),
+                              (currentRosTime + Duration(seconds=2)))
         self.assertEqual(s, [msg, msg],
                          "invalid msg returned in headerless scenario")
 

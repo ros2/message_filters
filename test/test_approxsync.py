@@ -80,13 +80,16 @@ class TestApproxSync(unittest.TestCase):
                 m1.signalMessage(msg1)
                 self.assertEqual(self.collector, [(msg0, msg1)])
 
-        # Scramble sequences of length N.  Make sure that TimeSequencer recombines them.
+        # Scramble sequences of length N.
+        # Make sure that TimeSequencer recombines them.
         random.seed(0)
         for N in range(1, 10):
             m0 = MockFilter()
             m1 = MockFilter()
-            seq0 = [MockMessage(Time(seconds=t).nanoseconds, random.random()) for t in range(N)]
-            seq1 = [MockMessage(Time(seconds=t).nanoseconds, random.random()) for t in range(N)]
+            seq0 = [MockMessage(Time(seconds=t).nanoseconds, random.random())\
+                    for t in range(N)]
+            seq1 = [MockMessage(Time(seconds=t).nanoseconds, random.random())\
+                    for t in range(N)]
             # random.shuffle(seq0)
             ts = ApproximateTimeSynchronizer([m0, m1], N, 0.1)
             ts.registerCallback(self.cb_collector_2msg)
@@ -105,10 +108,12 @@ class TestApproxSync(unittest.TestCase):
             m0 = MockFilter()
             m1 = MockFilter()
             currentRosTime = ROSClock().now().nanoseconds
-            seq0 = [MockMessage((currentRosTime + Duration(seconds=t).nanoseconds), random.random()) for t in range(N)]
+            seq0 = [MockMessage((currentRosTime + Duration(seconds=t).nanoseconds),
+                    random.random()) for t in range(N)]
             seq1 = [MockHeaderlessMessage(random.random()) for t in range(N)]
 
-            ts = ApproximateTimeSynchronizer([m0, m1], N, 10, allow_headerless=True)
+            ts = ApproximateTimeSynchronizer([m0, m1], N, 10,
+                                             allow_headerless=True)
             ts.registerCallback(self.cb_collector_2msg)
             self.collector = []
             for msg in random.sample(seq0, N):

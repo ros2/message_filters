@@ -54,7 +54,8 @@ class TestDirected(unittest.TestCase):
                 m1.signalMessage(msg1)
                 self.assertEqual(self.collector, [(msg0, msg1)])
 
-        # Scramble sequences of length N.  Make sure that TimeSequencer recombines them.
+        # Scramble sequences of length N.
+        # Make sure that TimeSequencer recombines them.
         random.seed(0)
         for N in range(1, 10):
             m0 = MockFilter()

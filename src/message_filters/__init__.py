@@ -49,9 +49,8 @@ class SimpleFilter(object):
     def registerCallback(self, cb, *args):
         """
         Register a callback function `cb` to be called when this filter
-        has output.
-        The filter calls the function ``cb`` with a filter-dependent list of arguments,
-        followed by the call-supplied arguments ``args``.
+        has output. The filter calls the function ``cb`` with a filter-dependent
+        list of arguments,followed by the call-supplied arguments ``args``.
         """
 
         conn = len(self.callbacks)
@@ -65,10 +64,10 @@ class SimpleFilter(object):
 class Subscriber(SimpleFilter):
     
     """
-    ROS subscription filter.  Identical arguments as :class:`rospy.Subscriber`.
+    ROS2 subscription filter,Identical arguments as :class:`rclpy.Subscriber`.
 
     This class acts as a highest-level filter, simply passing messages
-    from a ROS subscription through to the filters which have connected
+    from a ROS2 subscription through to the filters which have connected
     to it.
     """
     def __init__(self, *args, **kwargs):
@@ -120,10 +119,10 @@ class Cache(SimpleFilter):
     def add(self, msg):
         if not hasattr(msg, 'header') or not hasattr(msg.header, 'stamp'):
             if not self.allow_headerless:
-                rclpy.logging._root_logger.log("can not use message filters "
-                              "for messages without timestamp infomation when "
-                              "'allow_headerless' is disabled. auto assign "
-                              "ROSTIME to headerless messages once enabling "
+                rclpy.logging._root_logger.log("can not use message filters"
+                              "for messages without timestamp infomation when"
+                              "'allow_headerless' is disabled. auto assign"
+                              "ROSTIME to headerless messages once enabling"
                               "constructor option of 'allow_headerless'.",
                               LoggingSeverity.INFO)
 
@@ -192,11 +191,11 @@ class TimeSynchronizer(SimpleFilter):
     Synchronizes messages by their timestamps.
 
     :class:`TimeSynchronizer` synchronizes incoming message filters by the
-    timestamps contained in their messages' headers. TimeSynchronizer
-    listens on multiple input message filters ``fs``, and invokes the callback
-    when it has a collection of messages with matching timestamps.
+    timestamps contained in their messages' headers. TimeSynchronizer listens
+    on multiple input message filters ``fs``, and invokes the callback when
+    it has a collection of messages with matching timestamps.
 
-    The signature of the callback function is::
+    The signature of the callback function is:
 
         def callback(msg1, ... msgN):
 
@@ -239,11 +238,12 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
     """
     Approximately synchronizes messages by their timestamps.
 
-    :class:`ApproximateTimeSynchronizer` synchronizes incoming message filters by the
-    timestamps contained in their messages' headers. The API is the same as TimeSynchronizer
-    except for an extra `slop` parameter in the constructor that defines the delay (in seconds)
-    with which messages can be synchronized. The ``allow_headerless`` option specifies whether
-    to allow storing headerless messages with current ROS time instead of timestamp. You should
+    :class:`ApproximateTimeSynchronizer` synchronizes incoming message filters
+    by the timestamps contained in their messages' headers. The API is the same
+    as TimeSynchronizer except for an extra `slop` parameter in the constructor
+    that defines the delay (in seconds) with which messages can be synchronized.
+    The ``allow_headerless`` option specifies whether to allow storing
+    headerless messages with current ROS time instead of timestamp. You should
     avoid this as much as you can, since the delays are unpredictable.
     """
 
@@ -255,10 +255,10 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
     def add(self, msg, my_queue, my_queue_index=None):
         if not hasattr(msg, 'header') or not hasattr(msg.header, 'stamp'):
             if not self.allow_headerless:
-                rclpy.logging._root_logger.log("can not use message filters "
-                              "for messages without timestamp infomation when "
-                              "'allow_headerless' is disabled. auto assign "
-                              "ROSTIME to headerless messages once enabling "
+                rclpy.logging._root_logger.log("can not use message filters"
+                              "for messages without timestamp infomation when"
+                              "'allow_headerless' is disabled. auto assign"
+                              "ROSTIME to headerless messages once enabling"
                               "constructor option of 'allow_headerless'.",
                               LoggingSeverity.INFO)
                 return
