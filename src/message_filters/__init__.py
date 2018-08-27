@@ -49,7 +49,8 @@ class SimpleFilter(object):
     def registerCallback(self, cb, *args):
         """
         Register a callback function `cb` to be called when this filter
-        has output. The filter calls the function ``cb`` with a filter-dependent
+        has output.
+        The filter calls the function ``cb`` with a filter-dependent
         list of arguments,followed by the call-supplied arguments ``args``.
         """
 

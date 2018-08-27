@@ -91,15 +91,18 @@ class TestCache(unittest.TestCase):
         msg.header.stamp = Time(seconds=4)
         cache.add(msg)
 
-        l = len(cache.getInterval(Time(seconds=2.5), Time(seconds=3.5)))
+        l = len(cache.getInterval(Time(seconds=2.5),
+                                  Time(seconds=3.5)))
         self.assertEqual(l, 1, "invalid number of messages" +
                                 " returned in getInterval 1")
 
-        l = len(cache.getInterval(Time(seconds=2), Time(seconds=3)))
+        l = len(cache.getInterval(Time(seconds=2),
+                                  Time(seconds=3)))
         self.assertEqual(l, 2, "invalid number of messages" +
                                 " returned in getInterval 2")
 
-        l = len(cache.getInterval(Time(), Time(seconds=4)))
+        l = len(cache.getInterval(Time(),
+                                  Time(seconds=4)))
         self.assertEqual(l, 5, "invalid number of messages" +
                                 " returned in getInterval 5")
 
