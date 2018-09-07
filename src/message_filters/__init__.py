@@ -250,7 +250,7 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
 
     def __init__(self, fs, queue_size, slop, allow_headerless=False):
         TimeSynchronizer.__init__(self, fs, queue_size)
-        self.slop = Duration(seconds=slop).nanoseconds
+        self.slop = Duration(seconds=slop)
         self.allow_headerless = allow_headerless
 
     def add(self, msg, my_queue, my_queue_index=None):
@@ -264,12 +264,12 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
                               LoggingSeverity.INFO)
                 return
 
-            stamp = ROSClock().now().nanoseconds
+            stamp = ROSClock().now()
         else:
             stamp = msg.header.stamp
 
         self.lock.acquire()
-        my_queue[stamp] = msg
+        my_queue[stamp.nanoseconds] = msg
         while len(my_queue) > self.queue_size:
             del my_queue[min(my_queue)]
         # self.queues = [topic_0 {stamp: msg}, topic_1 {stamp: msg}, ...]
@@ -283,10 +283,11 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
         for queue in search_queues:
             topic_stamps = []
             for s in queue:
-                stamp_delta = abs(s - stamp)
+                stamp_delta = Duration(nanoseconds=abs(s - stamp.nanoseconds))
                 if stamp_delta > self.slop:
                     continue  # far over the slop
-                topic_stamps.append((s, stamp_delta))
+                topic_stamps.append(((Time(nanoseconds=s,
+                                   clock_type=stamp.clock_type)), stamp_delta))
             if not topic_stamps:
                 self.lock.release()
                 return
@@ -299,10 +300,10 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
                 vv.insert(my_queue_index, stamp)
             qt = list(zip(self.queues, vv))
             if ( ((max(vv) - min(vv)) < self.slop) and
-                (len([1 for q,t in qt if t not in q]) == 0) ):
-                msgs = [q[t] for q,t in qt]
+                (len([1 for q,t in qt if t.nanoseconds not in q]) == 0) ):
+                msgs = [q[t.nanoseconds] for q,t in qt]
                 self.signalMessage(*msgs)
                 for q,t in qt:
-                    del q[t]
+                    del q[t.nanoseconds]
                 break  # fast finish after the synchronization
         self.lock.release()

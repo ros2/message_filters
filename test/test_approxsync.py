@@ -64,21 +64,21 @@ class TestApproxSync(unittest.TestCase):
         self.collector.append((msg1, msg2))
 
     def test_approx(self):
+        # Simple case, pairs of messages,
+        # make sure that they get combined
         m0 = MockFilter()
         m1 = MockFilter()
         ts = ApproximateTimeSynchronizer([m0, m1], 1, 0.1)
         ts.registerCallback(self.cb_collector_2msg)
 
-        if 0:
-            # Simple case, pairs of messages, make sure that they get combined
-            for t in range(10):
-                self.collector = []
-                msg0 = MockMessage(t, 33)
-                msg1 = MockMessage(t, 34)
-                m0.signalMessage(msg0)
-                self.assertEqual(self.collector, [])
-                m1.signalMessage(msg1)
-                self.assertEqual(self.collector, [(msg0, msg1)])
+        for t in range(10):
+            self.collector = []
+            msg0 = MockMessage(Time(seconds=t), 33)
+            msg1 = MockMessage(Time(seconds=t), 34)
+            m0.signalMessage(msg0)
+            self.assertEqual(self.collector, [])
+            m1.signalMessage(msg1)
+            self.assertEqual(self.collector, [(msg0, msg1)])
 
         # Scramble sequences of length N.
         # Make sure that TimeSequencer recombines them.
@@ -86,9 +86,9 @@ class TestApproxSync(unittest.TestCase):
         for N in range(1, 10):
             m0 = MockFilter()
             m1 = MockFilter()
-            seq0 = [MockMessage(Time(seconds=t).nanoseconds, random.random())\
+            seq0 = [MockMessage(Time(seconds=t), random.random())\
                     for t in range(N)]
-            seq1 = [MockMessage(Time(seconds=t).nanoseconds, random.random())\
+            seq1 = [MockMessage(Time(seconds=t), random.random())\
                     for t in range(N)]
             # random.shuffle(seq0)
             ts = ApproximateTimeSynchronizer([m0, m1], N, 0.1)
@@ -107,8 +107,7 @@ class TestApproxSync(unittest.TestCase):
         for N in range(1, 10):
             m0 = MockFilter()
             m1 = MockFilter()
-            currentRosTime = ROSClock().now().nanoseconds
-            seq0 = [MockMessage((currentRosTime + Duration(seconds=t).nanoseconds),
+            seq0 = [MockMessage((ROSClock().now() + Duration(seconds=t)),
                     random.random()) for t in range(N)]
             seq1 = [MockHeaderlessMessage(random.random()) for t in range(N)]
 
