@@ -120,12 +120,14 @@ class Cache(SimpleFilter):
     def add(self, msg):
         if not hasattr(msg, 'header') or not hasattr(msg.header, 'stamp'):
             if not self.allow_headerless:
-                rclpy.logging._root_logger.log("can not use message filters"
-                              "for messages without timestamp infomation when"
-                              "'allow_headerless' is disabled. auto assign"
-                              "ROSTIME to headerless messages once enabling"
-                              "constructor option of 'allow_headerless'.",
-                              LoggingSeverity.INFO)
+                msg_filters_logger = rclpy.logging.get_logger('message_filters_cache')
+                msg_filters_logger.set_level(LoggingSeverity.INFO)
+                msg_filters_logger.warn("can not use message filters messages "
+                                        "without timestamp infomation when "
+                                        "'allow_headerless' is disabled. "
+                                        "auto assign ROSTIME to headerless "
+                                        "messages once enabling constructor "
+                                        "option of 'allow_headerless'.")
 
                 return
 
@@ -256,12 +258,13 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
     def add(self, msg, my_queue, my_queue_index=None):
         if not hasattr(msg, 'header') or not hasattr(msg.header, 'stamp'):
             if not self.allow_headerless:
-                rclpy.logging._root_logger.log("can not use message filters"
-                              "for messages without timestamp infomation when"
-                              "'allow_headerless' is disabled. auto assign"
-                              "ROSTIME to headerless messages once enabling"
-                              "constructor option of 'allow_headerless'.",
-                              LoggingSeverity.INFO)
+                msg_filters_logger = rclpy.logging.get_logger('message_filters_approx')
+                msg_filters_logger.set_level(LoggingSeverity.INFO)
+                msg_filters_logger.warn("can not use message filters for "
+                              "messages without timestamp infomation when "
+                              "'allow_headerless' is disabled. auto assign "
+                              "ROSTIME to headerless messages once enabling "
+                              "constructor option of 'allow_headerless'.")
                 return
 
             stamp = ROSClock().now()
