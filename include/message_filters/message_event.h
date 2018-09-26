@@ -26,12 +26,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef RCLCPP_MESSAGE_EVENT_H
-#define RCLCPP_MESSAGE_EVENT_H
+#ifndef MESSAGE_FILTERS__MESSAGE_EVENT_H_
+#define MESSAGE_FILTERS__MESSAGE_EVENT_H_
 
-#include <rclcpp/rclcpp.hpp>
 #include <type_traits>
 #include <memory>
+
+#include <rclcpp/rclcpp.hpp>
 
 #ifndef RCUTILS_ASSERT
 // TODO(tfoote) remove this after it's implemented upstream
@@ -235,7 +236,7 @@ private:
 
 template<typename M> const std::string MessageEvent<M>::s_unknown_publisher_string_("unknown_publisher");
 
+}  // namespace message_filters
 
-}
+#endif  // MESSAGE_FILTERS__MESSAGE_EVENT_H_
 
-#endif // RCLCPP_MESSAGE_EVENT_H

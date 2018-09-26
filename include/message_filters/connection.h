@@ -32,12 +32,13 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS_CONNECTION_H
-#define MESSAGE_FILTERS_CONNECTION_H
+#ifndef MESSAGE_FILTERS__CONNECTION_H_
+#define MESSAGE_FILTERS__CONNECTION_H_
 
 #include <functional>
 #include <memory>
-#include "macros.h"
+
+#include "message_filters/visibility_control.h"
 
 namespace message_filters
 {
@@ -72,6 +73,6 @@ private:
   WithConnectionDisconnectFunction connection_disconnect_;
 };
 
-}
+}  // namespace message_filters
 
-#endif // MESSAGE_FILTERS_CONNECTION_H
+#endif  // MESSAGE_FILTERS__CONNECTION_H_

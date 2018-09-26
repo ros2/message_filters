@@ -32,13 +32,13 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS_CHAIN_H
-#define MESSAGE_FILTERS_CHAIN_H
-
-#include "simple_filter.h"
-#include "pass_through.h"
+#ifndef MESSAGE_FILTERS__CHAIN_H
+#define MESSAGE_FILTERS__CHAIN_H
 
 #include <vector>
+
+#include "message_filters/simple_filter.h"
+#include "message_filters/pass_through.h"
 
 namespace message_filters
 {
@@ -249,6 +249,6 @@ private:
   Connection incoming_connection_;
   Connection last_filter_connection_;
 };
-}
+}  // namespace message_filters
 
-#endif // MESSAGE_FILTERS_CHAIN_H
+#endif  // MESSAGE_FILTERS__CHAIN_H_

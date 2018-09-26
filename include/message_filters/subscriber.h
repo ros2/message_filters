@@ -32,13 +32,13 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS_SUBSCRIBER_H
-#define MESSAGE_FILTERS_SUBSCRIBER_H
+#ifndef MESSAGE_FILTERS__SUBSCRIBER_H_
+#define MESSAGE_FILTERS__SUBSCRIBER_H_
 
 #include <rclcpp/rclcpp.hpp>
 
-#include "connection.h"
-#include "simple_filter.h"
+#include "message_filters/connection.h"
+#include "message_filters/simple_filter.h"
 
 namespace message_filters
 {
@@ -205,6 +205,6 @@ private:
   rmw_qos_profile_t qos_;
 };
 
-}
+}  // namespace message_filters
 
-#endif
+#endif  // MESSAGE_FILTERS__SUBSCRIBER_H_

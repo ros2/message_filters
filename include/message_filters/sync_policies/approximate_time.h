@@ -32,23 +32,23 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS_SYNC_APPROXIMATE_TIME_H
-#define MESSAGE_FILTERS_SYNC_APPROXIMATE_TIME_H
+#ifndef MESSAGE_FILTERS__SYNC_APPROXIMATE_TIME_H_
+#define MESSAGE_FILTERS__SYNC_APPROXIMATE_TIME_H_
 
-#include "message_filters/synchronizer.h"
-#include "message_filters/connection.h"
-#include "message_filters/null_types.h"
-#include "message_filters/signal9.h"
-#include "message_filters/message_traits.h"
-
-#include <rclcpp/rclcpp.hpp>
 #include <cassert>
 #include <deque>
-#include <vector>
 #include <string>
 #include <tuple>
+#include <vector>
 
+#include <rclcpp/rclcpp.hpp>
 #include <rcutils/logging_macros.h>
+
+#include "message_filters/connection.h"
+#include "message_filters/message_traits.h"
+#include "message_filters/null_types.h"
+#include "message_filters/signal9.h"
+#include "message_filters/synchronizer.h"
 
 
 #ifndef RCUTILS_ASSERT
@@ -855,7 +855,7 @@ private:
   std::vector<bool> warned_about_incorrect_bound_;
 };
 
-} // namespace sync
-} // namespace message_filters
+}  // namespace sync
+}  // namespace message_filters
 
-#endif // MESSAGE_FILTERS_SYNC_APPROXIMATE_TIME_H
+#endif // MESSAGE_FILTERS__SYNC_APPROXIMATE_TIME_H_

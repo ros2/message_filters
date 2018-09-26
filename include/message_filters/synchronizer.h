@@ -32,19 +32,19 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS_SYNCHRONIZER_H
-#define MESSAGE_FILTERS_SYNCHRONIZER_H
+#ifndef MESSAGE_FILTERS__SYNCHRONIZER_H_
+#define MESSAGE_FILTERS__SYNCHRONIZER_H_
 
-#include "connection.h"
-#include "null_types.h"
-#include "signal9.h"
-#include "message_event.h"
-
-#include <type_traits>
 #include <deque>
-#include <tuple>
-#include <vector>
 #include <string>
+#include <tuple>
+#include <type_traits>
+#include <vector>
+
+#include "message_filters/connection.h"
+#include "message_filters/null_types.h"
+#include "message_filters/message_event.h"
+#include "message_filters/signal9.h"
 
 namespace message_filters
 {
@@ -396,6 +396,6 @@ struct PolicyBase
   typedef typename std::tuple_element<8, Events>::type M8Event;
 };
 
-} // namespace message_filters
+}  // namespace message_filters
 
-#endif // MESSAGE_FILTERS_SYNCHRONIZER_H
+#endif  // MESSAGE_FILTERS__SYNCHRONIZER_H_

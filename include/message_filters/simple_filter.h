@@ -32,14 +32,16 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS_SIMPLE_FILTER_H
-#define MESSAGE_FILTERS_SIMPLE_FILTER_H
+#ifndef MESSAGE_FILTERS__SIMPLE_FILTER_H_
+#define MESSAGE_FILTERS__SIMPLE_FILTER_H_
+
 #include <functional>
 #include <memory>
-#include "connection.h"
-#include "signal1.h"
-#include "message_event.h"
 #include <string>
+
+#include "message_filters/connection.h"
+#include "message_filters/signal1.h"
+#include "message_filters/message_event.h"
 
 namespace message_filters
 {
@@ -139,6 +141,6 @@ private:
   std::string name_;
 };
 
-}
+}  // namespace message_filters
 
-#endif
+#endif  // MESSAGE_FILTERS__SIMPLE_FILTER_H_

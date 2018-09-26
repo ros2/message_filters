@@ -32,8 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS_CACHE_H_
-#define MESSAGE_FILTERS_CACHE_H_
+#ifndef MESSAGE_FILTERS__CACHE_H_
+#define MESSAGE_FILTERS__CACHE_H_
 
 #include <deque>
 #include <memory>
@@ -41,9 +41,9 @@
 
 #include <rclcpp/rclcpp.hpp>
 
-#include "connection.h"
-#include "simple_filter.h"
-#include "message_traits.h"
+#include "message_filters/connection.h"
+#include "message_filters/simple_filter.h"
+#include "message_filters/message_traits.h"
 
 namespace message_filters
 {
@@ -336,8 +336,6 @@ private:
 
   Connection incoming_connection_;
 };
+}  // namespace message_filters;
 
-}
-
-
-#endif /* MESSAGE_FILTERS_CACHE_H_ */
+#endif  // MESSAGE_FILTERS__CACHE_H_

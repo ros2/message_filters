@@ -25,12 +25,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MESSAGE_FILTERS_PARAMETER_ADAPTER_H
-#define MESSAGE_FILTERS_PARAMETER_ADAPTER_H
+#ifndef MESSAGE_FILTERS__PARAMETER_ADAPTER_H_
+#define MESSAGE_FILTERS__PARAMETER_ADAPTER_H_
 
-#include "message_event.h"
 #include <memory>
 #include <type_traits>
+
+#include "message_filters/message_event.h"
 
 namespace message_filters
 {
@@ -173,6 +174,6 @@ struct ParameterAdapter<const MessageEvent<M>& >
   }
 };
 
-}
+}  // namespace message_filters
 
-#endif // MESSAGE_FILTERS_PARAMETER_ADAPTER_H
+#endif // MESSAGE_FILTERS__PARAMETER_ADAPTER_H_
