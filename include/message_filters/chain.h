@@ -165,7 +165,7 @@ public:
       filter->connectInput(*filters_.back().passthrough);
     }
 
-    uint32_t count = filters_.size();
+    size_t count = filters_.size();
     filters_.push_back(info);
     return count;
   }

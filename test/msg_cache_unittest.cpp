@@ -135,7 +135,7 @@ TEST(Cache, easySurroundingInterval)
 }
 
 
-std::shared_ptr<Msg const> buildMsg(double time, int data)
+std::shared_ptr<Msg const> buildMsg(int32_t time, int data)
 {
   Msg* msg = new Msg ;
   msg->data = data ;
@@ -149,11 +149,11 @@ TEST(Cache, easyUnsorted)
 {
   Cache<Msg> cache(10) ;
 
-  cache.add(buildMsg(10.0, 1)) ;
-  cache.add(buildMsg(30.0, 3)) ;
-  cache.add(buildMsg(70.0, 7)) ;
-  cache.add(buildMsg( 5.0, 0)) ;
-  cache.add(buildMsg(20.0, 2)) ;
+  cache.add(buildMsg(10, 1)) ;
+  cache.add(buildMsg(30, 3)) ;
+  cache.add(buildMsg(70, 7)) ;
+  cache.add(buildMsg( 5, 0)) ;
+  cache.add(buildMsg(20, 2)) ;
 
   vector<std::shared_ptr<Msg const> > interval_data = cache.getInterval(rclcpp::Time(3, 0), rclcpp::Time(15, 0)) ;
 
@@ -179,16 +179,16 @@ TEST(Cache, easyElemBeforeAfter)
 
   fillCacheEasy(cache, 5, 10) ;
 
-  elem_ptr = cache.getElemAfterTime( rclcpp::Time(85.0, 0)) ;
+  elem_ptr = cache.getElemAfterTime( rclcpp::Time(85, 0)) ;
 
   ASSERT_FALSE(!elem_ptr) ;
   EXPECT_EQ(elem_ptr->data, 9) ;
 
-  elem_ptr = cache.getElemBeforeTime( rclcpp::Time(85.0, 0)) ;
+  elem_ptr = cache.getElemBeforeTime( rclcpp::Time(85, 0)) ;
   ASSERT_FALSE(!elem_ptr) ;
   EXPECT_EQ(elem_ptr->data, 8) ;
 
-  elem_ptr = cache.getElemBeforeTime( rclcpp::Time(45.0, 0)) ;
+  elem_ptr = cache.getElemBeforeTime( rclcpp::Time(45, 0)) ;
   EXPECT_TRUE(!elem_ptr) ;
 }
 

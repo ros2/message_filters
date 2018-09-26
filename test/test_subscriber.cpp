@@ -68,7 +68,7 @@ TEST(Subscriber, simple)
   auto pub = node->create_publisher<Msg>("test_topic");
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
-  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1.0, 0))
+  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
   {
     pub->publish(std::make_shared<Msg>());
     rclcpp::Rate(50).sleep();
@@ -91,7 +91,7 @@ TEST(Subscriber, subUnsubSub)
 
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
-  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1.0, 0))
+  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
   {
     pub->publish(std::make_shared<Msg>());
     rclcpp::Rate(50).sleep();
@@ -112,7 +112,7 @@ TEST(Subscriber, subInChain)
 
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
-  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1.0, 0))
+  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
   {
     pub->publish(std::make_shared<Msg>());
     rclcpp::Rate(50).sleep();
