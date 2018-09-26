@@ -108,6 +108,11 @@ if(BUILD_TESTING)
     target_link_libraries(${PROJECT_NAME}-test_fuzz ${PROJECT_NAME})
   endif()
 
+  # python tests with python interfaces of message filters
+  find_package(ament_cmake_pytest REQUIRED)
+  ament_add_pytest_test(directed.py "test/directed.py")
+  ament_add_pytest_test(test_approxsync.py "test/test_approxsync.py")
+  ament_add_pytest_test(test_message_filters_cache.py "test/test_message_filters_cache.py")
 endif()
 
 ament_package()

@@ -13,8 +13,7 @@
 #
 #    wide.registerCallback(boost::bind(&PersonDataRecorder::wideCB, this, _1, _2, _3, _4));
 
-import rostest
-import rospy
+import rclpy
 import random
 import unittest
 
@@ -55,7 +54,8 @@ class TestDirected(unittest.TestCase):
                 m1.signalMessage(msg1)
                 self.assertEqual(self.collector, [(msg0, msg1)])
 
-        # Scramble sequences of length N.  Make sure that TimeSequencer recombines them.
+        # Scramble sequences of length N.
+        # Make sure that TimeSequencer recombines them.
         random.seed(0)
         for N in range(1, 10):
             m0 = MockFilter()
@@ -74,9 +74,6 @@ class TestDirected(unittest.TestCase):
             self.assertEqual(set(self.collector), set(zip(seq0, seq1)))
 
 if __name__ == '__main__':
-   if 0:
-        rostest.unitrun('message_filters', 'directed', TestDirected)
-   else:
-        suite = unittest.TestSuite()
-        suite.addTest(TestDirected('test_synchronizer'))
-        unittest.TextTestRunner(verbosity=2).run(suite)
+    suite = unittest.TestSuite()
+    suite.addTest(TestDirected('test_synchronizer'))
+    unittest.TextTestRunner(verbosity=2).run(suite)
