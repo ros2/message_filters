@@ -55,7 +55,7 @@ protected:
 /**
  * \brief Encapsulates a connection from one filter to another (or to a user-specified callback)
  */
-class MESSAGE_FILTERS_DECL Connection
+class MESSAGE_FILTERS_PUBLIC Connection
 {
 public:
   typedef std::function<void(void)> VoidDisconnectFunction;

@@ -117,25 +117,25 @@ struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   template<class C>
   Connection registerDropCallback(const C& callback)
   {
-    return drop_signal_.template addCallback(callback);
+    return drop_signal_.addCallback(callback);
   }
 
   template<class C>
   Connection registerDropCallback(C& callback)
   {
-    return drop_signal_.template addCallback(callback);
+    return drop_signal_.addCallback(callback);
   }
 
   template<class C, typename T>
   Connection registerDropCallback(const C& callback, T* t)
   {
-    return drop_signal_.template addCallback(callback, t);
+    return drop_signal_.addCallback(callback, t);
   }
 
   template<class C, typename T>
   Connection registerDropCallback(C& callback, T* t)
   {
-    return drop_signal_.template addCallback(callback, t);
+    return drop_signal_.addCallback(callback, t);
   }
 
 private:
