@@ -12,7 +12,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake_python REQUIRED)
-find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_ros REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcutils)
 find_package(builtin_interfaces REQUIRED)
@@ -24,12 +24,6 @@ if(WIN32)
     PRIVATE "MESSAGE_FILTERS_BUILDING_DLL")
 endif()
 target_include_directories(${PROJECT_NAME} PUBLIC include)
-
-if(BUILD_SHARED_LIBS)
-  set(${PROJECT_NAME}_LIBRARY_TYPE "SHARED")
-else()
-  set(${PROJECT_NAME}_LIBRARY_TYPE "STATIC")
-endif()
 
 ament_target_dependencies(${PROJECT_NAME}
   "rclcpp"
@@ -45,8 +39,8 @@ install(
 )
 
 install(
-DIRECTORY "include/"
-DESTINATION include
+  DIRECTORY "include/"
+  DESTINATION include
 )
 
 find_package(python_cmake_module REQUIRED)

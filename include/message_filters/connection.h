@@ -55,18 +55,18 @@ protected:
 /**
  * \brief Encapsulates a connection from one filter to another (or to a user-specified callback)
  */
-class MESSAGE_FILTERS_PUBLIC Connection
+class Connection
 {
 public:
-  typedef std::function<void(void)> VoidDisconnectFunction;
-  typedef std::function<void(const Connection&)> WithConnectionDisconnectFunction;
-  Connection() {}
-  Connection(const VoidDisconnectFunction& func);
+  using VoidDisconnectFunction = std::function<void(void)>;
+  using WithConnectionDisconnectFunction = std::function<void(const Connection&)>;
+  MESSAGE_FILTERS_PUBLIC Connection() {}
+  MESSAGE_FILTERS_PUBLIC Connection(const VoidDisconnectFunction& func);
 
   /**
    * \brief disconnects this connection
    */
-  void disconnect();
+  MESSAGE_FILTERS_PUBLIC void disconnect();
 
 private:
   VoidDisconnectFunction void_disconnect_;
