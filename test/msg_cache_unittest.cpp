@@ -135,11 +135,11 @@ TEST(Cache, easySurroundingInterval)
 }
 
 
-std::shared_ptr<Msg const> buildMsg(int32_t time, int data)
+std::shared_ptr<Msg const> buildMsg(int32_t seconds, int data)
 {
   Msg* msg = new Msg ;
   msg->data = data ;
-  msg->header.stamp = rclcpp::Time(time, 0) ;
+  msg->header.stamp = rclcpp::Time(seconds, 0) ;
 
   std::shared_ptr<Msg const> msg_ptr(msg) ;
   return msg_ptr ;
