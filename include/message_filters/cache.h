@@ -170,7 +170,7 @@ public:
     std::lock_guard<std::mutex> lock(cache_lock_);
 
     // Find the starting index. (Find the first index after [or at] the start of the interval)
-    unsigned int start_index = 0 ;
+    size_t start_index = 0 ;
     while(start_index < cache_.size() &&
           mt::TimeStamp<M>::value(*cache_[start_index].getMessage()) < start)
     {
@@ -178,7 +178,7 @@ public:
     }
 
     // Find the ending index. (Find the first index after the end of interval)
-    unsigned int end_index = start_index ;
+    size_t end_index = start_index ;
     while(end_index < cache_.size() &&
           mt::TimeStamp<M>::value(*cache_[end_index].getMessage()) <= end)
     {
@@ -187,7 +187,7 @@ public:
 
     std::vector<MConstPtr> interval_elems ;
     interval_elems.reserve(end_index - start_index) ;
-    for (unsigned int i=start_index; i<end_index; i++)
+    for (size_t i=start_index; i<end_index; i++)
     {
       interval_elems.push_back(cache_[i].getMessage()) ;
     }
@@ -208,14 +208,15 @@ public:
 
     std::lock_guard<std::mutex> lock(cache_lock_);
     // Find the starting index. (Find the first index after [or at] the start of the interval)
-    size_t start_index = cache_.size() - 1;
+    int start_index = static_cast<int>(cache_.size()) - 1;
     while(start_index > 0 &&
           mt::TimeStamp<M>::value(*cache_[start_index].getMessage()) > start)
     {
       start_index--;
     }
-    size_t end_index = start_index;
-    while(end_index < cache_.size()-1 &&
+
+    int end_index = start_index;
+    while(end_index < static_cast<int>(cache_.size()) - 1 &&
           mt::TimeStamp<M>::value(*cache_[end_index].getMessage()) < end)
     {
       end_index++;
@@ -223,7 +224,7 @@ public:
 
     std::vector<MConstPtr> interval_elems;
     interval_elems.reserve(end_index - start_index + 1) ;
-    for (size_t i=start_index; i<=end_index; i++)
+    for (int i=start_index; i<=end_index; i++)
     {
       interval_elems.push_back(cache_[i].getMessage()) ;
     }
@@ -272,12 +273,12 @@ public:
 
     MConstPtr out ;
 
-    size_t i=cache_.size()-1 ;
+    int i = static_cast<int>(cache_.size()) - 1 ;
     int elem_index = -1 ;
     while (i>=0 &&
         mt::TimeStamp<M>::value(*cache_[i].getMessage()) > time)
     {
-      elem_index = static_cast<int>(i) ;
+      elem_index = i ;
       i-- ;
     }
 
