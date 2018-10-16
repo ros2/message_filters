@@ -32,19 +32,20 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS_SYNC_EXACT_TIME_H
-#define MESSAGE_FILTERS_SYNC_EXACT_TIME_H
+#ifndef MESSAGE_FILTERS__SYNC_EXACT_TIME_H_
+#define MESSAGE_FILTERS__SYNC_EXACT_TIME_H_
 
-#include "message_filters/synchronizer.h"
-#include "message_filters/connection.h"
-#include "message_filters/null_types.h"
-#include "message_filters/signal9.h"
-#include "message_filters/message_traits.h"
-
-#include <rclcpp/rclcpp.hpp>
 #include <deque>
 #include <string>
 #include <tuple>
+
+#include <rclcpp/rclcpp.hpp>
+
+#include "message_filters/connection.h"
+#include "message_filters/message_traits.h"
+#include "message_filters/null_types.h"
+#include "message_filters/signal9.h"
+#include "message_filters/synchronizer.h"
 
 namespace message_filters
 {
@@ -116,25 +117,25 @@ struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   template<class C>
   Connection registerDropCallback(const C& callback)
   {
-    return drop_signal_.template addCallback(callback);
+    return drop_signal_.addCallback(callback);
   }
 
   template<class C>
   Connection registerDropCallback(C& callback)
   {
-    return drop_signal_.template addCallback(callback);
+    return drop_signal_.addCallback(callback);
   }
 
   template<class C, typename T>
   Connection registerDropCallback(const C& callback, T* t)
   {
-    return drop_signal_.template addCallback(callback, t);
+    return drop_signal_.addCallback(callback, t);
   }
 
   template<class C, typename T>
   Connection registerDropCallback(C& callback, T* t)
   {
-    return drop_signal_.template addCallback(callback, t);
+    return drop_signal_.addCallback(callback, t);
   }
 
 private:
@@ -220,8 +221,8 @@ private:
   std::mutex mutex_;
 };
 
-} // namespace sync
-} // namespace message_filters
+}  // namespace sync_policies
+}  // namespace message_filters
 
-#endif // MESSAGE_FILTERS_SYNC_EXACT_TIME_H
+#endif  // MESSAGE_FILTERS__SYNC_EXACT_TIME_H_
 

@@ -37,7 +37,6 @@
 namespace message_filters
 {
 
-
 Connection::Connection(const VoidDisconnectFunction& func)
 : void_disconnect_(func)
 {
@@ -55,4 +54,4 @@ void Connection::disconnect()
   }
 }
 
-}
+}  // namespace message_filters

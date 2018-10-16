@@ -12,14 +12,19 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake_python REQUIRED)
-find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_ros REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcutils)
 find_package(builtin_interfaces REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
-include_directories(include)
-add_library(${PROJECT_NAME} SHARED src/connection.cpp)
+add_library(${PROJECT_NAME} src/connection.cpp)
+if(WIN32)
+  target_compile_definitions(${PROJECT_NAME}
+    PRIVATE "MESSAGE_FILTERS_BUILDING_DLL")
+endif()
+target_include_directories(${PROJECT_NAME} PUBLIC include)
+
 ament_target_dependencies(${PROJECT_NAME}
   "rclcpp"
   "rcutils"
@@ -34,8 +39,8 @@ install(
 )
 
 install(
-DIRECTORY "include/"
-DESTINATION include
+  DIRECTORY "include/"
+  DESTINATION include
 )
 
 find_package(python_cmake_module REQUIRED)
@@ -61,7 +66,6 @@ if(BUILD_TESTING)
   if(TARGET ${PROJECT_NAME}-test_simple)
     target_link_libraries(${PROJECT_NAME}-test_simple ${PROJECT_NAME})
   endif()
-
 
   ament_add_gtest(${PROJECT_NAME}-msg_cache_unittest test/msg_cache_unittest.cpp)
   if(TARGET ${PROJECT_NAME}-msg_cache_unittest)

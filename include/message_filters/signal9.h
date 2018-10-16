@@ -32,16 +32,17 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS_SIGNAL9_H
-#define MESSAGE_FILTERS_SIGNAL9_H
+#ifndef MESSAGE_FILTERS__SIGNAL9_H_
+#define MESSAGE_FILTERS__SIGNAL9_H_
 
 
 #include <functional>
 #include <mutex>
-#include "connection.h"
-#include "null_types.h"
-#include "message_event.h"
-#include "parameter_adapter.h"
+
+#include "message_filters/connection.h"
+#include "message_filters/null_types.h"
+#include "message_filters/message_event.h"
+#include "message_filters/parameter_adapter.h"
 
 namespace message_filters
 {
@@ -324,6 +325,6 @@ private:
   V_CallbackHelper9 callbacks_;
 };
 
-} // message_filters
+}  // namespace message_filters
 
-#endif // MESSAGE_FILTERS_SIGNAL9_H
+#endif // MESSAGE_FILTERS__SIGNAL9_H_

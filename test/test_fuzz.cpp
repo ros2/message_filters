@@ -85,7 +85,7 @@ TEST(TimeSequencer, fuzz_sequencer)
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
   auto msg = std::make_shared<Msg>();
-  while ((ros_clock.now() - start) < rclcpp::Duration(5.0, 0)) {
+  while ((ros_clock.now() - start) < rclcpp::Duration(5, 0)) {
     h.count_ = 0;
     fuzz_msg(msg);
     msg->header.stamp = ros_clock.now();
@@ -110,7 +110,7 @@ TEST(TimeSynchronizer, fuzz_synchronizer)
   auto start = ros_clock.now();
   auto msg1 = std::make_shared<Msg>();
   auto msg2 = std::make_shared<Msg>();
-  while ((ros_clock.now() - start) < rclcpp::Duration(5.0, 0))
+  while ((ros_clock.now() - start) < rclcpp::Duration(5, 0))
   {
     h.count_ = 0;
     fuzz_msg(msg1);
@@ -135,7 +135,7 @@ TEST(Subscriber, fuzz_subscriber)
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
   auto msg = std::make_shared<Msg>();
-  while ((ros_clock.now() - start) < rclcpp::Duration(5.0, 0))
+  while ((ros_clock.now() - start) < rclcpp::Duration(5, 0))
   {
     h.count_ = 0;
     fuzz_msg(msg);

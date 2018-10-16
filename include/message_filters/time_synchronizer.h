@@ -35,11 +35,11 @@
 #ifndef MESSAGE_FILTERS_TIME_SYNCHRONIZER_H
 #define MESSAGE_FILTERS_TIME_SYNCHRONIZER_H
 
-#include "synchronizer.h"
-#include "sync_policies/exact_time.h"
-
 #include <memory>
-#include "message_event.h"
+
+#include "message_filters/message_event.h"
+#include "message_filters/synchronizer.h"
+#include "message_filters/sync_policies/exact_time.h"
 
 namespace message_filters
 {
@@ -221,6 +221,6 @@ public:
   }
 };
 
-}
+}  // namespace message_filters
 
-#endif // MESSAGE_FILTERS_TIME_SYNCHRONIZER_H
+#endif  // MESSAGE_FILTERS__TIME_SYNCHRONIZER_H_

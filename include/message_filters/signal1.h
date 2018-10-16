@@ -32,15 +32,15 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS_SIGNAL1_H
-#define MESSAGE_FILTERS_SIGNAL1_H
+#ifndef MESSAGE_FILTERS__SIGNAL1_H_
+#define MESSAGE_FILTERS__SIGNAL1_H_
 
 #include <memory>
-#include "connection.h"
-#include "message_event.h"
-#include "parameter_adapter.h"
-
 #include <mutex>
+
+#include "message_filters/connection.h"
+#include "message_filters/message_event.h"
+#include "message_filters/parameter_adapter.h"
 
 namespace message_filters
 {
@@ -122,9 +122,6 @@ private:
   std::mutex mutex_;
   V_CallbackHelper1 callbacks_;
 };
+}  // message_filters
 
-} // message_filters
-
-#endif // MESSAGE_FILTERS_SIGNAL1_H
-
-
+#endif  // MESSAGE_FILTERS__SIGNAL1_H_
