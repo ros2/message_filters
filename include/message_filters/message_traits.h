@@ -53,8 +53,8 @@ struct HasHeader<M, decltype((void) M::header)> : std::true_type {};
 template<typename M, typename Enable = void>
 struct FrameId
 {
-  static std::string* pointer(M& m) { (void)m; return 0; }
-  static std::string const* pointer(const M& m) { (void)m; return 0; }
+  static std::string* pointer(M& m) { (void)m; return nullptr; }
+  static std::string const* pointer(const M& m) { (void)m; return nullptr; }
 };
  template<typename M>
 struct FrameId<M, typename std::enable_if<HasHeader<M>::value>::type >
