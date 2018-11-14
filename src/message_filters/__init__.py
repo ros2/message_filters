@@ -133,7 +133,7 @@ class Cache(SimpleFilter):
 
             stamp = ROSClock().now()
         else:
-            stamp = msg.header.stamp
+            stamp = Time.from_msg(msg.header.stamp)
 
         # Insert sorted
         self.cache_times.append(stamp)
@@ -269,7 +269,7 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
 
             stamp = ROSClock().now()
         else:
-            stamp = msg.header.stamp
+            stamp = Time.from_msg(msg.header.stamp)
 
         self.lock.acquire()
         my_queue[stamp.nanoseconds] = msg
