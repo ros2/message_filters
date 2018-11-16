@@ -144,23 +144,9 @@ public:
    */
   void subscribe(rclcpp::Node::SharedPtr node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
   {
-    unsubscribe();
-
-    if (!topic.empty())
-    {
-      topic_ = topic;
-      qos_ = qos;
-      sub_ = node->create_subscription<M>(topic,
-               [this](std::shared_ptr<M const> msg) {
-                 this->cb(EventType(msg));
-               }, qos);
-
-      // The subscriber is switching to using a shared pointer, so relase the raw.
-      if (node_raw_ != nullptr) {
-        node_raw_ = nullptr;
-      }
-      node_shared_ = node;
-    }
+    subscribe(node.get(), topic, qos);
+    node_raw_ = nullptr;
+    node_shared_ = node;
   }
 
   /**
@@ -185,11 +171,6 @@ public:
                  this->cb(EventType(msg));
                }, qos);
 
-      // The subscriber is switching to using a raw pointer, so release the shared.
-      if (node_shared_ != nullptr) {
-        node_shared_.reset();
-      }
-
       node_raw_ = node;
     }
   }
@@ -199,8 +180,6 @@ public:
    */
   void subscribe()
   {
-    unsubscribe();
-
     if (!topic_.empty())
     {
       if (node_raw_ != nullptr) {

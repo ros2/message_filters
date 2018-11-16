@@ -166,7 +166,6 @@ TEST(Subscriber, switchRawAndShared)
   ASSERT_GT(h.count_, 0);
 }
 
-
 TEST(Subscriber, subInChain)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
