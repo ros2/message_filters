@@ -68,7 +68,26 @@ TEST(Subscriber, simple)
   auto pub = node->create_publisher<Msg>("test_topic");
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
-  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
+  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1.0, 0))
+  {
+    pub->publish(std::make_shared<Msg>());
+    rclcpp::Rate(50).sleep();
+    rclcpp::spin_some(node);
+  }
+
+  ASSERT_GT(h.count_, 0);
+}
+
+TEST(Subscriber, simple_raw)
+{
+  auto node = std::make_shared<rclcpp::Node>("test_node");
+  Helper h;
+  Subscriber<Msg> sub(node.get(), "test_topic");
+  sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
+  auto pub = node->create_publisher<Msg>("test_topic");
+  rclcpp::Clock ros_clock;
+  auto start = ros_clock.now();
+  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1.0, 0))
   {
     pub->publish(std::make_shared<Msg>());
     rclcpp::Rate(50).sleep();
@@ -91,7 +110,7 @@ TEST(Subscriber, subUnsubSub)
 
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
-  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
+  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1.0, 0))
   {
     pub->publish(std::make_shared<Msg>());
     rclcpp::Rate(50).sleep();
@@ -100,6 +119,53 @@ TEST(Subscriber, subUnsubSub)
 
   ASSERT_GT(h.count_, 0);
 }
+
+TEST(Subscriber, subUnsubSub_raw)
+{
+  auto node = std::make_shared<rclcpp::Node>("test_node");
+  Helper h;
+  Subscriber<Msg> sub(node.get(), "test_topic");
+  sub.registerCallback(std::bind(&Helper::cb, &h,  std::placeholders::_1));
+  auto pub = node->create_publisher<Msg>("test_topic");
+
+  sub.unsubscribe();
+  sub.subscribe();
+
+  rclcpp::Clock ros_clock;
+  auto start = ros_clock.now();
+  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1.0, 0))
+  {
+    pub->publish(std::make_shared<Msg>());
+    rclcpp::Rate(50).sleep();
+    rclcpp::spin_some(node);
+  }
+
+  ASSERT_GT(h.count_, 0);
+}
+
+TEST(Subscriber, switchRawAndShared)
+{
+  auto node = std::make_shared<rclcpp::Node>("test_node");
+  Helper h;
+  Subscriber<Msg> sub(node, "test_topic");
+  sub.registerCallback(std::bind(&Helper::cb, &h,  std::placeholders::_1));
+  auto pub = node->create_publisher<Msg>("test_topic2");
+
+  sub.unsubscribe();
+  sub.subscribe(node.get(), "test_topic2");
+
+  rclcpp::Clock ros_clock;
+  auto start = ros_clock.now();
+  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1.0, 0))
+  {
+    pub->publish(std::make_shared<Msg>());
+    rclcpp::Rate(50).sleep();
+    rclcpp::spin_some(node);
+  }
+
+  ASSERT_GT(h.count_, 0);
+}
+
 
 TEST(Subscriber, subInChain)
 {
@@ -112,7 +178,7 @@ TEST(Subscriber, subInChain)
 
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
-  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
+  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1.0, 0))
   {
     pub->publish(std::make_shared<Msg>());
     rclcpp::Rate(50).sleep();
