@@ -35,6 +35,7 @@ import itertools
 import threading
 import rclpy
 
+import builtin_interfaces
 from rclpy.clock import ROSClock
 from rclpy.duration import Duration
 from rclpy.logging import LoggingSeverity
@@ -134,7 +135,8 @@ class Cache(SimpleFilter):
             stamp = ROSClock().now()
         else:
             stamp = msg.header.stamp
-
+            if not hasattr(stamp, 'nanoseconds'):
+                stamp = Time.from_msg(stamp)
         # Insert sorted
         self.cache_times.append(stamp)
         self.cache_msgs.append(msg)
@@ -270,7 +272,9 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
             stamp = ROSClock().now()
         else:
             stamp = msg.header.stamp
-
+            if not hasattr(stamp, 'nanoseconds'):
+                stamp = Time.from_msg(stamp)
+            # print(stamp)
         self.lock.acquire()
         my_queue[stamp.nanoseconds] = msg
         while len(my_queue) > self.queue_size:
