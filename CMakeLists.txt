@@ -83,8 +83,9 @@ if(BUILD_TESTING)
 
   ament_add_gtest(${PROJECT_NAME}-test_subscriber test/test_subscriber.cpp)
   if(TARGET ${PROJECT_NAME}-test_subscriber)
-    target_link_libraries(${PROJECT_NAME}-test_subscriber ${PROJECT_NAME} sensor_msgs_LIBRARIES)
-    target_include_directories(${PROJECT_NAME}-test_subscriber PUBLIC sensor_msgs_INCLUDE_DIRS)
+    target_link_libraries(${PROJECT_NAME}-test_subscriber ${PROJECT_NAME})
+    target_include_directories(${PROJECT_NAME}-test_subscriber PUBLIC include)
+    ament_target_dependencies(${PROJECT_NAME}-test_subscriber "rclcpp" "sensor_msgs")
   endif()
 
   ament_add_gtest(${PROJECT_NAME}-test_synchronizer test/test_synchronizer.cpp)
@@ -109,9 +110,9 @@ if(BUILD_TESTING)
 
   ament_add_gtest(${PROJECT_NAME}-test_fuzz test/test_fuzz.cpp SKIP_TEST)
   if(TARGET ${PROJECT_NAME}-test_fuzz)
-    target_link_libraries(${PROJECT_NAME}-test_fuzz ${PROJECT_NAME} sensor_msgs_LIBRARIES)
-    target_include_directories(${PROJECT_NAME}-test_fuzz PUBLIC sensor_msgs_INCLUDE_DIRS)
-
+    target_link_libraries(${PROJECT_NAME}-test_fuzz ${PROJECT_NAME})
+    target_include_directories(${PROJECT_NAME}-test_fuzz PUBLIC include)
+    ament_target_dependencies(${PROJECT_NAME}-test_fuzz "rclcpp" "sensor_msgs")
   endif()
 
   # python tests with python interfaces of message filters
