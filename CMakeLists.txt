@@ -16,7 +16,6 @@ find_package(ament_cmake_ros REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcutils)
 find_package(builtin_interfaces REQUIRED)
-find_package(sensor_msgs REQUIRED)
 
 add_library(${PROJECT_NAME} src/connection.cpp)
 if(WIN32)
@@ -29,7 +28,7 @@ ament_target_dependencies(${PROJECT_NAME}
   "rclcpp"
   "rcutils"
   "builtin_interfaces"
-  "sensor_msgs")
+  )
 
 install(
   TARGETS ${PROJECT_NAME}
@@ -56,8 +55,8 @@ ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
 
 if(BUILD_TESTING)
+  find_package(sensor_msgs REQUIRED)
   find_package(ament_lint_auto REQUIRED)
-  find_package(std_msgs REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
   find_package(ament_cmake_gtest)
@@ -85,6 +84,8 @@ if(BUILD_TESTING)
   ament_add_gtest(${PROJECT_NAME}-test_subscriber test/test_subscriber.cpp)
   if(TARGET ${PROJECT_NAME}-test_subscriber)
     target_link_libraries(${PROJECT_NAME}-test_subscriber ${PROJECT_NAME})
+    target_include_directories(${PROJECT_NAME}-test_subscriber PUBLIC include)
+    ament_target_dependencies(${PROJECT_NAME}-test_subscriber "rclcpp" "sensor_msgs")
   endif()
 
   ament_add_gtest(${PROJECT_NAME}-test_synchronizer test/test_synchronizer.cpp)
@@ -110,6 +111,8 @@ if(BUILD_TESTING)
   ament_add_gtest(${PROJECT_NAME}-test_fuzz test/test_fuzz.cpp SKIP_TEST)
   if(TARGET ${PROJECT_NAME}-test_fuzz)
     target_link_libraries(${PROJECT_NAME}-test_fuzz ${PROJECT_NAME})
+    target_include_directories(${PROJECT_NAME}-test_fuzz PUBLIC include)
+    ament_target_dependencies(${PROJECT_NAME}-test_fuzz "rclcpp" "sensor_msgs")
   endif()
 
   # python tests with python interfaces of message filters
