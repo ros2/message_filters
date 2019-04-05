@@ -115,11 +115,24 @@ if(BUILD_TESTING)
     ament_target_dependencies(${PROJECT_NAME}-test_fuzz "rclcpp" "sensor_msgs")
   endif()
 
+  # Provides PYTHON_EXECUTABLE_DEBUG
+  find_package(python_cmake_module REQUIRED)
+  find_package(PythonExtra REQUIRED)
+  set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
+  if(WIN32)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+      set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE_DEBUG}")
+    endif()
+  endif()
+
   # python tests with python interfaces of message filters
   find_package(ament_cmake_pytest REQUIRED)
-  ament_add_pytest_test(directed.py "test/directed.py")
-  ament_add_pytest_test(test_approxsync.py "test/test_approxsync.py")
-  ament_add_pytest_test(test_message_filters_cache.py "test/test_message_filters_cache.py")
+  ament_add_pytest_test(directed.py "test/directed.py"
+    PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}")
+  ament_add_pytest_test(test_approxsync.py "test/test_approxsync.py"
+    PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}")
+  ament_add_pytest_test(test_message_filters_cache.py "test/test_message_filters_cache.py"
+    PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}")
 endif()
 
 ament_package()
