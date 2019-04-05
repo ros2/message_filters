@@ -116,7 +116,6 @@ if(BUILD_TESTING)
   endif()
 
   # Provides PYTHON_EXECUTABLE_DEBUG
-  find_package(python_cmake_module REQUIRED)
   find_package(PythonExtra REQUIRED)
   set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
   if(WIN32)
