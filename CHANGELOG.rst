@@ -2,6 +2,12 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.0 (2019-04-14)
+------------------
+* Added direct dependency on python_cmake_module. (`#19 <https://github.com/ros2/message_filters/issues/19>`_)
+* Updated to use Python debug interpreter on Windows. (`#18 <https://github.com/ros2/message_filters/issues/18>`_)
+* Contributors: Dirk Thomas, Steven! Ragnarök
+
 3.0.0 (2018-11-22)
 ------------------
 * Move sensor_msgs to be a test dependency. (`#17 <https://github.com/ros2/message_filters/issues/17>`_)
