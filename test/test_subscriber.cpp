@@ -70,7 +70,7 @@ TEST(Subscriber, simple)
   auto start = ros_clock.now();
   while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
   {
-    pub->publish(std::make_shared<Msg>());
+    pub->publish(Msg());
     rclcpp::Rate(50).sleep();
     rclcpp::spin_some(node);
   }
@@ -89,7 +89,7 @@ TEST(Subscriber, simple_raw)
   auto start = ros_clock.now();
   while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
   {
-    pub->publish(std::make_shared<Msg>());
+    pub->publish(Msg());
     rclcpp::Rate(50).sleep();
     rclcpp::spin_some(node);
   }
@@ -112,7 +112,7 @@ TEST(Subscriber, subUnsubSub)
   auto start = ros_clock.now();
   while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
   {
-    pub->publish(std::make_shared<Msg>());
+    pub->publish(Msg());
     rclcpp::Rate(50).sleep();
     rclcpp::spin_some(node);
   }
@@ -135,7 +135,7 @@ TEST(Subscriber, subUnsubSub_raw)
   auto start = ros_clock.now();
   while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
   {
-    pub->publish(std::make_shared<Msg>());
+    pub->publish(Msg());
     rclcpp::Rate(50).sleep();
     rclcpp::spin_some(node);
   }
@@ -158,7 +158,7 @@ TEST(Subscriber, switchRawAndShared)
   auto start = ros_clock.now();
   while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
   {
-    pub->publish(std::make_shared<Msg>());
+    pub->publish(Msg());
     rclcpp::Rate(50).sleep();
     rclcpp::spin_some(node);
   }
@@ -179,7 +179,7 @@ TEST(Subscriber, subInChain)
   auto start = ros_clock.now();
   while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
   {
-    pub->publish(std::make_shared<Msg>());
+    pub->publish(Msg());
     rclcpp::Rate(50).sleep();
     rclcpp::spin_some(node);
   }

@@ -140,7 +140,7 @@ TEST(Subscriber, fuzz_subscriber)
     h.count_ = 0;
     fuzz_msg(msg);
     msg->header.stamp = ros_clock.now();
-    pub->publish(msg);
+    pub->publish(*msg);
     rclcpp::Rate(50).sleep();
     rclcpp::spin_some(node);
     ASSERT_EQ(h.count_, 1);
