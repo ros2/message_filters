@@ -29,12 +29,13 @@
 // File imported from
 // https://github.com/ros/roscpp_core/blob/38b9663/roscpp_traits/include/ros/message_event.h
 
-#ifndef MESSAGE_FILTERS_MESSAGE_EVENT_H_
-#define MESSAGE_FILTERS_MESSAGE_EVENT_H_
+#ifndef MESSAGE_FILTERS__MESSAGE_EVENT_H_
+#define MESSAGE_FILTERS__MESSAGE_EVENT_H_
 
-#include <rclcpp/rclcpp.hpp>
 #include <type_traits>
 #include <memory>
+
+#include <rclcpp/rclcpp.hpp>
 
 #ifndef RCUTILS_ASSERT
 // TODO(tfoote) remove this after it's implemented upstream
@@ -238,7 +239,6 @@ private:
 
 template<typename M> const std::string MessageEvent<M>::s_unknown_publisher_string_("unknown_publisher");
 
+}  // namespace message_filters
 
-}
-
-#endif // MESSAGE_FILTERS_MESSAGE_EVENT_H_
+#endif  // MESSAGE_FILTERS__MESSAGE_EVENT_H_

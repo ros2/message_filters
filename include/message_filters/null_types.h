@@ -32,14 +32,15 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS_NULL_TYPES_H
-#define MESSAGE_FILTERS_NULL_TYPES_H
+#ifndef MESSAGE_FILTERS__NULL_TYPES_H_
+#define MESSAGE_FILTERS__NULL_TYPES_H_
 
-#include "connection.h"
-
-#include "message_filters/message_traits.h"
-#include <rclcpp/rclcpp.hpp>
 #include <memory>
+
+#include <rclcpp/rclcpp.hpp>
+
+#include "message_filters/connection.h"
+#include "message_filters/message_traits.h"
 
 namespace message_filters
 {
@@ -75,7 +76,7 @@ struct TimeStamp<message_filters::NullType>
     return rclcpp::Time();
   }
 };
-}
-}
+}  // namespace message_traits
+}  // namespace message_filters
 
-#endif // MESSAGE_FILTERS_NULL_TYPES_H
+#endif  // MESSAGE_FILTERS__NULL_TYPES_H_

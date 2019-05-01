@@ -28,10 +28,11 @@
 // File imported from
 // https://github.com/ros/roscpp_core/blob/38b9663/roscpp_traits/include/ros/message_traits.h
 
-#ifndef MESSAGE_FILTERS_MESSAGE_TRAITS_H_
-#define MESSAGE_FILTERS_MESSAGE_TRAITS_H_
+#ifndef MESSAGE_FILTERS__MESSAGE_TRAITS_H_
+#define MESSAGE_FILTERS__MESSAGE_TRAITS_H_
 
 #include <type_traits>
+
 #include <rclcpp/rclcpp.hpp>
 
 namespace message_filters
@@ -46,6 +47,25 @@ template<typename M, typename = void> struct HasHeader : public std::false_type 
 
 template <typename M>
 struct HasHeader<M, decltype((void) M::header)> : std::true_type {};
+
+/**
+ * \brief FrameId trait.  In the default implementation pointer()
+ * returns &m.header.frame_id if HasHeader<M>::value is true, otherwise returns NULL.  value()
+ * does not exist, and causes a compile error
+ */
+template<typename M, typename Enable = void>
+struct FrameId
+{
+  static std::string* pointer(M& m) { (void)m; return nullptr; }
+  static std::string const* pointer(const M& m) { (void)m; return nullptr; }
+};
+ template<typename M>
+struct FrameId<M, typename std::enable_if<HasHeader<M>::value>::type >
+{
+  static std::string* pointer(M& m) { return &m.header.frame_id; }
+  static std::string const* pointer(const M& m) { return &m.header.frame_id; }
+  static std::string value(const M& m) { return m.header.frame_id; }
+};
 
 /**
  * \brief TimeStamp trait.  In the default implementation pointer()
@@ -70,7 +90,8 @@ struct TimeStamp<M, typename std::enable_if<HasHeader<M>::value>::type >
   }
 };
 
-} // namespace message_traits
-} // namespace message_filters
+}  // namespace message_traits
+}  // namespace message_filters
 
-#endif // MESSAGE_FILTERS_MESSAGE_TRAITS_H_
+#endif  // MESSAGE_FILTERS__MESSAGE_TRAITS_H_
+

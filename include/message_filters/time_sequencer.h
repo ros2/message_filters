@@ -32,14 +32,14 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS_TIME_SEQUENCER_H
-#define MESSAGE_FILTERS_TIME_SEQUENCER_H
+#ifndef MESSAGE_FILTERS__TIME_SEQUENCER_H_
+#define MESSAGE_FILTERS__TIME_SEQUENCER_H_
 
 #include <rclcpp/rclcpp.hpp>
 
-#include "connection.h"
-#include "simple_filter.h"
-#include "message_traits.h"
+#include "message_filters/connection.h"
+#include "message_filters/message_traits.h"
+#include "message_filters/simple_filter.h"
 
 namespace message_filters
 {
@@ -234,6 +234,6 @@ private:
   rclcpp::Time last_time_;
 };
 
-}
+}  // namespace message_filters
 
-#endif
+#endif  // MESSAGE_FILTERS__TIME_SEQUENCER_H_

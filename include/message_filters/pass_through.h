@@ -32,12 +32,12 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS_PASSTHROUGH_H
-#define MESSAGE_FILTERS_PASSTHROUGH_H
-
-#include "simple_filter.h"
+#ifndef MESSAGE_FILTERS__PASS_THROUGH_H_
+#define MESSAGE_FILTERS__PASS_THROUGH_H_
 
 #include <vector>
+
+#include "message_filters/simple_filter.h"
 
 namespace message_filters
 {
@@ -87,6 +87,6 @@ private:
   Connection incoming_connection_;
 };
 
-} // namespace message_filters
+}  // namespace message_filters
 
-#endif // MESSAGE_FILTERS_PASSTHROUGH_H
+#endif  // MESSAGE_FILTERS__PASS_THROUGH_H_
