@@ -41,6 +41,8 @@
 #include <tuple>
 #include <vector>
 
+#include <inttypes.h>
+
 #include <rclcpp/rclcpp.hpp>
 #include <rcutils/logging_macros.h>
 
@@ -194,8 +196,8 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
     else if ((msg_time - previous_msg_time) < inter_message_lower_bounds_[i])
     {
       RCUTILS_LOG_WARN_ONCE("Messages of type %d arrived closer ("
-        "%ld ) than the lower bound you provided ("
-        "%ld) (will print only once)",
+        "%" PRId64 ") than the lower bound you provided ("
+        "%" PRId64 ") (will print only once)",
         i,
         (msg_time - previous_msg_time).nanoseconds(),
         inter_message_lower_bounds_[i].nanoseconds());
