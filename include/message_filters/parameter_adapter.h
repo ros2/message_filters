@@ -25,6 +25,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+// Imported from
+// https://github.com/ros/ros_comm/blob/a2ca01ecf31d677dd5c1b08cc6852bd0dac02b97/clients/roscpp/include/ros/parameter_adapter.h
+
 #ifndef MESSAGE_FILTERS__PARAMETER_ADAPTER_H_
 #define MESSAGE_FILTERS__PARAMETER_ADAPTER_H_
 

@@ -32,6 +32,9 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+// Initial file imported from
+// https://github.com/ros2/message_filters/blob/1866ddb86db5b5c7746556ea7544b6f34c00415b/test/time_sequencer_unittest.cpp
+
 #include <gtest/gtest.h>
 #include <random>
 

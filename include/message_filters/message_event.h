@@ -26,6 +26,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+// File imported from
+// https://github.com/ros/roscpp_core/blob/38b9663/roscpp_traits/include/ros/message_event.h
+
 #ifndef MESSAGE_FILTERS__MESSAGE_EVENT_H_
 #define MESSAGE_FILTERS__MESSAGE_EVENT_H_
 
@@ -239,4 +242,3 @@ template<typename M> const std::string MessageEvent<M>::s_unknown_publisher_stri
 }  // namespace message_filters
 
 #endif  // MESSAGE_FILTERS__MESSAGE_EVENT_H_
-

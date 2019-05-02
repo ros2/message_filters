@@ -25,6 +25,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+// File imported from
+// https://github.com/ros/roscpp_core/blob/38b9663/roscpp_traits/include/ros/message_traits.h
+
 #ifndef MESSAGE_FILTERS__MESSAGE_TRAITS_H_
 #define MESSAGE_FILTERS__MESSAGE_TRAITS_H_
 
