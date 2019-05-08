@@ -134,7 +134,7 @@ TEST(Subscriber, fuzz_subscriber)
   Helper h;
   Subscriber<Msg> sub(node, "test_topic");
   sub.registerCallback(std::bind(&Helper::cb, &h, _1));
-  auto pub = node->create_publisher<Msg>("test_topic");
+  auto pub = node->create_publisher<Msg>("test_topic", 10);
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
   auto msg = std::make_shared<Msg>();

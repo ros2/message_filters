@@ -65,7 +65,7 @@ TEST(Subscriber, simple)
   Helper h;
   Subscriber<Msg> sub(node, "test_topic");
   sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
-  auto pub = node->create_publisher<Msg>("test_topic");
+  auto pub = node->create_publisher<Msg>("test_topic", 10);
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
   while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
@@ -84,7 +84,7 @@ TEST(Subscriber, simple_raw)
   Helper h;
   Subscriber<Msg> sub(node.get(), "test_topic");
   sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
-  auto pub = node->create_publisher<Msg>("test_topic");
+  auto pub = node->create_publisher<Msg>("test_topic", 10);
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
   while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
@@ -103,7 +103,7 @@ TEST(Subscriber, subUnsubSub)
   Helper h;
   Subscriber<Msg> sub(node, "test_topic");
   sub.registerCallback(std::bind(&Helper::cb, &h,  std::placeholders::_1));
-  auto pub = node->create_publisher<Msg>("test_topic");
+  auto pub = node->create_publisher<Msg>("test_topic", 10);
 
   sub.unsubscribe();
   sub.subscribe();
@@ -126,7 +126,7 @@ TEST(Subscriber, subUnsubSub_raw)
   Helper h;
   Subscriber<Msg> sub(node.get(), "test_topic");
   sub.registerCallback(std::bind(&Helper::cb, &h,  std::placeholders::_1));
-  auto pub = node->create_publisher<Msg>("test_topic");
+  auto pub = node->create_publisher<Msg>("test_topic", 10);
 
   sub.unsubscribe();
   sub.subscribe();
@@ -149,7 +149,7 @@ TEST(Subscriber, switchRawAndShared)
   Helper h;
   Subscriber<Msg> sub(node, "test_topic");
   sub.registerCallback(std::bind(&Helper::cb, &h,  std::placeholders::_1));
-  auto pub = node->create_publisher<Msg>("test_topic2");
+  auto pub = node->create_publisher<Msg>("test_topic2", 10);
 
   sub.unsubscribe();
   sub.subscribe(node.get(), "test_topic2");
@@ -173,7 +173,7 @@ TEST(Subscriber, subInChain)
   Chain<Msg> c;
   c.addFilter(std::make_shared<Subscriber<Msg> >(node, "test_topic"));
   c.registerCallback(std::bind(&Helper::cb, &h,  std::placeholders::_1));
-  auto pub = node->create_publisher<Msg>("test_topic");
+  auto pub = node->create_publisher<Msg>("test_topic", 10);
 
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
@@ -213,7 +213,7 @@ TEST(Subscriber, singleNonConstCallback)
   NonConstHelper h;
   Subscriber<Msg> sub(node, "test_topic");
   sub.registerCallback(&NonConstHelper::cb, &h);
-  auto pub = node->create_publisher<Msg>("test_topic");
+  auto pub = node->create_publisher<Msg>("test_topic", 10);
   Msg msg;
   pub->publish(Msg());
 
@@ -231,7 +231,7 @@ TEST(Subscriber, multipleNonConstCallbacksFilterSubscriber)
   Subscriber<Msg> sub(node, "test_topic");
   sub.registerCallback(&NonConstHelper::cb, &h);
   sub.registerCallback(&NonConstHelper::cb, &h2);
-  auto pub = node->create_publisher<Msg>("test_topic");
+  auto pub = node->create_publisher<Msg>("test_topic", 10);
   auto msg = std::make_unique<Msg>();
   pub->publish(std::move(msg));
 
@@ -251,9 +251,10 @@ TEST(Subscriber, multipleCallbacksSomeFilterSomeDirect)
   NonConstHelper h, h2;
   Subscriber<Msg> sub(node, "test_topic");
   sub.registerCallback(&NonConstHelper::cb, &h);
-  auto sub2 = node->create_subscription<Msg>("test_topic", std::bind(&NonConstHelper::cb, &h2, std::placeholders::_1));
+  auto sub2 = node->create_subscription<Msg>(
+    "test_topic", 10, std::bind(&NonConstHelper::cb, &h2, std::placeholders::_1));
 
-  auto pub = node->create_publisher<Msg>("test_topic");
+  auto pub = node->create_publisher<Msg>("test_topic", 10);
   auto msg = std::make_unique<Msg>();
   pub->publish(std::move(msg));
 

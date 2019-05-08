@@ -158,6 +158,7 @@ public:
    * \param topic The topic to subscribe to.
    * \param qos (optional) The rmw qos profile to use to subscribe
    */
+  // TODO(wjwwood): deprecate in favor of API's that use `rclcpp::QoS` instead.
   void subscribe(rclcpp::Node * node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
   {
     unsubscribe();
@@ -165,11 +166,13 @@ public:
     if (!topic.empty())
     {
       topic_ = topic;
+      rclcpp::QoS rclcpp_qos(rclcpp::QoSInitialization::from_rmw(qos));
+      rclcpp_qos.get_rmw_qos_profile() = qos;
       qos_ = qos;
-      sub_ = node->create_subscription<M>(topic,
+      sub_ = node->create_subscription<M>(topic, rclcpp_qos,
                [this](std::shared_ptr<M const> msg) {
                  this->cb(EventType(msg));
-               }, qos);
+               });
 
       node_raw_ = node;
     }
