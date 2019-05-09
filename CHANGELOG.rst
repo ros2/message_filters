@@ -2,6 +2,14 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.1 (2019-05-08)
+------------------
+* changes to avoid deprecated API's (`#26 <https://github.com/ros2/message_filters/issues/26>`_)
+* Merge pull request `#25 <https://github.com/ros2/message_filters/issues/25>`_ from ros2/ivanpauno/deprecate-shared-ptr-publish
+* adding code import references in comments (`#6 <https://github.com/ros2/message_filters/issues/6>`_)
+* Make format string agree with argument type. (`#24 <https://github.com/ros2/message_filters/issues/24>`_)
+* Contributors: Steven! Ragnarök, Tully Foote, William Woodall, ivanpauno
+
 3.1.0 (2019-04-14)
 ------------------
 * Added direct dependency on python_cmake_module. (`#19 <https://github.com/ros2/message_filters/issues/19>`_)
