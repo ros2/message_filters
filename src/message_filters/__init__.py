@@ -76,8 +76,7 @@ class Subscriber(SimpleFilter):
         SimpleFilter.__init__(self)
         self.node = args[0]
         self.topic = args[2]
-        kwargs['callback'] = self.callback
-        self.sub = self.node.create_subscription(*args[1:], **kwargs)
+        self.sub = self.node.create_subscription(*args[1:], self.callback, 10, **kwargs)
 
     def callback(self, msg):
         self.signalMessage(msg)
