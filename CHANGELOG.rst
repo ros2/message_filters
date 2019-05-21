@@ -2,6 +2,12 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.2 (2019-05-20)
+------------------
+* Add .gitignore
+* Fix deprecation warning
+* Contributors: Jacob Perron
+
 3.1.1 (2019-05-08)
 ------------------
 * changes to avoid deprecated API's (`#26 <https://github.com/ros2/message_filters/issues/26>`_)
