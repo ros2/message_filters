@@ -15,6 +15,7 @@ find_package(ament_cmake_python REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcutils REQUIRED)
+find_package(rclcpp_lifecycle REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 
 add_library(${PROJECT_NAME} src/connection.cpp)
@@ -28,6 +29,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 ament_target_dependencies(${PROJECT_NAME}
   "rclcpp"
+  "rclcpp_lifecycle"
   "rcutils"
   "builtin_interfaces"
   )
@@ -89,7 +91,7 @@ if(BUILD_TESTING)
   if(TARGET ${PROJECT_NAME}-test_subscriber)
     target_link_libraries(${PROJECT_NAME}-test_subscriber ${PROJECT_NAME})
     target_include_directories(${PROJECT_NAME}-test_subscriber PUBLIC include)
-    ament_target_dependencies(${PROJECT_NAME}-test_subscriber "rclcpp" "sensor_msgs")
+    ament_target_dependencies(${PROJECT_NAME}-test_subscriber "rclcpp" "rclcpp_lifecycle" "sensor_msgs")
   endif()
 
   ament_add_gtest(${PROJECT_NAME}-test_synchronizer test/test_synchronizer.cpp)
