@@ -179,112 +179,96 @@ public:
   template<typename P0, typename P1>
   Connection addCallback(void(*callback)(P0, P1))
   {
-    using namespace std::placeholders;
-    return addCallback(std::function<void(P0, P1, NullP, NullP, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, _1, _2)));
+    return addCallback(std::function<void(P0, P1, NullP, NullP, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2)));
   }
 
   template<typename P0, typename P1, typename P2>
   Connection addCallback(void(*callback)(P0, P1, P2))
   {
-    using namespace std::placeholders;
-    return addCallback(std::function<void(P0, P1, P2, NullP, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, _1, _2, _3)));
+    return addCallback(std::function<void(P0, P1, P2, NullP, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
   }
 
   template<typename P0, typename P1, typename P2, typename P3>
   Connection addCallback(void(*callback)(P0, P1, P2, P3))
   {
-    using namespace std::placeholders;
-    return addCallback(std::function<void(P0, P1, P2, P3, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, _1, _2, _3, _4)));
+    return addCallback(std::function<void(P0, P1, P2, P3, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
   }
 
   template<typename P0, typename P1, typename P2, typename P3, typename P4>
   Connection addCallback(void(*callback)(P0, P1, P2, P3, P4))
   {
-    using namespace std::placeholders;
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, NullP, NullP, NullP, NullP)>(std::bind(callback, _1, _2, _3, _4, _5)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, NullP, NullP, NullP, NullP)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5)));
   }
 
   template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5>
   Connection addCallback(void(*callback)(P0, P1, P2, P3, P4, P5))
   {
-    using namespace std::placeholders;
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, NullP, NullP, NullP)>(std::bind(callback, _1, _2, _3, _4, _5, _6)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, NullP, NullP, NullP)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6)));
   }
 
   template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6>
   Connection addCallback(void(*callback)(P0, P1, P2, P3, P4, P5, P6))
   {
-    using namespace std::placeholders;
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, NullP, NullP)>(std::bind(callback, _1, _2, _3, _4, _5, _6, _7)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, NullP, NullP)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7)));
   }
 
   template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7>
   Connection addCallback(void(*callback)(P0, P1, P2, P3, P4, P5, P6, P7))
   {
-    using namespace std::placeholders;
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, NullP)>(std::bind(callback, _1, _2, _3, _4, _5, _6, _7, _8)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, NullP)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7, std::placeholders::_8)));
   }
 
   template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7, typename P8>
   Connection addCallback(void(*callback)(P0, P1, P2, P3, P4, P5, P6, P7, P8))
   {
-    using namespace std::placeholders;
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, P8)>(std::bind(callback, _1, _2, _3, _4, _5, _6, _7, _8, _9)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, P8)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7, std::placeholders::_8, std::placeholders::_9)));
   }
 
   template<typename T, typename P0, typename P1>
   Connection addCallback(void(T::*callback)(P0, P1), T* t)
   {
-    using namespace std::placeholders;
-    return addCallback(std::function<void(P0, P1, NullP, NullP, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, t, _1, _2)));
+    return addCallback(std::function<void(P0, P1, NullP, NullP, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, t, std::placeholders::_1, std::placeholders::_2)));
   }
 
   template<typename T, typename P0, typename P1, typename P2>
   Connection addCallback(void(T::*callback)(P0, P1, P2), T* t)
   {
-    using namespace std::placeholders;
-    return addCallback(std::function<void(P0, P1, P2, NullP, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, t, _1, _2, _3)));
+    return addCallback(std::function<void(P0, P1, P2, NullP, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, t, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
   }
 
   template<typename T, typename P0, typename P1, typename P2, typename P3>
   Connection addCallback(void(T::*callback)(P0, P1, P2, P3), T* t)
   {
-    using namespace std::placeholders;
-    return addCallback(std::function<void(P0, P1, P2, P3, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, t, _1, _2, _3, _4)));
+    return addCallback(std::function<void(P0, P1, P2, P3, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, t, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
   }
 
   template<typename T, typename P0, typename P1, typename P2, typename P3, typename P4>
   Connection addCallback(void(T::*callback)(P0, P1, P2, P3, P4), T* t)
   {
-    using namespace std::placeholders;
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, NullP, NullP, NullP, NullP)>(std::bind(callback, t, _1, _2, _3, _4, _5)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, NullP, NullP, NullP, NullP)>(std::bind(callback, t, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5)));
   }
 
   template<typename T, typename P0, typename P1, typename P2, typename P3, typename P4, typename P5>
   Connection addCallback(void(T::*callback)(P0, P1, P2, P3, P4, P5), T* t)
   {
-    using namespace std::placeholders;
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, NullP, NullP, NullP)>(std::bind(callback, t, _1, _2, _3, _4, _5, _6)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, NullP, NullP, NullP)>(std::bind(callback, t, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6)));
   }
 
   template<typename T, typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6>
   Connection addCallback(void(T::*callback)(P0, P1, P2, P3, P4, P5, P6), T* t)
   {
-    using namespace std::placeholders;
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, NullP, NullP)>(std::bind(callback, t, _1, _2, _3, _4, _5, _6, _7)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, NullP, NullP)>(std::bind(callback, t, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7)));
   }
 
   template<typename T, typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7>
   Connection addCallback(void(T::*callback)(P0, P1, P2, P3, P4, P5, P6, P7), T* t)
   {
-    using namespace std::placeholders;
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, NullP)>(std::bind(callback, t, _1, _2, _3, _4, _5, _6, _7, _8)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, NullP)>(std::bind(callback, t, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7, std::placeholders::_8)));
   }
 
   template<typename C>
   Connection addCallback( C& callback)
   {
-    using namespace std::placeholders;
     return addCallback<const M0ConstPtr&,
                      const M1ConstPtr&,
                      const M2ConstPtr&,
@@ -293,7 +277,7 @@ public:
                      const M5ConstPtr&,
                      const M6ConstPtr&,
                      const M7ConstPtr&,
-                     const M8ConstPtr&>(std::bind(callback, _1, _2, _3, _4, _5, _6, _7, _8, _9));
+                     const M8ConstPtr&>(std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7, std::placeholders::_8, std::placeholders::_9));
   }
 
   void removeCallback(const CallbackHelper9Ptr& helper)
