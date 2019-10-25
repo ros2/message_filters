@@ -76,10 +76,9 @@ class Subscriber(SimpleFilter):
         SimpleFilter.__init__(self)
         self.node = args[0]
         self.topic = args[2]
-        if kwargs.get('qos_profile'):
-            self.sub = self.node.create_subscription(*args[1:], self.callback, **kwargs)
-        else:
-            self.sub = self.node.create_subscription(*args[1:], self.callback, 10, **kwargs)
+        if not kwargs.get(qos_profile):
+            kwargs[qos_profile] = 10
+        self.sub = self.node.create_subscription(*args[1:], self.callback, **kwargs)
 
     def callback(self, msg):
         self.signalMessage(msg)
