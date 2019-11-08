@@ -17,6 +17,7 @@ import rclpy
 import random
 import unittest
 
+from builtin_interfaces.msg import Time as TimeMsg
 from message_filters import SimpleFilter, Subscriber, Cache, TimeSynchronizer
 
 
@@ -26,7 +27,7 @@ class MockHeader:
 class MockMessage:
     def __init__(self, stamp, data):
         self.header = MockHeader()
-        self.header.stamp = stamp
+        self.header.stamp = TimeMsg(sec=stamp)
         self.data = data
 
 class MockFilter(SimpleFilter):
