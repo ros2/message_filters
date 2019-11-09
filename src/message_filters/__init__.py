@@ -224,7 +224,8 @@ class TimeSynchronizer(SimpleFilter):
 
     def add(self, msg, my_queue, my_queue_index=None):
         self.lock.acquire()
-        my_queue[msg.header.stamp] = msg
+        stamp = Time.from_msg(msg.header.stamp)
+        my_queue[stamp.nanoseconds] = msg
         while len(my_queue) > self.queue_size:
             del my_queue[min(my_queue)]
         # common is the set of timestamps that occur in all queues
