@@ -2,8 +2,8 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.2.3 (2019-11-18)
+------------------
 * allow custom qos for message filters
 
 3.2.2 (2019-11-08)
