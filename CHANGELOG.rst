@@ -2,6 +2,11 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+3.1.3 (2019-12-05)
+------------------
+* Resolve ambiguity with boost/bind.hpp (`#42 <https://github.com/ros2/message_filters/issues/42>`_)
+* Contributors: Shane Loretz
+
 3.1.2 (2019-05-20)
 ------------------
 * Add .gitignore
