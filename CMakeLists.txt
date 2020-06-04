@@ -22,7 +22,9 @@ if(WIN32)
   target_compile_definitions(${PROJECT_NAME}
     PRIVATE "MESSAGE_FILTERS_BUILDING_DLL")
 endif()
-target_include_directories(${PROJECT_NAME} PUBLIC include)
+target_include_directories(${PROJECT_NAME} PUBLIC
+  "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+  "$<INSTALL_INTERFACE:include>")
 
 ament_target_dependencies(${PROJECT_NAME}
   "rclcpp"
@@ -31,7 +33,7 @@ ament_target_dependencies(${PROJECT_NAME}
   )
 
 install(
-  TARGETS ${PROJECT_NAME}
+  TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
@@ -53,6 +55,7 @@ install(
 
 ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
+ament_export_targets(${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(sensor_msgs REQUIRED)
