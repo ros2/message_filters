@@ -2,6 +2,11 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* export targets in a addition to include directories / libraries (`#46 <https://github.com/ros2/message_filters/issues/46>`_)
+* Contributors: Dirk Thomas
+
 3.2.3 (2019-11-18)
 ------------------
 * allow custom qos for message filters
