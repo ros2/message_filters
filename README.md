@@ -9,6 +9,7 @@ The python api has the following classes:
 * Cache: Stores a time history of messages.
 * TimeSynchronizer: Synchronizes messages by their timestamps.
 * ApproximateTimeSynchronizer: Approximately synchronizes messages by their timestamps.
+
 The implementation with the details can be found in [src/message_filters/__init__.py](src/message_filters/__init__.py)
 
 ### Example
@@ -20,7 +21,7 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import Image, PointCloud2
 
-class PointCloudVisNode(Node):
+class ExampleNode(Node):
     def __init__(self):
         super().__init__("ExampleNode")
 
@@ -43,3 +44,5 @@ class PointCloudVisNode(Node):
         pass
 ```
 **Note**: It is **VERY IMPORTANT** that the subscribers have the same `qos_profile` than the one specified in the publisher. If they don't match, the callback won't be executed silecntly and you will be very frustated. In the example above, if the pointcloud subscriber didn't have explicitly that `qos_profile`, the callback wouldn't be called.
+
+The latest version (foxy) hast the stable version of the python api. If you are using older distros please upgrade the code with the master branch.
