@@ -43,6 +43,6 @@ class ExampleNode(Node):
         # do your stuff here
         pass
 ```
-**Note**: It is **VERY IMPORTANT** that the subscribers have the same `qos_profile` than the one specified in the publisher. If they don't match, the callback won't be executed silecntly and you will be very frustated. In the example above, if the pointcloud subscriber didn't have explicitly that `qos_profile`, the callback wouldn't be called.
+**Note**: It is **VERY IMPORTANT** that each subscriber has the same `qos_profile` than the one specified in the corresponding publisher code. If they don't match, the callback won't be executed (without any warning) and you will be very frustated. In the example above, if the pointcloud subscriber didn't have explicitly that `qos_profile`, the callback wouldn't have been called.
 
-The latest version (foxy) hast the stable version of the python api. If you are using older distros please upgrade the code with the master branch.
+The latest version (foxy) has the stable version of the python api. If you are using older distros please upgrade the code with the master branch.
