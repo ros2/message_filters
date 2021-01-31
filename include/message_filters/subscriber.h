@@ -152,7 +152,7 @@ public:
    *
    * \param node The rclcpp::Node::SharedPtr to use to subscribe.
    * \param topic The topic to subscribe to.
-   * \param qos (optional) The qos profile to use to subscribe
+   * \param qos The qos profile to use to subscribe
    */
   Subscriber(rclcpp::Node::SharedPtr node, const std::string& topic, const rclcpp::QoS & qos)
   {
@@ -229,7 +229,6 @@ public:
    * \param topic The topic to subscribe to.
    * \param qos (optional) The qos profile to use to subscribe
    */
-  // TODO(wjwwood): deprecate in favor of API's that use `rclcpp::QoS` instead.
   void subscribe(rclcpp::Node * node, const std::string& topic, const rclcpp::QoS & qos)
   {
     unsubscribe();
