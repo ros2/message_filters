@@ -57,6 +57,16 @@ public:
    * \param qos (optional) The rmw qos profile to use to subscribe
    */
   virtual void subscribe(rclcpp::Node::SharedPtr node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default) = 0;
+  /**
+   * \brief Subscribe to a topic.
+   *
+   * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
+   *
+   * \param node The rclcpp::Node::SharedPtr to use to subscribe.
+   * \param topic The topic to subscribe to.
+   * \param qos (optional) The qos profile to use to subscribe
+   */
+  virtual void subscribe(rclcpp::Node::SharedPtr node, const std::string& topic, const rclcpp::QoS & qos) = 0;
 
   /**
    * \brief Subscribe to a topic.
@@ -67,7 +77,17 @@ public:
    * \param topic The topic to subscribe to.
    * \param qos (optional) The rmw qos profile to use to subscribe
    */
-  virtual void subscribe(rclcpp::Node * node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default) = 0;
+  virtual void subscribe(rclcpp::Node * node, const std::string& topic, const rmw_qos_profile_t qos= rmw_qos_profile_default) = 0;
+  /**
+   * \brief Subscribe to a topic.
+   *
+   * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
+   *
+   * \param node The rclcpp::Node to use to subscribe.
+   * \param topic The topic to subscribe to.
+   * \param qos (optional) The qos profile to use to subscribe
+   */
+  virtual void subscribe(rclcpp::Node * node, const std::string& topic, const rclcpp::QoS & qos) = 0;
   /**
    * \brief Re-subscribe to a topic.  Only works if this subscriber has previously been subscribed to a topic.
    */
@@ -113,12 +133,33 @@ public:
    * \param topic The topic to subscribe to.
    * \param qos (optional) The rmw qos profile to use to subscribe
    */
-  Subscriber(rclcpp::Node::SharedPtr node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
+  Subscriber(rclcpp::Node::SharedPtr node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default) 
+  {
+    rclcpp::QoS rclcpp_qos(rclcpp::QoSInitialization::from_rmw(qos));
+    subscribe(node, topic, rclcpp_qos);
+  }
+
+  Subscriber(rclcpp::Node* node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
+  {
+    rclcpp::QoS rclcpp_qos(rclcpp::QoSInitialization::from_rmw(qos));
+    subscribe(node, topic, rclcpp_qos);
+  }
+
+  /**
+   * \brief Constructor
+   *
+   * See the rclcpp::Node::subscribe() variants for more information on the parameters
+   *
+   * \param node The rclcpp::Node::SharedPtr to use to subscribe.
+   * \param topic The topic to subscribe to.
+   * \param qos (optional) The qos profile to use to subscribe
+   */
+  Subscriber(rclcpp::Node::SharedPtr node, const std::string& topic, const rclcpp::QoS & qos)
   {
     subscribe(node, topic, qos);
   }
 
-  Subscriber(rclcpp::Node* node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
+  Subscriber(rclcpp::Node* node, const std::string& topic, const rclcpp::QoS & qos)
   {
     subscribe(node, topic, qos);
   }
@@ -140,9 +181,24 @@ public:
    *
    * \param node The rclcpp::Node::SharedPtr to use to subscribe.
    * \param topic The topic to subscribe to.
-   * \param qos (optional) The rmw qos profile to use to subscribe
+   * \param qos (optional) The qos profile to use to subscribe
    */
   void subscribe(rclcpp::Node::SharedPtr node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
+  {
+    rclcpp::QoS rclcpp_qos(rclcpp::QoSInitialization::from_rmw(qos));
+    subscribe(node, topic, rclcpp_qos);
+  }
+
+  /**
+   * \brief Subscribe to a topic.
+   *
+   * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
+   *
+   * \param node The rclcpp::Node::SharedPtr to use to subscribe.
+   * \param topic The topic to subscribe to.
+   * \param qos (optional) The qos profile to use to subscribe
+   */
+  void subscribe(rclcpp::Node::SharedPtr node, const std::string& topic, const rclcpp::QoS & qos)
   {
     subscribe(node.get(), topic, qos);
     node_raw_ = nullptr;
@@ -156,20 +212,33 @@ public:
    *
    * \param node The rclcpp::Node to use to subscribe.
    * \param topic The topic to subscribe to.
-   * \param qos (optional) The rmw qos profile to use to subscribe
+   * \param qos (optional) The qos profile to use to subscribe
+   */
+  void subscribe(rclcpp::Node * node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
+  {
+    rclcpp::QoS rclcpp_qos(rclcpp::QoSInitialization::from_rmw(qos));
+    subscribe(node, topic, rclcpp_qos);
+  }
+
+  /**
+   * \brief Subscribe to a topic.
+   *
+   * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
+   *
+   * \param node The rclcpp::Node to use to subscribe.
+   * \param topic The topic to subscribe to.
+   * \param qos (optional) The qos profile to use to subscribe
    */
   // TODO(wjwwood): deprecate in favor of API's that use `rclcpp::QoS` instead.
-  void subscribe(rclcpp::Node * node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
+  void subscribe(rclcpp::Node * node, const std::string& topic, const rclcpp::QoS & qos)
   {
     unsubscribe();
 
     if (!topic.empty())
     {
       topic_ = topic;
-      rclcpp::QoS rclcpp_qos(rclcpp::QoSInitialization::from_rmw(qos));
-      rclcpp_qos.get_rmw_qos_profile() = qos;
       qos_ = qos;
-      sub_ = node->create_subscription<M>(topic, rclcpp_qos,
+      sub_ = node->create_subscription<M>(topic, qos,
                [this](std::shared_ptr<M const> msg) {
                  this->cb(EventType(msg));
                });
@@ -241,7 +310,7 @@ private:
   rclcpp::Node * node_raw_ {nullptr};
 
   std::string topic_;
-  rmw_qos_profile_t qos_;
+  rclcpp::QoS qos_ {100};
 };
 
 }  // namespace message_filters
