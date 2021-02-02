@@ -164,7 +164,7 @@ public:
   /**
    * \brief Empty constructor, use subscribe() to subscribe to a topic
    */
-  Subscriber() = default;
+  Subscriber(): qos_(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default)) {}
 
   ~Subscriber()
   {
