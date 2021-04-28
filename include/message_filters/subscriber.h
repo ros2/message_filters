@@ -43,6 +43,7 @@
 namespace message_filters
 {
 
+template <typename AllocatorT=std::allocator<void>>
 class SubscriberBase
 {
 public:
@@ -56,7 +57,12 @@ public:
    * \param topic The topic to subscribe to.
    * \param qos (optional) The rmw qos profile to use to subscribe
    */
-  virtual void subscribe(rclcpp::Node::SharedPtr node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default) = 0;
+  virtual void subscribe(
+    rclcpp::Node::SharedPtr node,
+    const std::string& topic,
+    const rmw_qos_profile_t qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> options =
+      rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>()) = 0;
 
   /**
    * \brief Subscribe to a topic.
@@ -67,7 +73,12 @@ public:
    * \param topic The topic to subscribe to.
    * \param qos (optional) The rmw qos profile to use to subscribe
    */
-  virtual void subscribe(rclcpp::Node * node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default) = 0;
+  virtual void subscribe(
+    rclcpp::Node * node,
+    const std::string& topic,
+    const rmw_qos_profile_t qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> options =
+      rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>()) = 0;
   /**
    * \brief Re-subscribe to a topic.  Only works if this subscriber has previously been subscribed to a topic.
    */
@@ -77,7 +88,8 @@ public:
    */
   virtual void unsubscribe() = 0;
 };
-typedef std::shared_ptr<SubscriberBase> SubscriberBasePtr;
+template <typename AllocatorT=std::allocator<void>>
+using SubscriberBasePtr = std::shared_ptr<SubscriberBase<AllocatorT>>;
 
 /**
  * \brief ROS subscription filter.
@@ -98,8 +110,11 @@ typedef std::shared_ptr<SubscriberBase> SubscriberBasePtr;
 void callback(const std::shared_ptr<M const>&);
 \endverbatim
  */
-template<class M>
-class Subscriber : public SubscriberBase, public SimpleFilter<M>
+template<
+  class M,
+  typename AllocatorT=std::allocator<void>
+>
+class Subscriber : public SubscriberBase<AllocatorT>, public SimpleFilter<M>
 {
 public:
   typedef MessageEvent<M const> EventType;
@@ -113,14 +128,24 @@ public:
    * \param topic The topic to subscribe to.
    * \param qos (optional) The rmw qos profile to use to subscribe
    */
-  Subscriber(rclcpp::Node::SharedPtr node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
+  Subscriber(
+    rclcpp::Node::SharedPtr node,
+    const std::string& topic,
+    const rmw_qos_profile_t qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> options =
+      rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>())
   {
-    subscribe(node, topic, qos);
+    subscribe(node, topic, qos, options);
   }
 
-  Subscriber(rclcpp::Node* node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
+  Subscriber(
+    rclcpp::Node* node,
+    const std::string& topic,
+    const rmw_qos_profile_t qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> options =
+      rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>())
   {
-    subscribe(node, topic, qos);
+    subscribe(node, topic, qos, options);
   }
 
   /**
@@ -142,9 +167,14 @@ public:
    * \param topic The topic to subscribe to.
    * \param qos (optional) The rmw qos profile to use to subscribe
    */
-  void subscribe(rclcpp::Node::SharedPtr node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
+  void subscribe(
+    rclcpp::Node::SharedPtr node,
+    const std::string& topic,
+    const rmw_qos_profile_t qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> options =
+      rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>())
   {
-    subscribe(node.get(), topic, qos);
+    subscribe(node.get(), topic, qos, options);
     node_raw_ = nullptr;
     node_shared_ = node;
   }
@@ -159,7 +189,12 @@ public:
    * \param qos (optional) The rmw qos profile to use to subscribe
    */
   // TODO(wjwwood): deprecate in favor of API's that use `rclcpp::QoS` instead.
-  void subscribe(rclcpp::Node * node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
+  void subscribe(
+    rclcpp::Node * node,
+    const std::string& topic,
+    const rmw_qos_profile_t qos = rmw_qos_profile_default,
+    rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> options =
+      rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>())
   {
     unsubscribe();
 
@@ -169,10 +204,11 @@ public:
       rclcpp::QoS rclcpp_qos(rclcpp::QoSInitialization::from_rmw(qos));
       rclcpp_qos.get_rmw_qos_profile() = qos;
       qos_ = qos;
+      options_ = options;
       sub_ = node->create_subscription<M>(topic, rclcpp_qos,
                [this](std::shared_ptr<M const> msg) {
                  this->cb(EventType(msg));
-               });
+               }, options);
 
       node_raw_ = node;
     }
@@ -186,9 +222,9 @@ public:
     if (!topic_.empty())
     {
       if (node_raw_ != nullptr) {
-        subscribe(node_raw_, topic_, qos_);
+        subscribe(node_raw_, topic_, qos_, options_);
       } else if (node_shared_ != nullptr) {
-        subscribe(node_shared_, topic_, qos_);
+        subscribe(node_shared_, topic_, qos_, options_);
       }
     }
   }
@@ -242,6 +278,7 @@ private:
 
   std::string topic_;
   rmw_qos_profile_t qos_;
+  rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> options_;
 };
 
 }  // namespace message_filters
