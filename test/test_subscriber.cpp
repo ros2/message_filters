@@ -44,9 +44,6 @@ typedef sensor_msgs::msg::Imu Msg;
 typedef std::shared_ptr<sensor_msgs::msg::Imu const> MsgConstPtr;
 typedef std::shared_ptr<sensor_msgs::msg::Imu> MsgPtr;
 
-auto g_qos_profile = rmw_qos_profile_default;
-auto g_options = rclcpp::SubscriptionOptionsWithAllocator<std::allocator<void>>();
-
 class Helper
 {
 public:
@@ -66,7 +63,7 @@ TEST(Subscriber, simple)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
-  Subscriber<Msg> sub(node, "test_topic", g_qos_profile, g_options);
+  Subscriber<Msg> sub(node, "test_topic");
   sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
   rclcpp::Clock ros_clock;
@@ -85,7 +82,7 @@ TEST(Subscriber, simple_raw)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
-  Subscriber<Msg> sub(node.get(), "test_topic", g_qos_profile, g_options);
+  Subscriber<Msg> sub(node.get(), "test_topic");
   sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
   rclcpp::Clock ros_clock;
@@ -104,7 +101,7 @@ TEST(Subscriber, subUnsubSub)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
-  Subscriber<Msg> sub(node, "test_topic", g_qos_profile, g_options);
+  Subscriber<Msg> sub(node, "test_topic");
   sub.registerCallback(std::bind(&Helper::cb, &h,  std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
 
@@ -127,7 +124,7 @@ TEST(Subscriber, subUnsubSub_raw)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
-  Subscriber<Msg> sub(node.get(), "test_topic", g_qos_profile, g_options);
+  Subscriber<Msg> sub(node.get(), "test_topic");
   sub.registerCallback(std::bind(&Helper::cb, &h,  std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
 
@@ -150,7 +147,7 @@ TEST(Subscriber, switchRawAndShared)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
-  Subscriber<Msg> sub(node, "test_topic", g_qos_profile, g_options);
+  Subscriber<Msg> sub(node, "test_topic");
   sub.registerCallback(std::bind(&Helper::cb, &h,  std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic2", 10);
 
@@ -174,7 +171,7 @@ TEST(Subscriber, subInChain)
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
   Chain<Msg> c;
-  c.addFilter(std::make_shared<Subscriber<Msg> >(node, "test_topic", g_qos_profile, g_options));
+  c.addFilter(std::make_shared<Subscriber<Msg> >(node, "test_topic"));
   c.registerCallback(std::bind(&Helper::cb, &h,  std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
 
@@ -214,7 +211,7 @@ TEST(Subscriber, singleNonConstCallback)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   NonConstHelper h;
-  Subscriber<Msg> sub(node, "test_topic", g_qos_profile, g_options);
+  Subscriber<Msg> sub(node, "test_topic");
   sub.registerCallback(&NonConstHelper::cb, &h);
   auto pub = node->create_publisher<Msg>("test_topic", 10);
   Msg msg;
@@ -231,7 +228,7 @@ TEST(Subscriber, multipleNonConstCallbacksFilterSubscriber)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   NonConstHelper h, h2;
-  Subscriber<Msg> sub(node, "test_topic", g_qos_profile, g_options);
+  Subscriber<Msg> sub(node, "test_topic");
   sub.registerCallback(&NonConstHelper::cb, &h);
   sub.registerCallback(&NonConstHelper::cb, &h2);
   auto pub = node->create_publisher<Msg>("test_topic", 10);
@@ -252,7 +249,7 @@ TEST(Subscriber, multipleCallbacksSomeFilterSomeDirect)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   NonConstHelper h, h2;
-  Subscriber<Msg> sub(node, "test_topic", g_qos_profile, g_options);
+  Subscriber<Msg> sub(node, "test_topic");
   sub.registerCallback(&NonConstHelper::cb, &h);
   auto sub2 = node->create_subscription<Msg>(
     "test_topic", 10, std::bind(&NonConstHelper::cb, &h2, std::placeholders::_1));
