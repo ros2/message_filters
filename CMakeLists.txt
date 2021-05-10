@@ -56,6 +56,9 @@ install(
 ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
 ament_export_targets(${PROJECT_NAME})
+ament_export_dependencies(rclcpp)
+ament_export_dependencies(rcutils)
+ament_export_dependencies(builtin_interfaces)
 
 if(BUILD_TESTING)
   find_package(sensor_msgs REQUIRED)
