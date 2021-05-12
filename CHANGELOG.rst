@@ -2,8 +2,8 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.2.6 (2021-05-12)
+------------------
 * Find and export dependencies properly (`#54 <https://github.com/ros2/message_filters/issues/54>`_)
 * Contributors: Michel Hidalgo
 
