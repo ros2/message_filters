@@ -2,6 +2,11 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Find and export dependencies properly (`#54 <https://github.com/ros2/message_filters/issues/54>`_)
+* Contributors: Michel Hidalgo
+
 3.2.5 (2020-12-10)
 ------------------
 * Add pytest.ini so local tests don't display warning (`#47 <https://github.com/ros2/message_filters/issues/47>`_)
