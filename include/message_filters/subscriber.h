@@ -107,7 +107,7 @@ public:
     rclcpp::SubscriptionOptions options)
   {
     (void) options;
-    throw std::runtime_error("SubscriberBase::subscribe with four arguments has not been overridden");
+    RCLCPP_WARN(node->get_logger(), "SubscriberBase::subscribe with four arguments has not been overridden");
     this->subscribe(node, topic, qos);
   }
 
