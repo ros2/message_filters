@@ -2,6 +2,11 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.0.0 (2021-05-26)
+------------------
+* Expose Subscription Options - V2 (`#56 <https://github.com/ros2/message_filters/issues/56>`_)
+* Contributors: Audrow Nash
+
 3.2.6 (2021-05-12)
 ------------------
 * Find and export dependencies properly (`#54 <https://github.com/ros2/message_filters/issues/54>`_)
