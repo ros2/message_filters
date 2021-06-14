@@ -104,7 +104,7 @@ public:
    * \param qos (optional) The rmw qos profile to use to subscribe
    */
   virtual void subscribe(
-    NoteType * node,
+    NodeType * node,
     const std::string& topic,
     const rmw_qos_profile_t qos,
     rclcpp::SubscriptionOptions options)
@@ -168,7 +168,7 @@ public:
     subscribe(node, topic, qos);
   }
 
-  Subscriber(NodeType* node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
+  Subscriber(NodeType * node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
   {
     subscribe(node, topic, qos);
   }
@@ -184,16 +184,16 @@ public:
    * \param options The subscription options to use to subscribe.
    */
   Subscriber(
-    rclcpp::Node::SharedPtr node,
+    NodePtr node,
     const std::string& topic,
     const rmw_qos_profile_t qos,
     rclcpp::SubscriptionOptions options)
   {
-    subscribe(node, topic, qos, options);
+      subscribe(node.get(), topic, qos, options);
   }
 
   Subscriber(
-    rclcpp::Node* node,
+    NodeType * node,
     const std::string& topic,
     const rmw_qos_profile_t qos,
     rclcpp::SubscriptionOptions options)
@@ -222,7 +222,7 @@ public:
    */
   void subscribe(NodePtr node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default) override
   {
-    subscribe(node, topic, qos, rclcpp::SubscriptionOptions());
+    subscribe(node.get(), topic, qos, rclcpp::SubscriptionOptions());
   }
 
   /**
@@ -251,7 +251,7 @@ public:
    * \param options The subscription options to use to subscribe.
    */
   void subscribe(
-    rclcpp::Node::SharedPtr node,
+    NodePtr node,
     const std::string& topic,
     const rmw_qos_profile_t qos,
     rclcpp::SubscriptionOptions options)
@@ -273,7 +273,7 @@ public:
    */
   // TODO(wjwwood): deprecate in favor of API's that use `rclcpp::QoS` instead.
   void subscribe(
-    rclcpp::Node * node,
+    NodeType * node,
     const std::string& topic,
     const rmw_qos_profile_t qos,
     rclcpp::SubscriptionOptions options)
