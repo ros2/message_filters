@@ -14,13 +14,17 @@
   <author>Dirk Thomas</author>
   <author>Jing Wang</author>
 
-  <buildtool_depend>ament_cmake_ros</buildtool_depend>
   <buildtool_depend>ament_cmake_python</buildtool_depend>
+  <buildtool_depend>ament_cmake_ros</buildtool_depend>
   <buildtool_depend>python_cmake_module</buildtool_depend>
 
-  <build_depend>builtin_interfaces</build_depend>
   <build_depend>rclcpp</build_depend>
-  <build_depend>rclpy</build_depend>
+  <build_depend>rcutils</build_depend>
+  <build_export_depend>rclcpp</build_export_depend>
+  <build_export_depend>rcutils</build_export_depend>
+
+  <exec_depend>builtin_interfaces</exec_depend>
+  <exec_depend>rclpy</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_cmake_gtest</test_depend>

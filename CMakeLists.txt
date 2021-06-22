@@ -15,7 +15,6 @@ find_package(ament_cmake_python REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcutils REQUIRED)
-find_package(builtin_interfaces REQUIRED)
 
 add_library(${PROJECT_NAME} src/connection.cpp)
 if(WIN32)
@@ -29,8 +28,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 ament_target_dependencies(${PROJECT_NAME}
   "rclcpp"
   "rcutils"
-  "builtin_interfaces"
-  )
+)
 
 install(
   TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}
@@ -44,19 +42,13 @@ install(
   DESTINATION include
 )
 
-find_package(python_cmake_module REQUIRED)
-_ament_cmake_python_register_environment_hook()
-install(
-  DIRECTORY "src/${PROJECT_NAME}/"
-  DESTINATION "${PYTHON_INSTALL_DIR}/${PROJECT_NAME}"
-  PATTERN "*.pyc" EXCLUDE
-  PATTERN "__pycache__" EXCLUDE
-)
+ament_python_install_package(${PROJECT_NAME}
+  PACKAGE_DIR src/${PROJECT_NAME})
 
 ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
 ament_export_targets(${PROJECT_NAME})
-ament_export_dependencies(rclcpp rcutils builtin_interfaces)
+ament_export_dependencies(rclcpp rcutils)
 
 if(BUILD_TESTING)
   find_package(sensor_msgs REQUIRED)
@@ -120,6 +112,7 @@ if(BUILD_TESTING)
   endif()
 
   # Provides PYTHON_EXECUTABLE_DEBUG
+  find_package(python_cmake_module REQUIRED)
   find_package(PythonExtra REQUIRED)
   set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
   if(WIN32)
