@@ -28,7 +28,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 ament_target_dependencies(${PROJECT_NAME}
   "rclcpp"
-  "rclcpp_lifecycle"
   "rcutils"
   "builtin_interfaces"
   )
@@ -63,6 +62,7 @@ if(BUILD_TESTING)
   find_package(sensor_msgs REQUIRED)
   find_package(ament_lint_auto REQUIRED)
   find_package(rclcpp_lifecycle REQUIRED)
+
   ament_lint_auto_find_test_dependencies()
 
   find_package(ament_cmake_gtest)
