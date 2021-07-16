@@ -53,6 +53,8 @@ ament_export_dependencies(rclcpp rcutils)
 if(BUILD_TESTING)
   find_package(sensor_msgs REQUIRED)
   find_package(ament_lint_auto REQUIRED)
+  find_package(rclcpp_lifecycle REQUIRED)
+
   ament_lint_auto_find_test_dependencies()
 
   find_package(ament_cmake_gtest)
@@ -81,7 +83,7 @@ if(BUILD_TESTING)
   if(TARGET ${PROJECT_NAME}-test_subscriber)
     target_link_libraries(${PROJECT_NAME}-test_subscriber ${PROJECT_NAME})
     target_include_directories(${PROJECT_NAME}-test_subscriber PUBLIC include)
-    ament_target_dependencies(${PROJECT_NAME}-test_subscriber "rclcpp" "sensor_msgs")
+    ament_target_dependencies(${PROJECT_NAME}-test_subscriber "rclcpp" "rclcpp_lifecycle" "sensor_msgs")
   endif()
 
   ament_add_gtest(${PROJECT_NAME}-test_synchronizer test/test_synchronizer.cpp)

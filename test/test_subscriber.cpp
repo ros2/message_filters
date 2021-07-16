@@ -35,6 +35,7 @@
 #include <gtest/gtest.h>
 
 #include <rclcpp/rclcpp.hpp>
+#include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include "message_filters/subscriber.h"
 #include "message_filters/chain.h"
 #include "sensor_msgs/msg/imu.hpp"
@@ -268,6 +269,26 @@ TEST(Subscriber, multipleCallbacksSomeFilterSomeDirect)
   EXPECT_NE(msg.get(), h.msg_.get());
   EXPECT_NE(msg.get(), h2.msg_.get());
   EXPECT_NE(h.msg_.get(), h2.msg_.get());
+}
+
+TEST(Subscriber, lifecycle)
+{
+  auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("test_node");
+  Helper h;
+  Subscriber<Msg, rclcpp_lifecycle::LifecycleNode> sub(node, "test_topic");
+  sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
+  auto pub = node->create_publisher<Msg>("test_topic", 10);
+  pub->on_activate();
+  rclcpp::Clock ros_clock;
+  auto start = ros_clock.now();
+  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
+  {
+    pub->publish(Msg());
+    rclcpp::Rate(50).sleep();
+    rclcpp::spin_some(node->get_node_base_interface());
+  }
+
+  ASSERT_GT(h.count_, 0);
 }
 
 
