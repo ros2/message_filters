@@ -254,7 +254,7 @@ public:
     NodePtr node,
     const std::string& topic,
     const rmw_qos_profile_t qos,
-    rclcpp::SubscriptionOptions options)
+    rclcpp::SubscriptionOptions options) override
   {
     subscribe(node.get(), topic, qos, options);
     node_raw_ = nullptr;
@@ -276,7 +276,7 @@ public:
     NodeType * node,
     const std::string& topic,
     const rmw_qos_profile_t qos,
-    rclcpp::SubscriptionOptions options)
+    rclcpp::SubscriptionOptions options) override
   {
     unsubscribe();
 
