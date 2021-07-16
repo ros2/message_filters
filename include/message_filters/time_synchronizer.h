@@ -60,7 +60,7 @@ namespace message_filters
 \verbatim
 void callback(const std::shared_ptr<M const>&);
 \endverbatim
- * The output connection for the TimeSynchronizer object is dependent on the number of messages being synchronized.  For
+ * The output connection for the TimeSynchronizer object is dependent on the number of messages being synchronized. For
  * a 3-message synchronizer for example, it would be:
 \verbatim
 void callback(const std::shared_ptr<M0 const>&, const std::shared_ptr<M1 const>&, const std::shared_ptr<M2 const>&);
@@ -68,13 +68,13 @@ void callback(const std::shared_ptr<M0 const>&, const std::shared_ptr<M1 const>&
  * \section usage USAGE
  * Example usage would be:
 \verbatim
-TimeSynchronizer<sensor_msgs::CameraInfo, sensor_msgs::Image, sensor_msgs::Image> sync_policies(caminfo_sub, limage_sub, rimage_sub, 3);
+TimeSynchronizer<sensor_msgs::msg::CameraInfo, sensor_msgs::msg::Image, sensor_msgs::msg::Image> sync_policies(caminfo_sub, limage_sub, rimage_sub, 3);
 sync_policies.registerCallback(callback);
 \endverbatim
 
  * The callback is then of the form:
 \verbatim
-void callback(const sensor_msgs::CameraInfo::ConstPtr&, const sensor_msgs::Image::ConstPtr&, const sensor_msgs::Image::ConstPtr&);
+void callback(const sensor_msgs::msg::CameraInfo::SharedPtr, const sensor_msgs::msg::Image::SharedPtr, const sensor_msgs::msg::Image::SharedPtr);
 \endverbatim
  *
  */
@@ -223,4 +223,4 @@ public:
 
 }  // namespace message_filters
 
-#endif  // MESSAGE_FILTERS__TIME_SYNCHRONIZER_H_
+#endif  // MESSAGE_FILTERS_TIME_SYNCHRONIZER_H
