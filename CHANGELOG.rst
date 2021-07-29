@@ -2,6 +2,13 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.1.0 (2021-07-29)
+------------------
+* Add missing overrides to subscriber.h (`#60 <https://github.com/ros2/message_filters/issues/60>`_)
+* Add lifecycle node support (`#59 <https://github.com/ros2/message_filters/issues/59>`_)
+* Correct package.xml and CMakeLists.txt (`#58 <https://github.com/ros2/message_filters/issues/58>`_)
+* Contributors: Hunter L. Allen, Michel Hidalgo, Rebecca Butler
+
 4.0.0 (2021-05-26)
 ------------------
 * Expose Subscription Options - V2 (`#56 <https://github.com/ros2/message_filters/issues/56>`_)
