@@ -1,0 +1,20 @@
+type: 'rosdoc2 config'
+version: 1
+
+---
+
+settings:
+  generate_package_index: true
+  python_source: 'src/message_filters'
+  run_doxygen: true
+  run_sphinx_apidoc: true
+
+builders:
+  - doxygen:
+      name: 'message_filters Public C/C++ API'
+      output_dir: 'generated/doxygen'
+
+  - sphinx:
+      name: 'message_filters'
+      doxygen_xml_directory: 'generated/doxygen/xml'
+      output_dir: ''
