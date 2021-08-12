@@ -34,6 +34,10 @@
 
 #include <gtest/gtest.h>
 
+// see ros2/rclcpp#1619,1713
+// TODO: remove this comment, and the `NonConstHelper` tests
+// once the deprecated signatures have been discontinued.
+#define RCLCPP_AVOID_DEPRECATIONS_FOR_UNIT_TESTS 1
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include "message_filters/subscriber.h"
