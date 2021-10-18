@@ -2,6 +2,11 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Suppress rclcpp deprecation warnings in unit tests (`#62 <https://github.com/ros2/message_filters/issues/62>`_)
+* Contributors: Abrar Rahman Protyasha
+
 4.1.0 (2021-07-29)
 ------------------
 * Add missing overrides to subscriber.h (`#60 <https://github.com/ros2/message_filters/issues/60>`_)
