@@ -6,13 +6,17 @@
   <description>
     A set of ROS2 message filters which take in messages and may output those messages at a later time, based on the conditions that filter needs met.
   </description>
-  <maintainer email="ethan.gao@linux.intel.com">Ethan Gao</maintainer>
+
+  <maintainer email="geoff@openrobotics.org">Geoffrey Biggs</maintainer>
+
   <license>BSD</license>
   <url>https://github.com/intel/ros2_message_filters</url>
+
+  <author>Dirk Thomas</author>
+  <author email="ethan.gao@linux.intel.com">Ethan Gao</author>
+  <author>Jing Wang</author>
   <author>Josh Faust</author>
   <author>Vijay Pradeep</author>
-  <author>Dirk Thomas</author>
-  <author>Jing Wang</author>
 
   <buildtool_depend>ament_cmake_python</buildtool_depend>
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
