@@ -58,30 +58,33 @@ public:
   }
 
   template<typename F>
-  PassThrough(F& f)
+  PassThrough(F & f)  // NOLINT[runtime/explicit]
   {
     connectInput(f);
   }
 
   template<class F>
-  void connectInput(F& f)
+  void connectInput(F & f)
   {
     incoming_connection_.disconnect();
-    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(std::bind(&PassThrough::cb, this, std::placeholders::_1)));
+    incoming_connection_ =
+      f.registerCallback(
+      typename SimpleFilter<M>::EventCallback(
+        std::bind(&PassThrough::cb, this, std::placeholders::_1)));
   }
 
-  void add(const MConstPtr& msg)
+  void add(const MConstPtr & msg)
   {
     add(EventType(msg));
   }
 
-  void add(const EventType& evt)
+  void add(const EventType & evt)
   {
     this->signalMessage(evt);
   }
 
 private:
-  void cb(const EventType& evt)
+  void cb(const EventType & evt)
   {
     add(evt);
   }

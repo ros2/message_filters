@@ -74,18 +74,18 @@ struct NullPolicy : public message_filters::PolicyBase<M0, M1, M2, M3, M4, M5, M
 
   NullPolicy()
   {
-    for (int i = 0; i < RealTypeCount::value; ++i)
-    {
+    for (int i = 0; i < RealTypeCount::value; ++i) {
       added_[i] = 0;
     }
   }
 
-  void initParent(Sync*)
+  void initParent(Sync * s)
   {
+    (void)s;
   }
 
   template<int i>
-  void add(const typename std::tuple_element<i, Events>::type&)
+  void add(const typename std::tuple_element<i, Events>::type &)
   {
     ++added_.at(i);
   }
@@ -478,9 +478,8 @@ TEST(Synchronizer, add9)
   ASSERT_EQ(sync.added_[8], 1);
 }
 
-int main(int argc, char **argv){
+int main(int argc, char ** argv)
+{
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
-
-

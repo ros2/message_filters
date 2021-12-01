@@ -79,8 +79,9 @@ void callback(const sensor_msgs::CameraInfo::ConstPtr&, const sensor_msgs::Image
  *
  */
 template<class M0, class M1, class M2 = NullType, class M3 = NullType, class M4 = NullType,
-         class M5 = NullType, class M6 = NullType, class M7 = NullType, class M8 = NullType>
-class TimeSynchronizer : public Synchronizer<sync_policies::ExactTime<M0, M1, M2, M3, M4, M5, M6, M7, M8> >
+  class M5 = NullType, class M6 = NullType, class M7 = NullType, class M8 = NullType>
+class TimeSynchronizer : public Synchronizer<sync_policies::ExactTime<M0, M1, M2, M3, M4, M5, M6,
+    M7, M8>>
 {
 public:
   typedef sync_policies::ExactTime<M0, M1, M2, M3, M4, M5, M6, M7, M8> Policy;
@@ -112,62 +113,66 @@ public:
   typedef typename Base::M8Event M8Event;
 
   template<class F0, class F1>
-  TimeSynchronizer(F0& f0, F1& f1, uint32_t queue_size)
+  TimeSynchronizer(F0 & f0, F1 & f1, uint32_t queue_size)
   : Base(Policy(queue_size))
   {
     connectInput(f0, f1);
   }
 
   template<class F0, class F1, class F2>
-  TimeSynchronizer(F0& f0, F1& f1, F2& f2, uint32_t queue_size)
+  TimeSynchronizer(F0 & f0, F1 & f1, F2 & f2, uint32_t queue_size)
   : Base(Policy(queue_size))
   {
     connectInput(f0, f1, f2);
   }
 
   template<class F0, class F1, class F2, class F3>
-  TimeSynchronizer(F0& f0, F1& f1, F2& f2, F3& f3, uint32_t queue_size)
+  TimeSynchronizer(F0 & f0, F1 & f1, F2 & f2, F3 & f3, uint32_t queue_size)
   : Base(Policy(queue_size))
   {
     connectInput(f0, f1, f2, f3);
   }
 
   template<class F0, class F1, class F2, class F3, class F4>
-  TimeSynchronizer(F0& f0, F1& f1, F2& f2, F3& f3, F4& f4, uint32_t queue_size)
+  TimeSynchronizer(F0 & f0, F1 & f1, F2 & f2, F3 & f3, F4 & f4, uint32_t queue_size)
   : Base(Policy(queue_size))
   {
     connectInput(f0, f1, f2, f3, f4);
   }
 
   template<class F0, class F1, class F2, class F3, class F4, class F5>
-  TimeSynchronizer(F0& f0, F1& f1, F2& f2, F3& f3, F4& f4, F5& f5, uint32_t queue_size)
+  TimeSynchronizer(F0 & f0, F1 & f1, F2 & f2, F3 & f3, F4 & f4, F5 & f5, uint32_t queue_size)
   : Base(Policy(queue_size))
   {
     connectInput(f0, f1, f2, f3, f4, f5);
   }
 
   template<class F0, class F1, class F2, class F3, class F4, class F5, class F6>
-  TimeSynchronizer(F0& f0, F1& f1, F2& f2, F3& f3, F4& f4, F5& f5, F6& f6, uint32_t queue_size)
+  TimeSynchronizer(
+    F0 & f0, F1 & f1, F2 & f2, F3 & f3, F4 & f4, F5 & f5, F6 & f6, uint32_t queue_size)
   : Base(Policy(queue_size))
   {
     connectInput(f0, f1, f2, f3, f4, f5, f6);
   }
 
   template<class F0, class F1, class F2, class F3, class F4, class F5, class F6, class F7>
-  TimeSynchronizer(F0& f0, F1& f1, F2& f2, F3& f3, F4& f4, F5& f5, F6& f6, F7& f7, uint32_t queue_size)
+  TimeSynchronizer(
+    F0 & f0, F1 & f1, F2 & f2, F3 & f3, F4 & f4, F5 & f5, F6 & f6, F7 & f7, uint32_t queue_size)
   : Base(Policy(queue_size))
   {
     connectInput(f0, f1, f2, f3, f4, f5, f6, f7);
   }
 
   template<class F0, class F1, class F2, class F3, class F4, class F5, class F6, class F7, class F8>
-  TimeSynchronizer(F0& f0, F1& f1, F2& f2, F3& f3, F4& f4, F5& f5, F6& f6, F7& f7, F8& f8, uint32_t queue_size)
+  TimeSynchronizer(
+    F0 & f0, F1 & f1, F2 & f2, F3 & f3, F4 & f4, F5 & f5, F6 & f6, F7 & f7, F8 & f8,
+    uint32_t queue_size)
   : Base(Policy(queue_size))
   {
     connectInput(f0, f1, f2, f3, f4, f5, f6, f7, f8);
   }
 
-  TimeSynchronizer(uint32_t queue_size)
+  TimeSynchronizer(uint32_t queue_size)  // NOLINT[runtime/explicit]
   : Base(Policy(queue_size))
   {
   }
@@ -175,47 +180,47 @@ public:
   ////////////////////////////////////////////////////////////////
   // For backwards compatibility
   ////////////////////////////////////////////////////////////////
-  void add0(const M0ConstPtr& msg)
+  void add0(const M0ConstPtr & msg)
   {
     this->template add<0>(M0Event(msg));
   }
 
-  void add1(const M1ConstPtr& msg)
+  void add1(const M1ConstPtr & msg)
   {
     this->template add<1>(M1Event(msg));
   }
 
-  void add2(const M2ConstPtr& msg)
+  void add2(const M2ConstPtr & msg)
   {
     this->template add<2>(M2Event(msg));
   }
 
-  void add3(const M3ConstPtr& msg)
+  void add3(const M3ConstPtr & msg)
   {
     this->template add<3>(M3Event(msg));
   }
 
-  void add4(const M4ConstPtr& msg)
+  void add4(const M4ConstPtr & msg)
   {
     this->template add<4>(M4Event(msg));
   }
 
-  void add5(const M5ConstPtr& msg)
+  void add5(const M5ConstPtr & msg)
   {
     this->template add<5>(M5Event(msg));
   }
 
-  void add6(const M6ConstPtr& msg)
+  void add6(const M6ConstPtr & msg)
   {
     this->template add<6>(M6Event(msg));
   }
 
-  void add7(const M7ConstPtr& msg)
+  void add7(const M7ConstPtr & msg)
   {
     this->template add<7>(M7Event(msg));
   }
 
-  void add8(const M8ConstPtr& msg)
+  void add8(const M8ConstPtr & msg)
   {
     this->template add<8>(M8Event(msg));
   }

@@ -62,13 +62,13 @@ namespace message_traits
 template<>
 struct TimeStamp<Msg>
 {
-  static rclcpp::Time value(const Msg& m)
+  static rclcpp::Time value(const Msg & m)
   {
     return m.header.stamp;
   }
 };
-}
-}
+}  // namespace message_traits
+}  // namespace message_filters
 
 class Helper
 {
@@ -77,7 +77,7 @@ public:
   : count_(0)
   {}
 
-  void cb(const MsgConstPtr&)
+  void cb(const MsgConstPtr &)
   {
     ++count_;
   }
@@ -142,8 +142,7 @@ TEST(TimeSequencer, eventInEventOut)
     std::make_shared<Msg const>(), rclcpp::Clock().now());
   seq.add(evt);
 
-  while (!h.event_.getMessage())
-  {
+  while (!h.event_.getMessage()) {
     rclcpp::Rate(100).sleep();
     rclcpp::spin_some(nh);
   }
@@ -152,7 +151,8 @@ TEST(TimeSequencer, eventInEventOut)
   EXPECT_EQ(h.event_.getMessage(), evt.getMessage());
 }
 
-int main(int argc, char **argv){
+int main(int argc, char ** argv)
+{
   testing::InitGoogleTest(&argc, argv);
 
   rclcpp::init(argc, argv);

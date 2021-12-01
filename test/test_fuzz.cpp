@@ -60,25 +60,27 @@ public:
   : count_(0)
   {}
 
-  void cb(const MsgConstPtr&)
+  void cb(const MsgConstPtr &)
   {
     ++count_;
   }
 
-  void cb2(const MsgConstPtr&, const MsgConstPtr&)
+  void cb2(const MsgConstPtr &, const MsgConstPtr &)
   {
     ++count_;
   }
+
   int32_t count_;
 };
 
-static void fuzz_msg(MsgPtr msg) {
-    static std::random_device seeder;
-    std::mt19937 gen(seeder());
-    std::uniform_real_distribution<float> distr(1.0, 3.0);
-    msg->linear_acceleration.x = distr(gen);
-    msg->linear_acceleration.y = distr(gen);
-    msg->linear_acceleration.z = distr(gen);
+static void fuzz_msg(MsgPtr msg)
+{
+  static std::random_device seeder;
+  std::mt19937 gen(seeder());
+  std::uniform_real_distribution<float> distr(1.0, 3.0);
+  msg->linear_acceleration.x = distr(gen);
+  msg->linear_acceleration.y = distr(gen);
+  msg->linear_acceleration.z = distr(gen);
 }
 
 TEST(TimeSequencer, fuzz_sequencer)
@@ -116,8 +118,7 @@ TEST(TimeSynchronizer, fuzz_synchronizer)
   auto start = ros_clock.now();
   auto msg1 = std::make_shared<Msg>();
   auto msg2 = std::make_shared<Msg>();
-  while ((ros_clock.now() - start) < rclcpp::Duration(5, 0))
-  {
+  while ((ros_clock.now() - start) < rclcpp::Duration(5, 0)) {
     h.count_ = 0;
     fuzz_msg(msg1);
     msg1->header.stamp = rclcpp::Clock().now();
@@ -141,8 +142,7 @@ TEST(Subscriber, fuzz_subscriber)
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
   auto msg = std::make_shared<Msg>();
-  while ((ros_clock.now() - start) < rclcpp::Duration(5, 0))
-  {
+  while ((ros_clock.now() - start) < rclcpp::Duration(5, 0)) {
     h.count_ = 0;
     fuzz_msg(msg);
     msg->header.stamp = ros_clock.now();
@@ -154,7 +154,8 @@ TEST(Subscriber, fuzz_subscriber)
   rclcpp::spin_some(node);
 }
 
-int main(int argc, char **argv){
+int main(int argc, char ** argv)
+{
   testing::InitGoogleTest(&argc, argv);
 
   rclcpp::init(argc, argv);

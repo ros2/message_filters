@@ -64,20 +64,20 @@ namespace message_traits
 template<>
 struct TimeStamp<Msg>
 {
-  static rclcpp::Time value(const Msg& m)
+  static rclcpp::Time value(const Msg & m)
   {
     return m.header.stamp;
   }
 };
-}
-}
+}  // namespace message_traits
+}  // namespace message_filters
 
 class Helper
 {
 public:
   Helper()
-  : count_(0)
-  , drop_count_(0)
+  : count_(0),
+    drop_count_(0)
   {}
 
   void cb()
@@ -569,13 +569,9 @@ TEST(TimeSynchronizer, connectConstructor)
   ASSERT_EQ(h.count_, 1);
 }
 
-//TEST(TimeSynchronizer, connectToSimple)
-
-int main(int argc, char **argv){
+int main(int argc, char ** argv)
+{
   testing::InitGoogleTest(&argc, argv);
   rclcpp::init(argc, argv);
   return RUN_ALL_TESTS();
 }
-
-
-

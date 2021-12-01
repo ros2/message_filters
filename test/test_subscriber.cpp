@@ -35,7 +35,7 @@
 #include <gtest/gtest.h>
 
 // see ros2/rclcpp#1619,1713
-// TODO: remove this comment, and the `NonConstHelper` tests
+// TODO(anyone): remove this comment, and the `NonConstHelper` tests
 // once the deprecated signatures have been discontinued.
 #define RCLCPP_AVOID_DEPRECATIONS_FOR_UNIT_TESTS 1
 #include <rclcpp/rclcpp.hpp>
@@ -78,8 +78,7 @@ TEST(Subscriber, simple)
   auto pub = node->create_publisher<Msg>("test_topic", 10);
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
-  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
-  {
+  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0)) {
     pub->publish(Msg());
     rclcpp::Rate(50).sleep();
     rclcpp::spin_some(node);
@@ -97,8 +96,7 @@ TEST(Subscriber, simple_raw)
   auto pub = node->create_publisher<Msg>("test_topic", 10);
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
-  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
-  {
+  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0)) {
     pub->publish(Msg());
     rclcpp::Rate(50).sleep();
     rclcpp::spin_some(node);
@@ -120,8 +118,7 @@ TEST(Subscriber, subUnsubSub)
 
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
-  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
-  {
+  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0)) {
     pub->publish(Msg());
     rclcpp::Rate(50).sleep();
     rclcpp::spin_some(node);
@@ -143,8 +140,7 @@ TEST(Subscriber, subUnsubSub_raw)
 
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
-  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
-  {
+  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0)) {
     pub->publish(Msg());
     rclcpp::Rate(50).sleep();
     rclcpp::spin_some(node);
@@ -166,8 +162,7 @@ TEST(Subscriber, switchRawAndShared)
 
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
-  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
-  {
+  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0)) {
     pub->publish(Msg());
     rclcpp::Rate(50).sleep();
     rclcpp::spin_some(node);
@@ -187,8 +182,7 @@ TEST(Subscriber, subInChain)
 
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
-  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
-  {
+  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0)) {
     pub->publish(Msg());
     rclcpp::Rate(50).sleep();
     rclcpp::spin_some(node);
@@ -290,8 +284,7 @@ TEST(Subscriber, lifecycle)
   pub->on_activate();
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
-  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0))
-  {
+  while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0)) {
     pub->publish(Msg());
     rclcpp::Rate(50).sleep();
     rclcpp::spin_some(node->get_node_base_interface());
@@ -301,7 +294,8 @@ TEST(Subscriber, lifecycle)
 }
 
 
-int main(int argc, char **argv){
+int main(int argc, char ** argv)
+{
   testing::InitGoogleTest(&argc, argv);
 
   rclcpp::init(argc, argv);

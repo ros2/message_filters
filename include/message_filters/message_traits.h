@@ -44,10 +44,11 @@ namespace message_traits
 /**
  * \brief HasHeader informs whether or not there is a header that gets serialized as the first thing in the message
  */
-template<typename M, typename = void> struct HasHeader : public std::false_type {};
+template<typename M, typename = void>
+struct HasHeader : public std::false_type {};
 
-template <typename M>
-struct HasHeader<M, decltype((void) M::header)> : std::true_type {};
+template<typename M>
+struct HasHeader<M, decltype((void) M::header)>: std::true_type {};
 
 /**
  * \brief FrameId trait.  In the default implementation pointer()
@@ -57,15 +58,16 @@ struct HasHeader<M, decltype((void) M::header)> : std::true_type {};
 template<typename M, typename Enable = void>
 struct FrameId
 {
-  static std::string* pointer(M& m) { (void)m; return nullptr; }
-  static std::string const* pointer(const M& m) { (void)m; return nullptr; }
+  static std::string * pointer(M & m) {(void)m; return nullptr;}
+  static std::string const * pointer(const M & m) {(void)m; return nullptr;}
 };
- template<typename M>
-struct FrameId<M, typename std::enable_if<HasHeader<M>::value>::type >
+
+template<typename M>
+struct FrameId<M, typename std::enable_if<HasHeader<M>::value>::type>
 {
-  static std::string* pointer(M& m) { return &m.header.frame_id; }
-  static std::string const* pointer(const M& m) { return &m.header.frame_id; }
-  static std::string value(const M& m) { return m.header.frame_id; }
+  static std::string * pointer(M & m) {return &m.header.frame_id;}
+  static std::string const * pointer(const M & m) {return &m.header.frame_id;}
+  static std::string value(const M & m) {return m.header.frame_id;}
 };
 
 /**
@@ -76,16 +78,18 @@ struct FrameId<M, typename std::enable_if<HasHeader<M>::value>::type >
 template<typename M, typename Enable = void>
 struct TimeStamp
 {
-  static rclcpp::Time value(const M& m) {
+  static rclcpp::Time value(const M & m)
+  {
     (void)m;
     return rclcpp::Time();
   }
 };
 
 template<typename M>
-struct TimeStamp<M, typename std::enable_if<HasHeader<M>::value>::type >
+struct TimeStamp<M, typename std::enable_if<HasHeader<M>::value>::type>
 {
-  static rclcpp::Time value(const M& m) {
+  static rclcpp::Time value(const M & m)
+  {
     auto stamp = m.header.stamp;
     return rclcpp::Time(stamp.sec, stamp.nanosec);
   }

@@ -52,9 +52,9 @@ class CallbackHelper1
 public:
   virtual ~CallbackHelper1() {}
 
-  virtual void call(const MessageEvent<M const>& event, bool nonconst_need_copy) = 0;
+  virtual void call(const MessageEvent<M const> & event, bool nonconst_need_copy) = 0;
 
-  typedef std::shared_ptr<CallbackHelper1<M> > Ptr;
+  typedef std::shared_ptr<CallbackHelper1<M>> Ptr;
 };
 
 template<typename P, typename M>
@@ -62,15 +62,15 @@ class CallbackHelper1T : public CallbackHelper1<M>
 {
 public:
   typedef ParameterAdapter<P> Adapter;
-  typedef std::function<void(typename Adapter::Parameter)> Callback;
+  typedef std::function<void (typename Adapter::Parameter)> Callback;
   typedef typename Adapter::Event Event;
 
-  CallbackHelper1T(const Callback& cb)
+  CallbackHelper1T(const Callback & cb)  // NOLINT[runtime/explicit]
   : callback_(cb)
   {
   }
 
-  virtual void call(const MessageEvent<M const>& event, bool nonconst_force_copy)
+  virtual void call(const MessageEvent<M const> & event, bool nonconst_force_copy)
   {
     Event my_event(event, nonconst_force_copy || event.nonConstWillCopy());
     callback_(Adapter::getParameter(my_event));
@@ -83,37 +83,36 @@ private:
 template<class M>
 class Signal1
 {
-  typedef std::shared_ptr<CallbackHelper1<M> > CallbackHelper1Ptr;
+  typedef std::shared_ptr<CallbackHelper1<M>> CallbackHelper1Ptr;
   typedef std::vector<CallbackHelper1Ptr> V_CallbackHelper1;
 
 public:
   template<typename P>
-  CallbackHelper1Ptr addCallback(const std::function<void(P)>& callback)
+  CallbackHelper1Ptr addCallback(const std::function<void(P)> & callback)
   {
     std::lock_guard<std::mutex> lock(mutex_);
     callbacks_.emplace_back(std::make_shared<CallbackHelper1T<P, M>>(callback));
     return callbacks_.back();
   }
 
-  void removeCallback(const CallbackHelper1Ptr& helper)
+  void removeCallback(const CallbackHelper1Ptr & helper)
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    typename V_CallbackHelper1::iterator it = std::find(callbacks_.begin(), callbacks_.end(), helper);
-    if (it != callbacks_.end())
-    {
+    typename V_CallbackHelper1::iterator it =
+      std::find(callbacks_.begin(), callbacks_.end(), helper);
+    if (it != callbacks_.end()) {
       callbacks_.erase(it);
     }
   }
 
-  void call(const MessageEvent<M const>& event)
+  void call(const MessageEvent<M const> & event)
   {
     std::lock_guard<std::mutex> lock(mutex_);
     bool nonconst_force_copy = callbacks_.size() > 1;
     typename V_CallbackHelper1::iterator it = callbacks_.begin();
     typename V_CallbackHelper1::iterator end = callbacks_.end();
-    for (; it != end; ++it)
-    {
-      const CallbackHelper1Ptr& helper = *it;
+    for (; it != end; ++it) {
+      const CallbackHelper1Ptr & helper = *it;
       helper->call(event, nonconst_force_copy);
     }
   }
@@ -122,6 +121,6 @@ private:
   std::mutex mutex_;
   V_CallbackHelper1 callbacks_;
 };
-}  // message_filters
+}  // namespace message_filters
 
 #endif  // MESSAGE_FILTERS__SIGNAL1_H_

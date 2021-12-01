@@ -51,7 +51,7 @@ struct Filter : public message_filters::SimpleFilter<Msg>
 {
   typedef message_filters::MessageEvent<Msg const> EventType;
 
-  void add(const EventType& evt)
+  void add(const EventType & evt)
   {
     signalMessage(evt);
   }
@@ -65,12 +65,12 @@ public:
     counts_.fill(0);
   }
 
-  void cb0(const MsgConstPtr&)
+  void cb0(const MsgConstPtr &)
   {
     ++counts_[0];
   }
 
-  void cb1(const Msg&)
+  void cb1(const Msg &)
   {
     ++counts_[1];
   }
@@ -90,7 +90,7 @@ public:
     ++counts_[4];
   }
 
-  void cb5(const MsgPtr&)
+  void cb5(const MsgPtr &)
   {
     ++counts_[5];
   }
@@ -149,11 +149,9 @@ TEST(SimpleFilter, oldRegisterWithNewFilter)
   f.registerCallback(std::bind(&Helper::cb3, &h, std::placeholders::_1));
 }
 
-int main(int argc, char **argv){
+int main(int argc, char ** argv)
+{
   testing::InitGoogleTest(&argc, argv);
   rclcpp::init(argc, argv);
   return RUN_ALL_TESTS();
 }
-
-
-

@@ -44,15 +44,15 @@
 
 struct Header
 {
-  rclcpp::Time stamp ;
-} ;
+  rclcpp::Time stamp;
+};
 
 
 struct Msg
 {
-  Header header ;
-  int data ;
-} ;
+  Header header;
+  int data;
+};
 typedef std::shared_ptr<Msg const> MsgConstPtr;
 namespace message_filters
 {
@@ -61,25 +61,24 @@ namespace message_traits
 template<>
 struct TimeStamp<Msg>
 {
-  static rclcpp::Time value(const Msg& m)
+  static rclcpp::Time value(const Msg & m)
   {
     return m.header.stamp;
   }
 };
-}
-}
+}  // namespace message_traits
+}  // namespace message_filters
 
 
 void fillCacheEasy(message_filters::Cache<Msg> & cache, unsigned int start, unsigned int end)
 {
-  for (unsigned int i=start; i < end; i++)
-  {
-    Msg* msg = new Msg ;
-    msg->data = i ;
-    msg->header.stamp= rclcpp::Time(i*10, 0) ;
+  for (unsigned int i = start; i < end; i++) {
+    Msg * msg = new Msg;
+    msg->data = i;
+    msg->header.stamp = rclcpp::Time(i * 10, 0);
 
-    std::shared_ptr<Msg const> msg_ptr(msg) ;
-    cache.add(msg_ptr) ;
+    std::shared_ptr<Msg const> msg_ptr(msg);
+    cache.add(msg_ptr);
   }
 }
 
@@ -91,19 +90,19 @@ TEST(Cache, easyInterval)
   std::vector<std::shared_ptr<Msg const>> interval_data = cache.getInterval(
     rclcpp::Time(5, 0), rclcpp::Time(35, 0));
 
-  ASSERT_EQ(interval_data.size(), (unsigned int) 3) ;
-  EXPECT_EQ(interval_data[0]->data, 1) ;
-  EXPECT_EQ(interval_data[1]->data, 2) ;
-  EXPECT_EQ(interval_data[2]->data, 3) ;
+  ASSERT_EQ(interval_data.size(), 3u);
+  EXPECT_EQ(interval_data[0]->data, 1);
+  EXPECT_EQ(interval_data[1]->data, 2);
+  EXPECT_EQ(interval_data[2]->data, 3);
 
   // Look for an interval past the end of the cache
-  interval_data = cache.getInterval(rclcpp::Time(55, 0), rclcpp::Time(65, 0)) ;
-  EXPECT_EQ(interval_data.size(), (unsigned int) 0) ;
+  interval_data = cache.getInterval(rclcpp::Time(55, 0), rclcpp::Time(65, 0));
+  EXPECT_EQ(interval_data.size(), 0u);
 
   // Look for an interval that fell off the back of the cache
-  fillCacheEasy(cache, 5, 20) ;
-  interval_data = cache.getInterval(rclcpp::Time(5, 0), rclcpp::Time(35, 0)) ;
-  EXPECT_EQ(interval_data.size(), (unsigned int) 0) ;
+  fillCacheEasy(cache, 5, 20);
+  interval_data = cache.getInterval(rclcpp::Time(5, 0), rclcpp::Time(35, 0));
+  EXPECT_EQ(interval_data.size(), 0u);
 }
 
 TEST(Cache, easySurroundingInterval)
@@ -119,56 +118,56 @@ TEST(Cache, easySurroundingInterval)
   EXPECT_EQ(interval_data[2]->data, 3);
   EXPECT_EQ(interval_data[3]->data, 4);
 
-  interval_data = cache.getSurroundingInterval(rclcpp::Time(0,0), rclcpp::Time(35,0)) ;
-  ASSERT_EQ(interval_data.size(), (unsigned int) 4);
+  interval_data = cache.getSurroundingInterval(rclcpp::Time(0, 0), rclcpp::Time(35, 0));
+  ASSERT_EQ(interval_data.size(), 4u);
   EXPECT_EQ(interval_data[0]->data, 1);
 
-  interval_data = cache.getSurroundingInterval(rclcpp::Time(35,0), rclcpp::Time(35,0)) ;
-  ASSERT_EQ(interval_data.size(), (unsigned int) 2);
+  interval_data = cache.getSurroundingInterval(rclcpp::Time(35, 0), rclcpp::Time(35, 0));
+  ASSERT_EQ(interval_data.size(), 2u);
   EXPECT_EQ(interval_data[0]->data, 3);
   EXPECT_EQ(interval_data[1]->data, 4);
 
-  interval_data = cache.getSurroundingInterval(rclcpp::Time(55,0), rclcpp::Time(55,0)) ;
-  ASSERT_EQ(interval_data.size(), (unsigned int) 1);
+  interval_data = cache.getSurroundingInterval(rclcpp::Time(55, 0), rclcpp::Time(55, 0));
+  ASSERT_EQ(interval_data.size(), 1u);
   EXPECT_EQ(interval_data[0]->data, 5);
 }
 
 
 std::shared_ptr<Msg const> buildMsg(int32_t seconds, int data)
 {
-  Msg* msg = new Msg ;
-  msg->data = data ;
-  msg->header.stamp = rclcpp::Time(seconds, 0) ;
+  Msg * msg = new Msg;
+  msg->data = data;
+  msg->header.stamp = rclcpp::Time(seconds, 0);
 
-  std::shared_ptr<Msg const> msg_ptr(msg) ;
-  return msg_ptr ;
+  std::shared_ptr<Msg const> msg_ptr(msg);
+  return msg_ptr;
 }
 
 TEST(Cache, easyUnsorted)
 {
   message_filters::Cache<Msg> cache(10);
 
-  cache.add(buildMsg(10, 1)) ;
-  cache.add(buildMsg(30, 3)) ;
-  cache.add(buildMsg(70, 7)) ;
-  cache.add(buildMsg( 5, 0)) ;
-  cache.add(buildMsg(20, 2)) ;
+  cache.add(buildMsg(10, 1));
+  cache.add(buildMsg(30, 3));
+  cache.add(buildMsg(70, 7));
+  cache.add(buildMsg(5, 0));
+  cache.add(buildMsg(20, 2));
 
   std::vector<std::shared_ptr<Msg const>> interval_data = cache.getInterval(
     rclcpp::Time(3, 0), rclcpp::Time(15, 0));
 
-  ASSERT_EQ(interval_data.size(), (unsigned int) 2) ;
-  EXPECT_EQ(interval_data[0]->data, 0) ;
-  EXPECT_EQ(interval_data[1]->data, 1) ;
+  ASSERT_EQ(interval_data.size(), 2u);
+  EXPECT_EQ(interval_data[0]->data, 0);
+  EXPECT_EQ(interval_data[1]->data, 1);
 
   // Grab all the data
-  interval_data = cache.getInterval(rclcpp::Time(0, 0), rclcpp::Time(80, 0)) ;
-  ASSERT_EQ(interval_data.size(), (unsigned int) 5) ;
-  EXPECT_EQ(interval_data[0]->data, 0) ;
-  EXPECT_EQ(interval_data[1]->data, 1) ;
-  EXPECT_EQ(interval_data[2]->data, 2) ;
-  EXPECT_EQ(interval_data[3]->data, 3) ;
-  EXPECT_EQ(interval_data[4]->data, 7) ;
+  interval_data = cache.getInterval(rclcpp::Time(0, 0), rclcpp::Time(80, 0));
+  ASSERT_EQ(interval_data.size(), 5u);
+  EXPECT_EQ(interval_data[0]->data, 0);
+  EXPECT_EQ(interval_data[1]->data, 1);
+  EXPECT_EQ(interval_data[2]->data, 2);
+  EXPECT_EQ(interval_data[3]->data, 3);
+  EXPECT_EQ(interval_data[4]->data, 7);
 }
 
 
@@ -177,19 +176,19 @@ TEST(Cache, easyElemBeforeAfter)
   message_filters::Cache<Msg> cache(10);
   std::shared_ptr<Msg const> elem_ptr;
 
-  fillCacheEasy(cache, 5, 10) ;
+  fillCacheEasy(cache, 5, 10);
 
-  elem_ptr = cache.getElemAfterTime( rclcpp::Time(85, 0)) ;
+  elem_ptr = cache.getElemAfterTime(rclcpp::Time(85, 0));
 
-  ASSERT_FALSE(!elem_ptr) ;
-  EXPECT_EQ(elem_ptr->data, 9) ;
+  ASSERT_FALSE(!elem_ptr);
+  EXPECT_EQ(elem_ptr->data, 9);
 
-  elem_ptr = cache.getElemBeforeTime( rclcpp::Time(85, 0)) ;
-  ASSERT_FALSE(!elem_ptr) ;
-  EXPECT_EQ(elem_ptr->data, 8) ;
+  elem_ptr = cache.getElemBeforeTime(rclcpp::Time(85, 0));
+  ASSERT_FALSE(!elem_ptr);
+  EXPECT_EQ(elem_ptr->data, 8);
 
-  elem_ptr = cache.getElemBeforeTime( rclcpp::Time(45, 0)) ;
-  EXPECT_TRUE(!elem_ptr) ;
+  elem_ptr = cache.getElemBeforeTime(rclcpp::Time(45, 0));
+  EXPECT_TRUE(!elem_ptr);
 }
 
 struct EventHelper
@@ -217,9 +216,9 @@ TEST(Cache, eventInEventOut)
   EXPECT_EQ(h.event_.getMessage(), evt.getMessage());
 }
 
-int main(int argc, char **argv){
+int main(int argc, char ** argv)
+{
   testing::InitGoogleTest(&argc, argv);
   rclcpp::init(argc, argv);
   return RUN_ALL_TESTS();
 }
-

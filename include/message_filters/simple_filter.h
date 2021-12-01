@@ -58,16 +58,16 @@ class SimpleFilter : public noncopyable
 {
 public:
   typedef std::shared_ptr<M const> MConstPtr;
-  typedef std::function<void(const MConstPtr&)> Callback;
+  typedef std::function<void (const MConstPtr &)> Callback;
   typedef MessageEvent<M const> EventType;
-  typedef std::function<void(const EventType&)> EventCallback;
+  typedef std::function<void (const EventType &)> EventCallback;
 
   /**
    * \brief Register a callback to be called when this filter has passed
    * \param callback The callback to call
    */
   template<typename C>
-  Connection registerCallback(const C& callback)
+  Connection registerCallback(const C & callback)
   {
     typename CallbackHelper1<M>::Ptr helper = signal_.addCallback(Callback(callback));
     return Connection(std::bind(&Signal::removeCallback, &signal_, helper));
@@ -78,7 +78,7 @@ public:
    * \param callback The callback to call
    */
   template<typename P>
-  Connection registerCallback(const std::function<void(P)>& callback)
+  Connection registerCallback(const std::function<void(P)> & callback)
   {
     return Connection(std::bind(&Signal::removeCallback, &signal_, signal_.addCallback(callback)));
   }
@@ -88,9 +88,10 @@ public:
    * \param callback The callback to call
    */
   template<typename P>
-  Connection registerCallback(void(*callback)(P))
+  Connection registerCallback(void (* callback)(P))
   {
-    typename CallbackHelper1<M>::Ptr helper = signal_.template addCallback<P>(std::bind(callback, std::placeholders::_1));
+    typename CallbackHelper1<M>::Ptr helper =
+      signal_.template addCallback<P>(std::bind(callback, std::placeholders::_1));
     return Connection(std::bind(&Signal::removeCallback, &signal_, helper));
   }
 
@@ -99,26 +100,27 @@ public:
    * \param callback The callback to call
    */
   template<typename T, typename P>
-  Connection registerCallback(void(T::*callback)(P), T* t)
+  Connection registerCallback(void (T::* callback)(P), T * t)
   {
-    typename CallbackHelper1<M>::Ptr helper = signal_.template addCallback<P>(std::bind(callback, t, std::placeholders::_1));
+    typename CallbackHelper1<M>::Ptr helper =
+      signal_.template addCallback<P>(std::bind(callback, t, std::placeholders::_1));
     return Connection(std::bind(&Signal::removeCallback, &signal_, helper));
   }
 
   /**
    * \brief Set the name of this filter.  For debugging use.
    */
-  void setName(const std::string& name) { name_ = name; }
+  void setName(const std::string & name) {name_ = name;}
   /**
    * \brief Get the name of this filter.  For debugging use.
    */
-  const std::string& getName() { return name_; }
+  const std::string & getName() {return name_;}
 
 protected:
   /**
    * \brief Call all registered callbacks, passing them the specified message
    */
-  void signalMessage(const MConstPtr& msg)
+  void signalMessage(const MConstPtr & msg)
   {
     MessageEvent<M const> event(msg);
 
@@ -128,7 +130,7 @@ protected:
   /**
    * \brief Call all registered callbacks, passing them the specified message
    */
-  void signalMessage(const MessageEvent<M const>& event)
+  void signalMessage(const MessageEvent<M const> & event)
   {
     signal_.call(event);
   }
