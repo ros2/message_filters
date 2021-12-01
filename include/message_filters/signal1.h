@@ -90,10 +90,8 @@ public:
   template<typename P>
   CallbackHelper1Ptr addCallback(const std::function<void(P)>& callback)
   {
-    CallbackHelper1T<P, M>* helper = new CallbackHelper1T<P, M>(callback);
-
     std::lock_guard<std::mutex> lock(mutex_);
-    callbacks_.push_back(CallbackHelper1Ptr(helper));
+    callbacks_.emplace_back(std::make_shared<CallbackHelper1T<P, M>>(callback));
     return callbacks_.back();
   }
 
