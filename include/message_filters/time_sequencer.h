@@ -37,6 +37,13 @@
 
 #include <rclcpp/rclcpp.hpp>
 
+#include <chrono>
+#include <functional>
+#include <memory>
+#include <mutex>
+#include <set>
+#include <vector>
+
 #include "message_filters/connection.h"
 #include "message_filters/message_traits.h"
 #include "message_filters/simple_filter.h"

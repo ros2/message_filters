@@ -35,11 +35,11 @@
 #ifndef MESSAGE_FILTERS__SYNCHRONIZER_H_
 #define MESSAGE_FILTERS__SYNCHRONIZER_H_
 
-#include <deque>
+#include <functional>
+#include <memory>
 #include <string>
 #include <tuple>
 #include <type_traits>
-#include <vector>
 
 #include "message_filters/connection.h"
 #include "message_filters/null_types.h"

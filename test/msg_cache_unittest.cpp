@@ -35,8 +35,10 @@
 #include <gtest/gtest.h>
 
 #include <rclcpp/rclcpp.hpp>
+
 #include <memory>
-#include <functional>
+#include <vector>
+
 #include "message_filters/cache.h"
 #include "message_filters/message_traits.h"
 

@@ -35,9 +35,10 @@
 #ifndef MESSAGE_FILTERS__SIGNAL9_H_
 #define MESSAGE_FILTERS__SIGNAL9_H_
 
-
 #include <functional>
+#include <memory>
 #include <mutex>
+#include <vector>
 
 #include "message_filters/connection.h"
 #include "message_filters/null_types.h"
@@ -311,4 +312,4 @@ private:
 
 }  // namespace message_filters
 
-#endif // MESSAGE_FILTERS__SIGNAL9_H_
+#endif  // MESSAGE_FILTERS__SIGNAL9_H_

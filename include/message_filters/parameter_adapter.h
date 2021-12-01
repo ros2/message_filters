@@ -179,4 +179,4 @@ struct ParameterAdapter<const MessageEvent<M>& >
 
 }  // namespace message_filters
 
-#endif // MESSAGE_FILTERS__PARAMETER_ADAPTER_H_
+#endif  // MESSAGE_FILTERS__PARAMETER_ADAPTER_H_

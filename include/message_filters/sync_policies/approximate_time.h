@@ -32,19 +32,21 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS__SYNC_APPROXIMATE_TIME_H_
-#define MESSAGE_FILTERS__SYNC_APPROXIMATE_TIME_H_
-
-#include <cassert>
-#include <deque>
-#include <string>
-#include <tuple>
-#include <vector>
+#ifndef MESSAGE_FILTERS__SYNC_POLICIES__APPROXIMATE_TIME_H_
+#define MESSAGE_FILTERS__SYNC_POLICIES__APPROXIMATE_TIME_H_
 
 #include <inttypes.h>
 
 #include <rclcpp/rclcpp.hpp>
 #include <rcutils/logging_macros.h>
+
+#include <cassert>
+#include <deque>
+#include <limits>
+#include <mutex>
+#include <string>
+#include <tuple>
+#include <vector>
 
 #include "message_filters/connection.h"
 #include "message_filters/message_traits.h"
@@ -59,13 +61,12 @@
 #define RCUTILS_ASSERT assert
 #endif
 #ifndef RCUTILS_BREAK
-#include <cassert>
 // TODO(tfoote) remove this after it's implemented upstream
 // https://github.com/ros2/rcutils/pull/112
 #define RCUTILS_BREAK std::abort
 #endif
 // Uncomment below intead
-//#include <rcutils/assert.h>
+// #include <rcutils/assert.h>
 
 namespace message_filters
 {
@@ -860,4 +861,4 @@ private:
 }  // namespace sync
 }  // namespace message_filters
 
-#endif // MESSAGE_FILTERS__SYNC_APPROXIMATE_TIME_H_
+#endif  // MESSAGE_FILTERS__SYNC_POLICIES__APPROXIMATE_TIME_H_

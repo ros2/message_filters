@@ -35,11 +35,13 @@
 #ifndef MESSAGE_FILTERS__CACHE_H_
 #define MESSAGE_FILTERS__CACHE_H_
 
-#include <deque>
-#include <memory>
-#include <functional>
-
 #include <rclcpp/rclcpp.hpp>
+
+#include <deque>
+#include <functional>
+#include <memory>
+#include <mutex>
+#include <vector>
 
 #include "message_filters/connection.h"
 #include "message_filters/simple_filter.h"

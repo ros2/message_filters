@@ -35,8 +35,10 @@
 #ifndef MESSAGE_FILTERS__SIGNAL1_H_
 #define MESSAGE_FILTERS__SIGNAL1_H_
 
+#include <functional>
 #include <memory>
 #include <mutex>
+#include <vector>
 
 #include "message_filters/connection.h"
 #include "message_filters/message_event.h"

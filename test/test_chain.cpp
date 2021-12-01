@@ -35,6 +35,10 @@
 #include <gtest/gtest.h>
 
 #include <rclcpp/rclcpp.hpp>
+
+#include <functional>
+#include <memory>
+
 #include "message_filters/chain.h"
 
 using namespace message_filters;

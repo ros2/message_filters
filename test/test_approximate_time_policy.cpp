@@ -1,4 +1,3 @@
-
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
@@ -34,11 +33,17 @@
 *********************************************************************/
 
 #include <gtest/gtest.h>
+
 #include <rclcpp/rclcpp.hpp>
+
+#include <functional>
+#include <memory>
+#include <utility>
+#include <vector>
+
 #include "message_filters/synchronizer.h"
 #include "message_filters/sync_policies/approximate_time.h"
 #include "message_filters/message_traits.h"
-#include <vector>
 
 using namespace std::placeholders;
 using namespace message_filters;

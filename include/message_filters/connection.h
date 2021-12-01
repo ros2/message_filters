@@ -36,7 +36,6 @@
 #define MESSAGE_FILTERS__CONNECTION_H_
 
 #include <functional>
-#include <memory>
 
 #include "message_filters/visibility_control.h"
 

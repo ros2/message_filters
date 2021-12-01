@@ -31,9 +31,10 @@
 #ifndef MESSAGE_FILTERS__MESSAGE_TRAITS_H_
 #define MESSAGE_FILTERS__MESSAGE_TRAITS_H_
 
-#include <type_traits>
-
 #include <rclcpp/rclcpp.hpp>
+
+#include <string>
+#include <type_traits>
 
 namespace message_filters
 {
@@ -94,4 +95,3 @@ struct TimeStamp<M, typename std::enable_if<HasHeader<M>::value>::type >
 }  // namespace message_filters
 
 #endif  // MESSAGE_FILTERS__MESSAGE_TRAITS_H_
-

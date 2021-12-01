@@ -32,14 +32,14 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS__SYNC_EXACT_TIME_H_
-#define MESSAGE_FILTERS__SYNC_EXACT_TIME_H_
-
-#include <deque>
-#include <string>
-#include <tuple>
+#ifndef MESSAGE_FILTERS__SYNC_POLICIES__EXACT_TIME_H_
+#define MESSAGE_FILTERS__SYNC_POLICIES__EXACT_TIME_H_
 
 #include <rclcpp/rclcpp.hpp>
+
+#include <map>
+#include <mutex>
+#include <tuple>
 
 #include "message_filters/connection.h"
 #include "message_filters/message_traits.h"
@@ -224,5 +224,4 @@ private:
 }  // namespace sync_policies
 }  // namespace message_filters
 
-#endif  // MESSAGE_FILTERS__SYNC_EXACT_TIME_H_
-
+#endif  // MESSAGE_FILTERS__SYNC_POLICIES__EXACT_TIME_H_

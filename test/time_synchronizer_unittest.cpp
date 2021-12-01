@@ -34,10 +34,14 @@
 
 #include <gtest/gtest.h>
 
+#include <rclcpp/rclcpp.hpp>
+
+#include <functional>
+#include <memory>
+
 #include "message_filters/time_synchronizer.h"
 #include "message_filters/pass_through.h"
 #include "message_filters/message_traits.h"
-#include <rclcpp/rclcpp.hpp>
 
 using namespace message_filters;
 

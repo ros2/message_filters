@@ -35,6 +35,10 @@
 #include <gtest/gtest.h>
 
 #include <rclcpp/rclcpp.hpp>
+
+#include <functional>
+#include <memory>
+
 #include "message_filters/synchronizer.h"
 #include "message_filters/sync_policies/exact_time.h"
 

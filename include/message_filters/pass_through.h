@@ -35,6 +35,8 @@
 #ifndef MESSAGE_FILTERS__PASS_THROUGH_H_
 #define MESSAGE_FILTERS__PASS_THROUGH_H_
 
+#include <functional>
+#include <memory>
 #include <vector>
 
 #include "message_filters/simple_filter.h"

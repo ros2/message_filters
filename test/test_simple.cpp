@@ -35,9 +35,10 @@
 #include <gtest/gtest.h>
 
 #include <rclcpp/rclcpp.hpp>
+#include <array>
 #include <functional>
 #include <memory>
-#include <array>
+
 #include "message_filters/simple_filter.h"
 
 using namespace message_filters;

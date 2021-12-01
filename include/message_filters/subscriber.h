@@ -35,9 +35,11 @@
 #ifndef MESSAGE_FILTERS__SUBSCRIBER_H_
 #define MESSAGE_FILTERS__SUBSCRIBER_H_
 
-#include <stdexcept>
-
 #include <rclcpp/rclcpp.hpp>
+
+#include <memory>
+#include <stdexcept>
+#include <string>
 
 #include "message_filters/connection.h"
 #include "message_filters/simple_filter.h"

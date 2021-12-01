@@ -32,8 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS_TIME_SYNCHRONIZER_H
-#define MESSAGE_FILTERS_TIME_SYNCHRONIZER_H
+#ifndef MESSAGE_FILTERS__TIME_SYNCHRONIZER_H_
+#define MESSAGE_FILTERS__TIME_SYNCHRONIZER_H_
 
 #include <memory>
 

@@ -35,9 +35,10 @@
 #ifndef MESSAGE_FILTERS__NULL_TYPES_H_
 #define MESSAGE_FILTERS__NULL_TYPES_H_
 
-#include <memory>
-
 #include <rclcpp/rclcpp.hpp>
+
+#include <functional>
+#include <memory>
 
 #include "message_filters/connection.h"
 #include "message_filters/message_traits.h"

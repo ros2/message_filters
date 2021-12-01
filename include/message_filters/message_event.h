@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2010, Willow Garage, Inc.
  *
@@ -32,10 +31,13 @@
 #ifndef MESSAGE_FILTERS__MESSAGE_EVENT_H_
 #define MESSAGE_FILTERS__MESSAGE_EVENT_H_
 
-#include <type_traits>
-#include <memory>
-
 #include <rclcpp/rclcpp.hpp>
+
+#include <functional>
+#include <map>
+#include <memory>
+#include <string>
+#include <type_traits>
 
 #ifndef RCUTILS_ASSERT
 // TODO(tfoote) remove this after it's implemented upstream
@@ -43,7 +45,7 @@
 #define RCUTILS_ASSERT assert
 #endif
 // Uncomment below intead
-//#include <rcutils/assert.h>
+// #include <rcutils/assert.h>
 
 namespace message_filters
 {

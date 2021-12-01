@@ -32,9 +32,11 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS__CHAIN_H
-#define MESSAGE_FILTERS__CHAIN_H
+#ifndef MESSAGE_FILTERS__CHAIN_H_
+#define MESSAGE_FILTERS__CHAIN_H_
 
+#include <functional>
+#include <memory>
 #include <vector>
 
 #include "message_filters/simple_filter.h"

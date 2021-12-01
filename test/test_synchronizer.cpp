@@ -35,8 +35,13 @@
 #include <gtest/gtest.h>
 
 #include <rclcpp/rclcpp.hpp>
-#include "message_filters/synchronizer.h"
+
 #include <array>
+#include <functional>
+#include <memory>
+#include <tuple>
+
+#include "message_filters/synchronizer.h"
 
 using namespace message_filters;
 using namespace std::placeholders;
