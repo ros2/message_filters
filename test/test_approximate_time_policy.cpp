@@ -45,10 +45,6 @@
 #include "message_filters/sync_policies/approximate_time.h"
 #include "message_filters/message_traits.h"
 
-using namespace std::placeholders;
-using namespace message_filters;
-using namespace message_filters::sync_policies;
-
 struct Header
 {
   rclcpp::Time stamp;
@@ -104,7 +100,12 @@ public:
 				  uint32_t queue_size) :
     input_(input), output_(output), output_position_(0), sync_(queue_size)
   {
-    sync_.registerCallback(std::bind(&ApproximateTimeSynchronizerTest::callback, this, _1, _2));
+    sync_.registerCallback(
+      std::bind(
+        &ApproximateTimeSynchronizerTest::callback,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2));
   }
 
   void callback(const MsgConstPtr& p, const MsgConstPtr& q)
@@ -144,7 +145,9 @@ private:
   const std::vector<TimeAndTopic> &input_;
   const std::vector<TimePair> &output_;
   unsigned int output_position_;
-  typedef Synchronizer<ApproximateTime<Msg, Msg> > Sync2;
+  typedef message_filters::Synchronizer<message_filters::sync_policies::ApproximateTime<Msg,
+      Msg>> Sync2;
+
 public:
   Sync2 sync_;
 };
@@ -162,7 +165,14 @@ public:
 				      uint32_t queue_size) :
     input_(input), output_(output), output_position_(0), sync_(queue_size)
   {
-    sync_.registerCallback(std::bind(&ApproximateTimeSynchronizerTestQuad::callback, this, _1, _2, _3, _4));
+    sync_.registerCallback(
+      std::bind(
+        &ApproximateTimeSynchronizerTestQuad::callback,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3,
+        std::placeholders::_4));
   }
 
     void callback(const MsgConstPtr& p, const MsgConstPtr& q, const MsgConstPtr& r, const MsgConstPtr& s)
@@ -211,7 +221,9 @@ private:
   const std::vector<TimeAndTopic> &input_;
   const std::vector<TimeQuad> &output_;
   unsigned int output_position_;
-  typedef Synchronizer<ApproximateTime<Msg, Msg, Msg, Msg> > Sync4;
+  typedef message_filters::Synchronizer<message_filters::sync_policies::ApproximateTime<Msg, Msg,
+      Msg, Msg>> Sync4;
+
 public:
   Sync4 sync_;
 };

@@ -43,8 +43,6 @@
 #include "message_filters/pass_through.h"
 #include "message_filters/message_traits.h"
 
-using namespace message_filters;
-
 struct Header
 {
   rclcpp::Time stamp;
@@ -98,173 +96,201 @@ public:
 
 TEST(TimeSynchronizer, compile2)
 {
-  NullFilter<Msg> f0, f1;
-  TimeSynchronizer<Msg, Msg> sync(f0, f1, 1);
+  message_filters::NullFilter<Msg> f0, f1;
+  message_filters::TimeSynchronizer<Msg, Msg> sync(f0, f1, 1);
 }
 
 TEST(TimeSynchronizer, compile3)
 {
-  NullFilter<Msg> f0, f1, f2;
-  TimeSynchronizer<Msg, Msg, Msg> sync(f0, f1, f2, 1);
+  message_filters::NullFilter<Msg> f0, f1, f2;
+  message_filters::TimeSynchronizer<Msg, Msg, Msg> sync(f0, f1, f2, 1);
 }
 
 TEST(TimeSynchronizer, compile4)
 {
-  NullFilter<Msg> f0, f1, f2, f3;
-  TimeSynchronizer<Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, 1);
+  message_filters::NullFilter<Msg> f0, f1, f2, f3;
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, 1);
 }
 
 TEST(TimeSynchronizer, compile5)
 {
-  NullFilter<Msg> f0, f1, f2, f3, f4;
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4, 1);
+  message_filters::NullFilter<Msg> f0, f1, f2, f3, f4;
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4, 1);
 }
 
 TEST(TimeSynchronizer, compile6)
 {
-  NullFilter<Msg> f0, f1, f2, f3, f4, f5;
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4, f5, 1);
+  message_filters::NullFilter<Msg> f0, f1, f2, f3, f4, f5;
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4, f5, 1);
 }
 
 TEST(TimeSynchronizer, compile7)
 {
-  NullFilter<Msg> f0, f1, f2, f3, f4, f5, f6;
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4, f5, f6, 1);
+  message_filters::NullFilter<Msg> f0, f1, f2, f3, f4, f5, f6;
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4, f5,
+    f6, 1);
 }
 
 TEST(TimeSynchronizer, compile8)
 {
-  NullFilter<Msg> f0, f1, f2, f3, f4, f5, f6, f7;
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4, f5, f6, f7, 1);
+  message_filters::NullFilter<Msg> f0, f1, f2, f3, f4, f5, f6, f7;
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4,
+    f5, f6, f7, 1);
 }
 
 TEST(TimeSynchronizer, compile9)
 {
-  NullFilter<Msg> f0, f1, f2, f3, f4, f5, f6, f7, f8;
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4, f5, f6, f7, f8, 1);
+  message_filters::NullFilter<Msg> f0, f1, f2, f3, f4, f5, f6, f7, f8;
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2,
+    f3, f4, f5, f6, f7, f8, 1);
 }
 
-void function2(const MsgConstPtr&, const MsgConstPtr&) {}
-void function3(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function4(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function5(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function6(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function7(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function8(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function9(const MsgConstPtr&, MsgConstPtr, const MsgPtr&, MsgPtr, const Msg&, Msg, const MessageEvent<Msg const>&, const MessageEvent<Msg>&, const MsgConstPtr&) {}
+void function2(const MsgConstPtr &, const MsgConstPtr &) {}
+void function3(const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &) {}
+void function4(const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &)
+{
+}
+void function5(
+  const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &,
+  const MsgConstPtr &) {}
+void function6(
+  const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &,
+  const MsgConstPtr &, const MsgConstPtr &) {}
+void function7(
+  const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &,
+  const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &) {}
+void function8(
+  const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &,
+  const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &)
+{
+}
+void function9(
+  const MsgConstPtr &, MsgConstPtr, const MsgPtr &, MsgPtr, const Msg &, Msg,
+  const message_filters::MessageEvent<Msg const> &, const message_filters::MessageEvent<Msg> &,
+  const MsgConstPtr &) {}
 
 TEST(TimeSynchronizer, compileFunction2)
 {
-  TimeSynchronizer<Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg> sync(1);
   sync.registerCallback(function2);
 }
 
 TEST(TimeSynchronizer, compileFunction3)
 {
-  TimeSynchronizer<Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg> sync(1);
   sync.registerCallback(function3);
 }
 
 TEST(TimeSynchronizer, compileFunction4)
 {
-  TimeSynchronizer<Msg, Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg> sync(1);
   sync.registerCallback(function4);
 }
 
 TEST(TimeSynchronizer, compileFunction5)
 {
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg> sync(1);
   sync.registerCallback(function5);
 }
 
 TEST(TimeSynchronizer, compileFunction6)
 {
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
   sync.registerCallback(function6);
 }
 
 TEST(TimeSynchronizer, compileFunction7)
 {
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
   sync.registerCallback(function7);
 }
 
 TEST(TimeSynchronizer, compileFunction8)
 {
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
   sync.registerCallback(function8);
 }
 
 TEST(TimeSynchronizer, compileFunction9)
 {
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
   sync.registerCallback(function9);
 }
 
 struct MethodHelper
 {
-  void method2(const MsgConstPtr&, const MsgConstPtr&) {}
-  void method3(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-  void method4(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-  void method5(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-  void method6(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-  void method7(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-  void method8(const MsgConstPtr&, MsgConstPtr, const MsgPtr&, MsgPtr, const Msg&, Msg, const MessageEvent<Msg const>&, const MessageEvent<Msg>&) {}
+  void method2(const MsgConstPtr &, const MsgConstPtr &) {}
+  void method3(const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &) {}
+  void method4(const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &)
+  {
+  }
+  void method5(
+    const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &,
+    const MsgConstPtr &) {}
+  void method6(
+    const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &,
+    const MsgConstPtr &, const MsgConstPtr &) {}
+  void method7(
+    const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &,
+    const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &) {}
+  void method8(
+    const MsgConstPtr &, MsgConstPtr, const MsgPtr &, MsgPtr, const Msg &, Msg,
+    const message_filters::MessageEvent<Msg const> &, const message_filters::MessageEvent<Msg> &) {}
   // Can only do 8 here because the object instance counts as a parameter and bind only supports 9
 };
 
 TEST(TimeSynchronizer, compileMethod2)
 {
   MethodHelper h;
-  TimeSynchronizer<Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg> sync(1);
   sync.registerCallback(&MethodHelper::method2, &h);
 }
 
 TEST(TimeSynchronizer, compileMethod3)
 {
   MethodHelper h;
-  TimeSynchronizer<Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg> sync(1);
   sync.registerCallback(&MethodHelper::method3, &h);
 }
 
 TEST(TimeSynchronizer, compileMethod4)
 {
   MethodHelper h;
-  TimeSynchronizer<Msg, Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg> sync(1);
   sync.registerCallback(&MethodHelper::method4, &h);
 }
 
 TEST(TimeSynchronizer, compileMethod5)
 {
   MethodHelper h;
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg> sync(1);
   sync.registerCallback(&MethodHelper::method5, &h);
 }
 
 TEST(TimeSynchronizer, compileMethod6)
 {
   MethodHelper h;
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
   sync.registerCallback(&MethodHelper::method6, &h);
 }
 
 TEST(TimeSynchronizer, compileMethod7)
 {
   MethodHelper h;
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
   sync.registerCallback(&MethodHelper::method7, &h);
 }
 
 TEST(TimeSynchronizer, compileMethod8)
 {
   MethodHelper h;
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
   sync.registerCallback(&MethodHelper::method8, &h);
 }
 
 TEST(TimeSynchronizer, immediate2)
 {
-  TimeSynchronizer<Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg> sync(1);
   Helper h;
   sync.registerCallback(std::bind(&Helper::cb, &h));
   MsgPtr m(std::make_shared<Msg>());
@@ -278,7 +304,7 @@ TEST(TimeSynchronizer, immediate2)
 
 TEST(TimeSynchronizer, immediate3)
 {
-  TimeSynchronizer<Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg> sync(1);
   Helper h;
   sync.registerCallback(std::bind(&Helper::cb, &h));
   MsgPtr m(std::make_shared<Msg>());
@@ -294,7 +320,7 @@ TEST(TimeSynchronizer, immediate3)
 
 TEST(TimeSynchronizer, immediate4)
 {
-  TimeSynchronizer<Msg, Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg> sync(1);
   Helper h;
   sync.registerCallback(std::bind(&Helper::cb, &h));
   MsgPtr m(std::make_shared<Msg>());
@@ -312,7 +338,7 @@ TEST(TimeSynchronizer, immediate4)
 
 TEST(TimeSynchronizer, immediate5)
 {
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg> sync(1);
   Helper h;
   sync.registerCallback(std::bind(&Helper::cb, &h));
   MsgPtr m(std::make_shared<Msg>());
@@ -332,7 +358,7 @@ TEST(TimeSynchronizer, immediate5)
 
 TEST(TimeSynchronizer, immediate6)
 {
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
   Helper h;
   sync.registerCallback(std::bind(&Helper::cb, &h));
   MsgPtr m(std::make_shared<Msg>());
@@ -354,7 +380,7 @@ TEST(TimeSynchronizer, immediate6)
 
 TEST(TimeSynchronizer, immediate7)
 {
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
   Helper h;
   sync.registerCallback(std::bind(&Helper::cb, &h));
   MsgPtr m(std::make_shared<Msg>());
@@ -378,7 +404,7 @@ TEST(TimeSynchronizer, immediate7)
 
 TEST(TimeSynchronizer, immediate8)
 {
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
   Helper h;
   sync.registerCallback(std::bind(&Helper::cb, &h));
   MsgPtr m(std::make_shared<Msg>());
@@ -404,7 +430,7 @@ TEST(TimeSynchronizer, immediate8)
 
 TEST(TimeSynchronizer, immediate9)
 {
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1);
   Helper h;
   sync.registerCallback(std::bind(&Helper::cb, &h));
   MsgPtr m(std::make_shared<Msg>());
@@ -436,7 +462,7 @@ TEST(TimeSynchronizer, immediate9)
 //////////////////////////////////////////////////////////////////////////////////////////////////
 TEST(TimeSynchronizer, multipleTimes)
 {
-  TimeSynchronizer<Msg, Msg, Msg> sync(2);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg> sync(2);
   Helper h;
   sync.registerCallback(std::bind(&Helper::cb, &h));
   MsgPtr m(std::make_shared<Msg>());
@@ -457,7 +483,7 @@ TEST(TimeSynchronizer, multipleTimes)
 
 TEST(TimeSynchronizer, queueSize)
 {
-  TimeSynchronizer<Msg, Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg> sync(1);
   Helper h;
   sync.registerCallback(std::bind(&Helper::cb, &h));
   MsgPtr m(std::make_shared<Msg>());
@@ -483,7 +509,7 @@ TEST(TimeSynchronizer, queueSize)
 
 TEST(TimeSynchronizer, dropCallback)
 {
-  TimeSynchronizer<Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg> sync(1);
   Helper h;
   sync.registerCallback(std::bind(&Helper::cb, &h));
   sync.registerDropCallback(std::bind(&Helper::dropcb, &h));
@@ -500,22 +526,24 @@ TEST(TimeSynchronizer, dropCallback)
 
 struct EventHelper
 {
-  void callback(const MessageEvent<Msg const>& e1, const MessageEvent<Msg const>& e2)
+  void callback(
+    const message_filters::MessageEvent<Msg const> & e1,
+    const message_filters::MessageEvent<Msg const> & e2)
   {
     e1_ = e1;
     e2_ = e2;
   }
 
-  MessageEvent<Msg const> e1_;
-  MessageEvent<Msg const> e2_;
+  message_filters::MessageEvent<Msg const> e1_;
+  message_filters::MessageEvent<Msg const> e2_;
 };
 
 TEST(TimeSynchronizer, eventInEventOut)
 {
-  TimeSynchronizer<Msg, Msg> sync(2);
+  message_filters::TimeSynchronizer<Msg, Msg> sync(2);
   EventHelper h;
   sync.registerCallback(&EventHelper::callback, &h);
-  MessageEvent<Msg const> evt(std::make_shared<Msg>(), rclcpp::Time(4, 0));
+  message_filters::MessageEvent<Msg const> evt(std::make_shared<Msg>(), rclcpp::Time(4, 0));
 
   sync.add<0>(evt);
   sync.add<1>(evt);
@@ -528,8 +556,8 @@ TEST(TimeSynchronizer, eventInEventOut)
 
 TEST(TimeSynchronizer, connectConstructor)
 {
-  PassThrough<Msg> pt1, pt2;
-  TimeSynchronizer<Msg, Msg> sync(pt1, pt2, 1);
+  message_filters::PassThrough<Msg> pt1, pt2;
+  message_filters::TimeSynchronizer<Msg, Msg> sync(pt1, pt2, 1);
   Helper h;
   sync.registerCallback(std::bind(&Helper::cb, &h));
   MsgPtr m(std::make_shared<Msg>());
