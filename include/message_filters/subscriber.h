@@ -321,7 +321,7 @@ public:
 
   std::string getTopic() const
   {
-    return this->topic_;
+    return std::string(this->sub_->get_topic_name());
   }
 
   /**
