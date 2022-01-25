@@ -23,7 +23,7 @@ if(WIN32)
 endif()
 target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-  "$<INSTALL_INTERFACE:include>")
+  "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
 
 ament_target_dependencies(${PROJECT_NAME}
   "rclcpp"
@@ -39,15 +39,19 @@ install(
 
 install(
   DIRECTORY "include/"
-  DESTINATION include
+  DESTINATION include/${PROJECT_NAME}
 )
 
 ament_python_install_package(${PROJECT_NAME}
   PACKAGE_DIR src/${PROJECT_NAME})
 
-ament_export_include_directories(include)
+# Export old-style CMake variables
+ament_export_include_directories("include/${PROJECT_NAME}")
 ament_export_libraries(${PROJECT_NAME})
+
+# Export modern CMake targets
 ament_export_targets(${PROJECT_NAME})
+
 ament_export_dependencies(rclcpp rcutils)
 
 if(BUILD_TESTING)
@@ -82,7 +86,6 @@ if(BUILD_TESTING)
   ament_add_gtest(${PROJECT_NAME}-test_subscriber test/test_subscriber.cpp)
   if(TARGET ${PROJECT_NAME}-test_subscriber)
     target_link_libraries(${PROJECT_NAME}-test_subscriber ${PROJECT_NAME})
-    target_include_directories(${PROJECT_NAME}-test_subscriber PUBLIC include)
     ament_target_dependencies(${PROJECT_NAME}-test_subscriber "rclcpp" "rclcpp_lifecycle" "sensor_msgs")
   endif()
 
@@ -109,7 +112,6 @@ if(BUILD_TESTING)
   ament_add_gtest(${PROJECT_NAME}-test_fuzz test/test_fuzz.cpp SKIP_TEST)
   if(TARGET ${PROJECT_NAME}-test_fuzz)
     target_link_libraries(${PROJECT_NAME}-test_fuzz ${PROJECT_NAME})
-    target_include_directories(${PROJECT_NAME}-test_fuzz PUBLIC include)
     ament_target_dependencies(${PROJECT_NAME}-test_fuzz "rclcpp" "sensor_msgs")
   endif()
 
