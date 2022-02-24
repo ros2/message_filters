@@ -85,7 +85,7 @@ template<typename M>
 struct TimeStamp<M, typename std::enable_if<HasHeader<M>::value>::type >
 {
   static rclcpp::Time value(const M& m) {
-    return rclcpp::Time(m.header.stamp);
+    return rclcpp::Time(m.header.stamp, RCL_ROS_TIME);
   }
 };
 
