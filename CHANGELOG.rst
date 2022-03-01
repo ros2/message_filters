@@ -2,6 +2,12 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Install includes to include/${PROJECT_NAME} (`#71 <https://github.com/ros2/message_filters/issues/71>`_)
+* Update maintainers (`#67 <https://github.com/ros2/message_filters/issues/67>`_)
+* Contributors: Audrow Nash, Shane Loretz
+
 4.2.0 (2021-10-18)
 ------------------
 * Suppress rclcpp deprecation warnings in unit tests (`#62 <https://github.com/ros2/message_filters/issues/62>`_)
