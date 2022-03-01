@@ -2,8 +2,8 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.3.0 (2022-03-01)
+------------------
 * Install includes to include/${PROJECT_NAME} (`#71 <https://github.com/ros2/message_filters/issues/71>`_)
 * Update maintainers (`#67 <https://github.com/ros2/message_filters/issues/67>`_)
 * Contributors: Audrow Nash, Shane Loretz
