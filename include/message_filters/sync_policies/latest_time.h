@@ -121,7 +121,7 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 
   LatestTime(uint32_t)
   : parent_(0),
-    ros_clock_(RCL_ROS_TIME)  // RCL_STEADY_TIME)
+    ros_clock_(RCL_ROS_TIME)
   {
   }
 
