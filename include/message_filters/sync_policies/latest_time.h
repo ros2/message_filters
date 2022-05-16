@@ -55,20 +55,6 @@
 #include "message_filters/synchronizer.h"
 
 
-#ifndef RCUTILS_ASSERT
-// TODO(tfoote) remove this after it's implemented upstream
-// https://github.com/ros2/rcutils/pull/112
-#define RCUTILS_ASSERT assert
-#endif
-#ifndef RCUTILS_BREAK
-#include <cassert>
-// TODO(tfoote) remove this after it's implemented upstream
-// https://github.com/ros2/rcutils/pull/112
-#define RCUTILS_BREAK std::abort
-#endif
-// Uncomment below intead
-//#include <rcutils/assert.h>
-
 namespace message_filters
 {
 namespace sync_policies
