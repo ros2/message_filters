@@ -43,7 +43,7 @@
 #include <numeric>
 #include <algorithm>
 
-#include <inttypes.h>
+#include <cinttypes>
 
 #include <rclcpp/rclcpp.hpp>
 #include <rcutils/logging_macros.h>
