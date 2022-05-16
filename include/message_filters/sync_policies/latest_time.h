@@ -35,20 +35,15 @@
 #ifndef MESSAGE_FILTERS__SYNC_LATEST_TIME_H_
 #define MESSAGE_FILTERS__SYNC_LATEST_TIME_H_
 
-#include <cassert>
+#include <algorithm>
 #include <deque>
+#include <numeric>
 #include <string>
 #include <tuple>
 #include <vector>
-#include <numeric>
-#include <algorithm>
-
-#include <cinttypes>
 
 #include <rclcpp/rclcpp.hpp>
-#include <rcutils/logging_macros.h>
 
-#include "message_filters/connection.h"
 #include "message_filters/message_traits.h"
 #include "message_filters/null_types.h"
 #include "message_filters/signal9.h"
