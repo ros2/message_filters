@@ -32,6 +32,30 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+/**
+ * \brief Synchronizes up to 9 messages by their rates with upsampling via zero-order-hold.
+ *
+ * LatestTime policy synchronizes up to 9 incoming channels by the rates they are received.
+ * The callback with all the messages will be triggered whenever the fastest message is received.
+ * The slower messages will be repeated at the rate of the fastest message and will be updated
+ * whenever a new one is received. This is essentially an upsampling of slower messages using a
+ * zero-order hold (no interpolation).
+
+ * \section usage USAGE
+ * Example usage would be:
+\verbatim
+typedef LatestTime<sensor_msgs::CameraInfo, sensor_msgs::Image, sensor_msgs::Image> latest_policy;
+Synchronizer<latest_policy> sync_policies(latest_policy(1U), caminfo_sub, limage_sub, rimage_sub);
+sync_policies.registerCallback(callback);
+\endverbatim
+
+ * The callback is then of the form:
+\verbatim
+void callback(const sensor_msgs::CameraInfo::ConstPtr&, const sensor_msgs::Image::ConstPtr&, const sensor_msgs::Image::ConstPtr&);
+\endverbatim
+ *
+ */
+
 #ifndef MESSAGE_FILTERS__SYNC_LATEST_TIME_H_
 #define MESSAGE_FILTERS__SYNC_LATEST_TIME_H_
 
