@@ -139,7 +139,6 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 
     std::get<i>(events_) = evt;
 
-    std::cout << "compute hz for " << i << std::endl;
     rates_[i].compute_hz(ros_clock_.now());
     if(i == find_pivot() && is_full())
     {
@@ -151,7 +150,6 @@ private:
   // assumed data_mutex_ is locked
   void publish()
   {
-    std::cout << "publish!" << std::endl;
     parent_->signal(std::get<0>(events_), std::get<1>(events_), std::get<2>(events_),
                     std::get<3>(events_), std::get<4>(events_), std::get<5>(events_),
                     std::get<6>(events_), std::get<7>(events_), std::get<8>(events_));
@@ -161,7 +159,9 @@ private:
   {
     rclcpp::Time prev;
     double hz{0.0};
-    bool do_init{true};
+    double error{0.0};
+    bool do_hz_init{true};
+    bool do_error_init{true};
     Rate(const rclcpp::Time &start)
       : prev(start)
     {
@@ -175,14 +175,26 @@ private:
     void compute_hz(const rclcpp::Time &now)
     {
       double period = (now-prev).seconds();
-      prev = now;
-      if (do_init) {
+      if (do_hz_init) {
         hz = 1.0/period;
-        do_init = false;
+        do_hz_init = false;
       } else {
-        hz = 0.95/period + 0.05*hz;
+        if (do_error_init) {
+          error = fabs(hz - 1.0/period);
+          do_error_init = false;
+        } else {
+          if (fabs(hz - 1.0/period) > 10.0*error) {
+            // detected step change in rate so reset
+            do_hz_init = true;
+            do_error_init = true;
+            compute_hz(now);
+            return;
+          }
+          error = 0.7*error + 0.3*fabs(hz - 1.0/period);
+        }
+        hz = 0.9/period + 0.1*hz;
       }
-      std::cout << "hz:" << hz << std::endl;
+      prev = now;
     }
   };
 
