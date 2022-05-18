@@ -122,9 +122,9 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   void add(const typename std::tuple_element<i, Events>::type& evt)
   {
     RCUTILS_ASSERT(parent_);
-    
+
     std::lock_guard<std::mutex> lock(data_mutex_);
-    
+
     if(!received_msg<i>())
     {
       rates_.push_back(Rate(ros_clock_.now()));
@@ -211,7 +211,7 @@ private:
     // sort indexes based on comparing values in v
     // using std::stable_sort instead of std::sort
     // to avoid unnecessary index re-orderings
-    // when v contains elements of equal values 
+    // when v contains elements of equal values
     std::stable_sort(idx.begin(), idx.end(),
                      [&v](std::size_t i1, std::size_t i2) {return v[i1] > v[i2];});
 
@@ -252,7 +252,7 @@ private:
   Events events_;
   std::vector<Rate> rates_;
   std::mutex data_mutex_;  // Protects all of the above
-  
+
   rclcpp::Clock ros_clock_;
 };
 
