@@ -103,7 +103,7 @@ protected:
   std::vector<MsgPtr> p;
   std::vector<MsgPtr> q;
   std::vector<MsgPtr> r;
-  
+
   virtual void SetUp()
   {
     sync.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1,
@@ -142,7 +142,7 @@ TEST_F(LatestTimePolicy, Leading)
       sync.add<2>(r[idx / 4U]);
     }
     sync.add<0>(p[idx]);
-    
+
     EXPECT_EQ(h.count_, idx);
     if(idx > 0)
     {
@@ -175,7 +175,7 @@ TEST_F(LatestTimePolicy, Trailing)
       sync.add<2>(r[(idx - 3U) / 4U]);
     }
     sync.add<0>(p[idx]);
-    
+
     if (idx > 2U)
     {
       EXPECT_EQ(h.count_, idx - 2U);
@@ -189,7 +189,7 @@ TEST_F(LatestTimePolicy, Trailing)
       EXPECT_FALSE(h.q_);
       EXPECT_FALSE(h.r_);
     }
-    
+
     rate.sleep();
   }
 }
@@ -203,12 +203,12 @@ TEST_F(LatestTimePolicy, ChangeRate)
     {
       sync.add<1>(q[(idx - 1U) / 2U]);
     }
-    
+
     if(idx % 4U == 3U)
     {
       sync.add<2>(r[(idx - 3U) / 4U]);
     }
-    
+
     if (idx < 4U)
     {
       sync.add<0>(p[idx]);
@@ -263,7 +263,7 @@ TEST_F(LatestTimePolicy, ChangeRate)
       EXPECT_FALSE(h.q_);
       EXPECT_FALSE(h.r_);
     }
-    
+
     rate.sleep();
   }
 }
