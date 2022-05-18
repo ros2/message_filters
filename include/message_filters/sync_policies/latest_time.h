@@ -91,38 +91,6 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   typedef typename Super::Signal Signal;
   typedef typename Super::Events Events;
   typedef typename Super::RealTypeCount RealTypeCount;
-  typedef typename Super::M0Event M0Event;
-  typedef typename Super::M1Event M1Event;
-  typedef typename Super::M2Event M2Event;
-  typedef typename Super::M3Event M3Event;
-  typedef typename Super::M4Event M4Event;
-  typedef typename Super::M5Event M5Event;
-  typedef typename Super::M6Event M6Event;
-  typedef typename Super::M7Event M7Event;
-  typedef typename Super::M8Event M8Event;
-  typedef std::deque<M0Event> M0Deque;
-  typedef std::deque<M1Event> M1Deque;
-  typedef std::deque<M2Event> M2Deque;
-  typedef std::deque<M3Event> M3Deque;
-  typedef std::deque<M4Event> M4Deque;
-  typedef std::deque<M5Event> M5Deque;
-  typedef std::deque<M6Event> M6Deque;
-  typedef std::deque<M7Event> M7Deque;
-  typedef std::deque<M8Event> M8Deque;
-  typedef std::vector<M0Event> M0Vector;
-  typedef std::vector<M1Event> M1Vector;
-  typedef std::vector<M2Event> M2Vector;
-  typedef std::vector<M3Event> M3Vector;
-  typedef std::vector<M4Event> M4Vector;
-  typedef std::vector<M5Event> M5Vector;
-  typedef std::vector<M6Event> M6Vector;
-  typedef std::vector<M7Event> M7Vector;
-  typedef std::vector<M8Event> M8Vector;
-  typedef Events Tuple;
-  typedef std::tuple<M0Deque, M1Deque, M2Deque, M3Deque, M4Deque,
-                     M5Deque, M6Deque, M7Deque, M8Deque> DequeTuple;
-  typedef std::tuple<M0Vector, M1Vector, M2Vector, M3Vector, M4Vector,
-                     M5Vector, M6Vector, M7Vector, M8Vector> VectorTuple;
 
   LatestTime(uint32_t)
   : parent_(0),
@@ -159,7 +127,7 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
     
     if(!received_msg<i>())
     {
-      rates_.push_back(Rate(1U, ros_clock_.now()));
+      rates_.push_back(Rate(ros_clock_.now()));
       // wait until we get each message once to publish
       // then wait until we got each message twice to compute rates
       // NOTE: this will drop a few messages of the faster topics until
@@ -171,7 +139,8 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 
     std::get<i>(events_) = evt;
 
-    compute_hz(rates_[i]);
+    std::cout << "compute hz for " << i << std::endl;
+    rates_[i].compute_hz(ros_clock_.now());
     if(i == find_pivot() && is_full())
     {
       publish();
@@ -182,6 +151,7 @@ private:
   // assumed data_mutex_ is locked
   void publish()
   {
+    std::cout << "publish!" << std::endl;
     parent_->signal(std::get<0>(events_), std::get<1>(events_), std::get<2>(events_),
                     std::get<3>(events_), std::get<4>(events_), std::get<5>(events_),
                     std::get<6>(events_), std::get<7>(events_), std::get<8>(events_));
@@ -189,35 +159,34 @@ private:
 
   struct Rate
   {
-    uint64_t count;
-    rclcpp::Time start;
-    double hz;
-    Rate(const uint64_t &count, const rclcpp::Time &start)
-      : count(count),
-        start(start),
-        hz(0.0)
+    rclcpp::Time prev;
+    double hz{0.0};
+    bool do_init{true};
+    Rate(const rclcpp::Time &start)
+      : prev(start)
     {
     }
+
     bool operator>(const Rate &that) const
     {
       return this->hz > that.hz;
     }
+
+    void compute_hz(const rclcpp::Time &now)
+    {
+      double period = (now-prev).seconds();
+      prev = now;
+      if (do_init) {
+        hz = 1.0/period;
+        do_init = false;
+      } else {
+        hz = 0.95/period + 0.05*hz;
+      }
+      std::cout << "hz:" << hz << std::endl;
+    }
   };
 
   // assumed data_mutex_ is locked
-  void compute_hz(Rate &rate)
-  {
-    rate.count += 1;
-    rclcpp::Time now = ros_clock_.now();
-    double elapsed = (now-rate.start).seconds();
-    rate.hz = double(rate.count)/elapsed;
-
-    if(rate.count % 10000U == 0U)
-    {
-      rate.count = 0U;
-      rate.start = ros_clock_.now();
-    }
-  }
 
   template <typename T>
   std::vector<std::size_t> sort_indices(const std::vector<T> &v)
@@ -268,8 +237,6 @@ private:
   }
 
   Sync* parent_;
-  static const int NO_PIVOT = 9;  // Special value for the pivot indicating
-                                  // that no pivot has been selected
   Events events_;
   std::vector<Rate> rates_;
   std::mutex data_mutex_;  // Protects all of the above

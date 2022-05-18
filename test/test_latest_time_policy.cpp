@@ -73,14 +73,15 @@ class Helper
 {
 public:
   Helper()
-  : count_(0)
+  : count_(0),
+    ros_clock_(RCL_ROS_TIME)
   {}
 
   void cb(const MsgConstPtr& p, const MsgConstPtr& q, const MsgConstPtr& r)
   {
-    ASSERT_TRUE(p);
-    ASSERT_TRUE(q);
-    ASSERT_TRUE(r);
+    EXPECT_TRUE(p);
+    EXPECT_TRUE(q);
+    EXPECT_TRUE(r);
 
     p_ = p; q_ = q; r_ = r;
     ++count_;
@@ -88,146 +89,185 @@ public:
 
   MsgConstPtr p_, q_, r_;
   uint16_t count_;
+  rclcpp::Clock ros_clock_;
 };
 
 typedef LatestTime<Msg, Msg, Msg> Policy3;
 typedef Synchronizer<Policy3> Sync3;
 
-TEST(LatestTime, Leading)
+class LatestTimePolicy : public ::testing::Test
 {
-  Sync3 sync(1);
+protected:
+  Sync3 sync{1};
   Helper h;
-  sync.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1,
-                                                   std::placeholders::_2,
-                                                   std::placeholders::_3));
-  std::vector<MsgPtr> p; p.reserve(8U);
-  std::vector<MsgPtr> q; q.reserve(4U);
-  std::vector<MsgPtr> r; r.reserve(2U);
-  for(std::size_t idx = 0U; idx < 8U; ++idx)
+  std::vector<MsgPtr> p;
+  std::vector<MsgPtr> q;
+  std::vector<MsgPtr> r;
+  
+  virtual void SetUp()
   {
-    MsgPtr p_idx(std::make_shared<Msg>()); p_idx->data = idx; p.push_back(p_idx);
-    if(idx % 2U == 0U)
+    sync.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1,
+                                                     std::placeholders::_2,
+                                                     std::placeholders::_3));
+    p.reserve(12U);
+    q.reserve(6U);
+    r.reserve(3U);
+    for(std::size_t idx = 0U; idx < 12U; ++idx)
     {
-      MsgPtr q_idx(std::make_shared<Msg>()); q_idx->data = idx; q.push_back(q_idx);
-    }
-    if(idx % 4U == 0U)
-    {
-      MsgPtr r_idx(std::make_shared<Msg>()); r_idx->data = idx; r.push_back(r_idx);
+      MsgPtr p_idx(std::make_shared<Msg>()); p_idx->data = idx; p.push_back(p_idx);
+      if(idx % 2U == 0U)
+      {
+        MsgPtr q_idx(std::make_shared<Msg>()); q_idx->data = idx; q.push_back(q_idx);
+      }
+      if(idx % 4U == 0U)
+      {
+        MsgPtr r_idx(std::make_shared<Msg>()); r_idx->data = idx; r.push_back(r_idx);
+      }
     }
   }
+};
 
+
+TEST_F(LatestTimePolicy, Leading)
+{
   rclcpp::Rate rate(50.0);
   for(std::size_t idx = 0U; idx < 8U; ++idx)
   {
     if(idx % 2U == 0U)
     {
-      sync.add<1>(q[idx/2]);
+      sync.add<1>(q[idx / 2U]);
     }
     if(idx % 4U == 0U)
     {
-      sync.add<2>(r[idx/4]);
+      sync.add<2>(r[idx / 4U]);
     }
     sync.add<0>(p[idx]);
     
-    ASSERT_EQ(h.count_, idx);
+    EXPECT_EQ(h.count_, idx);
     if(idx > 0)
     {
-      ASSERT_EQ(h.p_->data, p[idx]->data);
-      ASSERT_EQ(h.q_->data, q[idx/2]->data);
-      ASSERT_EQ(h.r_->data, r[idx/4]->data);
+      EXPECT_EQ(h.p_->data, p[idx]->data);
+      EXPECT_EQ(h.q_->data, q[idx / 2U]->data);
+      EXPECT_EQ(h.r_->data, r[idx / 4U]->data);
     }
     else
     {
-      ASSERT_FALSE(h.p_);
-      ASSERT_FALSE(h.q_);
-      ASSERT_FALSE(h.r_);
+      EXPECT_FALSE(h.p_);
+      EXPECT_FALSE(h.q_);
+      EXPECT_FALSE(h.r_);
     }
 
     rate.sleep();
   }
 }
 
-TEST(LatestTime, Trailing)
+TEST_F(LatestTimePolicy, Trailing)
 {
-  Sync3 sync(1);
-  Helper h;
-  sync.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1,
-                                                   std::placeholders::_2,
-                                                   std::placeholders::_3));
-  std::vector<MsgPtr> p; p.reserve(8U);
-  std::vector<MsgPtr> q; q.reserve(4U);
-  std::vector<MsgPtr> r; r.reserve(2U);
-  for(std::size_t idx = 0U; idx < 8U; ++idx)
-  {
-    MsgPtr p_idx(std::make_shared<Msg>()); p_idx->data = idx; p.push_back(p_idx);
-    if(idx % 2U == 0U)
-    {
-      MsgPtr q_idx(std::make_shared<Msg>()); q_idx->data = idx; q.push_back(q_idx);
-    }
-    if(idx % 4U == 0U)
-    {
-      MsgPtr r_idx(std::make_shared<Msg>()); r_idx->data = idx; r.push_back(r_idx);
-    }
-  }
-
   rclcpp::Rate rate(50.0);
   for(std::size_t idx = 0U; idx < 8U; ++idx)
   {
     if(idx % 2U == 1U)
     {
-      sync.add<1>(q[(idx-1U)/2U]);
+      sync.add<1>(q[(idx - 1U) / 2U]);
     }
     if(idx % 4U == 3U)
     {
-      sync.add<2>(r[(idx-3U)/4U]);
+      sync.add<2>(r[(idx - 3U) / 4U]);
     }
     sync.add<0>(p[idx]);
     
-    switch(idx)
+    if (idx > 2U)
     {
-    case 0U:
-    case 1U:
-    case 2U:
-      ASSERT_EQ(h.count_, 0U);
-      ASSERT_FALSE(h.p_);
-      ASSERT_FALSE(h.q_);
-      ASSERT_FALSE(h.r_);
-      break;
-    case 3U:
-      ASSERT_EQ(h.count_, 1U);
-      ASSERT_EQ(h.p_->data, p[idx]->data);
-      ASSERT_EQ(h.q_->data, q[1U]->data);
-      ASSERT_EQ(h.r_->data, r[0U]->data);
-      break;
-    case 4U:
-      ASSERT_EQ(h.count_, 2U);
-      ASSERT_EQ(h.p_->data, p[idx]->data);
-      ASSERT_EQ(h.q_->data, q[1U]->data);
-      ASSERT_EQ(h.r_->data, r[0U]->data);
-      break;
-    case 5U:
-      ASSERT_EQ(h.count_, 3U);
-      ASSERT_EQ(h.p_->data, p[idx]->data);
-      ASSERT_EQ(h.q_->data, q[2U]->data);
-      ASSERT_EQ(h.r_->data, r[0U]->data);
-      break;
-    case 6U:
-      ASSERT_EQ(h.count_, 4U);
-      ASSERT_EQ(h.p_->data, p[idx]->data);
-      ASSERT_EQ(h.q_->data, q[2U]->data);
-      ASSERT_EQ(h.r_->data, r[0U]->data);
-      break;
-    case 7U:
-      ASSERT_EQ(h.count_, 5U);
-      ASSERT_EQ(h.p_->data, p[idx]->data);
-      ASSERT_EQ(h.q_->data, q[3U]->data);
-      ASSERT_EQ(h.r_->data, r[1U]->data);
-      break;
+      EXPECT_EQ(h.count_, idx - 2U);
+      EXPECT_EQ(h.p_->data, p[idx]->data);
+      EXPECT_EQ(h.q_->data, q[(idx - 1U) / 2U]->data);
+      EXPECT_EQ(h.r_->data, r[(idx - 3U) / 4U]->data);
+    }
+    else
+    {
+      EXPECT_FALSE(h.p_);
+      EXPECT_FALSE(h.q_);
+      EXPECT_FALSE(h.r_);
     }
     
     rate.sleep();
   }
 }
+
+TEST_F(LatestTimePolicy, ChangeRate)
+{
+  rclcpp::Rate rate(50.0);
+  for(std::size_t idx = 0U; idx < 12U; ++idx)
+  {
+    if(idx % 2U == 1U)
+    {
+      sync.add<1>(q[(idx - 1U) / 2U]);
+    }
+    
+    if(idx % 4U == 3U)
+    {
+      sync.add<2>(r[(idx - 3U) / 4U]);
+    }
+    
+    if (idx < 4U)
+    {
+      sync.add<0>(p[idx]);
+    }
+    else  // Change rate of p (still 50Hz @ idx == 4)
+    {
+      if(idx % 3U == 1U)
+      {
+        static std::size_t p_idx = 3U;
+        sync.add<0>(p[++p_idx]);
+      }
+    }
+
+    // operates like "Trailing" test for idx <= 3
+    if (idx == 3U)
+    {
+      EXPECT_EQ(h.count_, idx - 2U);
+      EXPECT_EQ(h.p_->data, p[idx]->data);
+      EXPECT_EQ(h.q_->data, q[(idx - 1U) / 2U]->data);
+      EXPECT_EQ(h.r_->data, r[(idx - 3U) / 4U]->data);
+    }
+    // rate of p still 50Hz @ idx==4, then change rate of p lower than q
+    // will not publish again until idx==9
+    // since rate of q is 25Hz, p was 50Hz @ idx==4,
+    // and new rate of p computed after q received @ idx==7
+    else if (idx >= 4U && idx < 9U)
+    {
+      EXPECT_EQ(h.count_, 2U);
+      EXPECT_EQ(h.p_->data, p[4U]->data);
+      EXPECT_EQ(h.q_->data, q[1U]->data);
+      EXPECT_EQ(h.r_->data, r[0U]->data);
+    }
+    // for idx >= 9, follows normal "Trailing" pattern again
+    // with pivot on q
+    else if (idx >= 9U && idx < 11U)
+    {
+      EXPECT_EQ(h.count_, 3U);
+      EXPECT_EQ(h.p_->data, p[5U]->data);
+      EXPECT_EQ(h.q_->data, q[4U]->data);
+      EXPECT_EQ(h.r_->data, r[1U]->data);
+    }
+    else if (idx == 11U)
+    {
+      EXPECT_EQ(h.count_, 4U);
+      EXPECT_EQ(h.p_->data, p[6U]->data);
+      EXPECT_EQ(h.q_->data, q[5U]->data);
+      EXPECT_EQ(h.r_->data, r[1U]->data);
+    }
+    else
+    {
+      EXPECT_FALSE(h.p_);
+      EXPECT_FALSE(h.q_);
+      EXPECT_FALSE(h.r_);
+    }
+    
+    rate.sleep();
+  }
+}
+
 
 int main(int argc, char **argv){
   testing::InitGoogleTest(&argc, argv);
