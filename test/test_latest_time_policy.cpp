@@ -130,7 +130,7 @@ protected:
 
 TEST_F(LatestTimePolicy, Leading)
 {
-  rclcpp::Rate rate(50.0);
+  rclcpp::Rate rate(1000.0);
   for(std::size_t idx = 0U; idx < 8U; ++idx)
   {
     if(idx % 2U == 0U)
@@ -163,7 +163,7 @@ TEST_F(LatestTimePolicy, Leading)
 
 TEST_F(LatestTimePolicy, Trailing)
 {
-  rclcpp::Rate rate(50.0);
+  rclcpp::Rate rate(1000.0);
   for(std::size_t idx = 0U; idx < 8U; ++idx)
   {
     if(idx % 2U == 1U)
@@ -194,9 +194,78 @@ TEST_F(LatestTimePolicy, Trailing)
   }
 }
 
-TEST_F(LatestTimePolicy, ChangeRate)
+TEST_F(LatestTimePolicy, ChangeRateLeading)
 {
-  rclcpp::Rate rate(50.0);
+  rclcpp::Rate rate(1000.0);
+  for(std::size_t idx = 0U; idx < 12U; ++idx)
+  {
+    if(idx % 2U == 0U)
+    {
+      sync.add<1>(q[idx/2U]);
+    }
+
+    if(idx % 4U == 0U)
+    {
+      sync.add<2>(r[idx/4U]);
+    }
+
+    if (idx < 4U)
+    {
+      sync.add<0>(p[idx]);
+    }
+    else  // Change rate of p
+    {
+      if(idx % 3U == 0U)
+      {
+        static std::size_t p_idx = 3U;
+        sync.add<0>(p[++p_idx]);
+      }
+    }
+
+    // operates like "Leading" test for idx <= 3
+    if (idx >= 1U && idx < 4U)
+    {
+      EXPECT_EQ(h.count_, idx);
+      EXPECT_EQ(h.p_->data, p[idx]->data);
+      EXPECT_EQ(h.q_->data, q[idx / 2U]->data);
+      EXPECT_EQ(h.r_->data, r[idx / 4U]->data);
+    }
+    // p rate is changed but isn't detected as late until idx==6,
+    // since q is 500Hz and p isn't late yet when q checks at idx==4.
+    // Will not publish again until idx==6 when q is found as new pivot.
+    // Same behavior as initialization dropping faster messages until rates of all are known
+    // or found to be late.
+    else if (idx >= 4U && idx < 6U)
+    {
+      EXPECT_EQ(h.count_, (idx + 2U) / 2U);
+      EXPECT_EQ(h.p_->data, p[3]->data);
+      EXPECT_EQ(h.q_->data, q[1]->data);
+      EXPECT_EQ(h.r_->data, r[0]->data);
+    }
+    // New actual rate of p computed when is received after q when idx==6
+    // for idx >= 6, follows normal "Leading" pattern again
+    // with pivot on q
+    else if (idx >= 6U)
+    {
+      EXPECT_EQ(h.count_, (idx + 2U) / 2U);
+      EXPECT_EQ(h.p_->data, p[idx / 2U]->data);
+      EXPECT_EQ(h.q_->data, q[idx / 2U]->data);
+      EXPECT_EQ(h.r_->data, r[(idx - 2U) / 4U]->data);
+    }
+    else
+    {
+      EXPECT_FALSE(h.p_);
+      EXPECT_FALSE(h.q_);
+      EXPECT_FALSE(h.r_);
+    }
+
+    rate.sleep();
+  }
+
+}
+TEST_F(LatestTimePolicy, ChangeRateTrailing)
+{
+  rclcpp::Rate rate(1000.0);
   for(std::size_t idx = 0U; idx < 12U; ++idx)
   {
     if(idx % 2U == 1U)
@@ -213,7 +282,7 @@ TEST_F(LatestTimePolicy, ChangeRate)
     {
       sync.add<0>(p[idx]);
     }
-    else  // Change rate of p (still 50Hz @ idx == 4)
+    else  // Change rate of p (still 1kHz @ idx == 4)
     {
       if(idx % 3U == 1U)
       {
@@ -230,10 +299,11 @@ TEST_F(LatestTimePolicy, ChangeRate)
       EXPECT_EQ(h.q_->data, q[(idx - 1U) / 2U]->data);
       EXPECT_EQ(h.r_->data, r[(idx - 3U) / 4U]->data);
     }
-    // Rate of p still 50Hz @ idx==4.
+    // Rate of p still 1kHz @ idx==4.
     // Then, change rate of p lower than q when idx==5.
     // At idx==5, policy still doesn't know that p is late when q is received.
     // Same behavior as initialization dropping faster messages until rates of all are known
+    // or found to be late.
     else if (idx > 4U && idx < 7U)
     {
       EXPECT_EQ(h.count_, 2U);
@@ -241,7 +311,7 @@ TEST_F(LatestTimePolicy, ChangeRate)
       EXPECT_EQ(h.q_->data, q[1U]->data);
       EXPECT_EQ(h.r_->data, r[0U]->data);
     }
-    // Will not publish again until idx==7, since rate of q is 25Hz
+    // Will not publish again until idx==7, since rate of q is 500Hz
     // and p is calculated as late when q recieved when idx==7 -- this makes q new pivot.
     // Since q is new pivot and publishes when idx==7,
     // and r comes in after q, r is now trailing.
