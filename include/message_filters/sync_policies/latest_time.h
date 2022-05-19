@@ -139,8 +139,9 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 
     std::get<i>(events_) = evt;
 
-    rates_[i].compute_hz(ros_clock_.now());
-    if(i == find_pivot() && is_full())
+    rclcpp::Time now = ros_clock_.now();
+    rates_[i].compute_hz(now);
+    if(i == find_pivot(now) && is_full())
     {
       publish();
     }
@@ -199,7 +200,6 @@ private:
   };
 
   // assumed data_mutex_ is locked
-
   template <typename T>
   std::vector<std::size_t> sort_indices(const std::vector<T> &v)
   {
@@ -242,16 +242,30 @@ private:
   }
 
   // assumed data_mutex_ is locked
-  int find_pivot()
+  int find_pivot(const rclcpp::Time & now)
   {
     // find arg max rate
-    return sort_indices(rates_)[0U];
+    std::vector<std::size_t> sorted_idx = sort_indices(rates_);
+
+    for (int pivot : sorted_idx) {
+      double period = (now-rates_[pivot].prev).seconds();
+      double rate_delta = rates_[pivot].hz - 1.0/period;
+      double margin = 10.0*rates_[pivot].error;
+      if (rate_delta > margin) {
+        // this pivot is late
+        continue;
+      }
+      return pivot;
+    }
+    return NO_PIVOT;
   }
 
   Sync* parent_;
   Events events_;
   std::vector<Rate> rates_;
   std::mutex data_mutex_;  // Protects all of the above
+
+  const int NO_PIVOT{9};
 
   rclcpp::Clock ros_clock_;
 };

@@ -223,39 +223,37 @@ TEST_F(LatestTimePolicy, ChangeRate)
     }
 
     // operates like "Trailing" test for idx <= 3
-    if (idx == 3U)
+    if (idx > 2U && idx <= 4U)
     {
       EXPECT_EQ(h.count_, idx - 2U);
       EXPECT_EQ(h.p_->data, p[idx]->data);
       EXPECT_EQ(h.q_->data, q[(idx - 1U) / 2U]->data);
       EXPECT_EQ(h.r_->data, r[(idx - 3U) / 4U]->data);
     }
-    // rate of p still 50Hz @ idx==4, then change rate of p lower than q
-    // will not publish again until idx==9
-    // since rate of q is 25Hz, p was 50Hz @ idx==4,
-    // and new rate of p computed after q received @ idx==7
-    else if (idx >= 4U && idx < 9U)
+    // Rate of p still 50Hz @ idx==4.
+    // Then, change rate of p lower than q when idx==5.
+    // At idx==5, policy still doesn't know that p is late when q is received.
+    // Same behavior as initialization dropping faster messages until rates of all are known
+    else if (idx > 4U && idx < 7U)
     {
       EXPECT_EQ(h.count_, 2U);
       EXPECT_EQ(h.p_->data, p[4U]->data);
       EXPECT_EQ(h.q_->data, q[1U]->data);
       EXPECT_EQ(h.r_->data, r[0U]->data);
     }
-    // for idx >= 9, follows normal "Trailing" pattern again
+    // Will not publish again until idx==7, since rate of q is 25Hz
+    // and p is calculated as late when q recieved when idx==7 -- this makes q new pivot.
+    // Since q is new pivot and publishes when idx==7,
+    // and r comes in after q, r is now trailing.
+    // New actual rate of p computed when is received after q when idx==7
+    // for idx >= 7, follows normal "Trailing" pattern again
     // with pivot on q
-    else if (idx >= 9U && idx < 11U)
+    else if (idx >= 7U)
     {
-      EXPECT_EQ(h.count_, 3U);
-      EXPECT_EQ(h.p_->data, p[5U]->data);
-      EXPECT_EQ(h.q_->data, q[4U]->data);
-      EXPECT_EQ(h.r_->data, r[1U]->data);
-    }
-    else if (idx == 11U)
-    {
-      EXPECT_EQ(h.count_, 4U);
-      EXPECT_EQ(h.p_->data, p[6U]->data);
-      EXPECT_EQ(h.q_->data, q[5U]->data);
-      EXPECT_EQ(h.r_->data, r[1U]->data);
+      EXPECT_EQ(h.count_, (idx - 1U) / 2U);
+      EXPECT_EQ(h.p_->data, p[(idx + 1U) / 2U]->data);
+      EXPECT_EQ(h.q_->data, q[(idx - 1U) / 2U]->data);
+      EXPECT_EQ(h.r_->data, r[(idx - 5U) / 4U]->data);
     }
     else
     {
