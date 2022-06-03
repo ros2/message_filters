@@ -247,7 +247,7 @@ private:
     // find arg max rate
     std::vector<std::size_t> sorted_idx = sort_indices(rates_);
 
-    for (int pivot : sorted_idx) {
+    for (size_t pivot : sorted_idx) {
       double period = (now-rates_[pivot].prev).seconds();
       double rate_delta = rates_[pivot].hz - 1.0/period;
       double margin = 10.0*rates_[pivot].error;
