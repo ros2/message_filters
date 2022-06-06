@@ -98,7 +98,7 @@ typedef Synchronizer<Policy3> Sync3;
 class LatestTimePolicy : public ::testing::Test
 {
 protected:
-  Sync3 sync{1};
+  Sync3 sync;//{1};
   Helper h;
   std::vector<MsgPtr> p;
   std::vector<MsgPtr> q;
@@ -130,7 +130,7 @@ protected:
 
 TEST_F(LatestTimePolicy, Leading)
 {
-  rclcpp::Rate rate(1000.0);
+  rclcpp::Rate rate(500.0);
   for(std::size_t idx = 0U; idx < 8U; ++idx)
   {
     if(idx % 2U == 0U)
@@ -163,7 +163,7 @@ TEST_F(LatestTimePolicy, Leading)
 
 TEST_F(LatestTimePolicy, Trailing)
 {
-  rclcpp::Rate rate(1000.0);
+  rclcpp::Rate rate(500.0);
   for(std::size_t idx = 0U; idx < 8U; ++idx)
   {
     if(idx % 2U == 1U)
@@ -196,7 +196,7 @@ TEST_F(LatestTimePolicy, Trailing)
 
 TEST_F(LatestTimePolicy, ChangeRateLeading)
 {
-  rclcpp::Rate rate(1000.0);
+  rclcpp::Rate rate(500.0);
   for(std::size_t idx = 0U; idx < 12U; ++idx)
   {
     if(idx % 2U == 0U)
@@ -265,7 +265,7 @@ TEST_F(LatestTimePolicy, ChangeRateLeading)
 }
 TEST_F(LatestTimePolicy, ChangeRateTrailing)
 {
-  rclcpp::Rate rate(1000.0);
+  rclcpp::Rate rate(500.0);
   for(std::size_t idx = 0U; idx < 12U; ++idx)
   {
     if(idx % 2U == 1U)

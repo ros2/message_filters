@@ -45,7 +45,15 @@
  * Example usage would be:
 \verbatim
 typedef LatestTime<sensor_msgs::CameraInfo, sensor_msgs::Image, sensor_msgs::Image> latest_policy;
-Synchronizer<latest_policy> sync_policies(latest_policy(1U), caminfo_sub, limage_sub, rimage_sub);
+Synchronizer<latest_policy> sync_policies(latest_policy(), caminfo_sub, limage_sub, rimage_sub);
+sync_policies.registerCallback(callback);
+\endverbatim
+
+ * May also take an instance of a `rclcpp::Clock::SharedPtr` from `rclpp::Node::get_clock()` 
+ * to use the node's time source (e.g. sim time) as in:
+\verbatim
+typedef LatestTime<sensor_msgs::CameraInfo, sensor_msgs::Image, sensor_msgs::Image> latest_policy;
+Synchronizer<latest_policy> sync_policies(latest_policy(node->get_clock()), caminfo_sub, limage_sub, rimage_sub);
 sync_policies.registerCallback(callback);
 \endverbatim
 
@@ -60,7 +68,9 @@ void callback(const sensor_msgs::CameraInfo::ConstPtr&, const sensor_msgs::Image
 #define MESSAGE_FILTERS__SYNC_LATEST_TIME_H_
 
 #include <algorithm>
+#include <cassert>
 #include <deque>
+#include <memory>
 #include <numeric>
 #include <string>
 #include <tuple>
@@ -92,9 +102,18 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   typedef typename Super::Events Events;
   typedef typename Super::RealTypeCount RealTypeCount;
 
-  LatestTime(uint32_t)
+  /// \brief filter coeffs and error margin factor:
+  /// <rate_ema_alpha, error_ema_alpha, rate_step_change_margin_factor>
+  typedef std::tuple<double, double, double> RateConfig;
+
+  LatestTime()
+    : LatestTime(rclcpp::Clock::SharedPtr(new rclcpp::Clock(RCL_ROS_TIME)))
+  {
+  }
+
+  LatestTime(rclcpp::Clock::SharedPtr clock)
   : parent_(0),
-    ros_clock_(RCL_ROS_TIME)
+    ros_clock_{clock}
   {
   }
 
@@ -103,7 +122,7 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
     *this = e;
   }
 
-  LatestTime& operator=(const LatestTime& rhs)
+  LatestTime & operator=(const LatestTime & rhs)
   {
     parent_ = rhs.parent_;
     events_ = rhs.events_;
@@ -113,13 +132,23 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
     return *this;
   }
 
-  void initParent(Sync* parent)
+  void initParent(Sync * parent)
   {
     parent_ = parent;
   }
 
+  void setRateConfigPerMessage(const std::vector<RateConfig> & configs)
+  {
+    rate_configs_.assign(configs.begin(), configs.end());
+  }
+
+  void setRateConfig(const RateConfig & config)
+  {
+    rate_configs_.assign(1U, config);
+  }
+
   template<int i>
-  void add(const typename std::tuple_element<i, Events>::type& evt)
+  void add(const typename std::tuple_element<i, Events>::type & evt)
   {
     RCUTILS_ASSERT(parent_);
 
@@ -127,7 +156,7 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 
     if(!received_msg<i>())
     {
-      rates_.push_back(Rate(ros_clock_.now()));
+      initialize_rate<i>();
       // wait until we get each message once to publish
       // then wait until we got each message twice to compute rates
       // NOTE: this will drop a few messages of the faster topics until
@@ -138,16 +167,49 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
     }
 
     std::get<i>(events_) = evt;
-
-    rclcpp::Time now = ros_clock_.now();
+    rclcpp::Time now = ros_clock_->now();
+    std::cout << "compute rate for [" << i << "]" << std::endl;
     rates_[i].compute_hz(now);
     if(i == find_pivot(now) && is_full())
     {
+      std::cout << "I'm pivot! [" << i << "] rate [" << rates_[i].hz << "]" << std::endl;
       publish();
+    } else {
+      std::cout << "I'm not pivot... [" << i << "] rate [" << rates_[i].hz << "]" << std::endl;
     }
   }
 
 private:
+  // assumed data_mutex_ is locked
+  template<int i>
+  void initialize_rate()
+  {
+    if (rate_configs_.size() > 0U) {
+      double rate_ema_alpha{Rate::DEFAULT_RATE_EMA_ALPHA};
+      double error_ema_alpha{Rate::DEFAULT_ERROR_EMA_ALPHA};
+      double rate_step_change_margin_factor{Rate::DEFAULT_MARGIN_FACTOR};
+      if (rate_configs_.size() == RealTypeCount::value) {
+        std::tie (
+          rate_ema_alpha,
+          error_ema_alpha,
+          rate_step_change_margin_factor) = rate_configs_[i];
+      } else if (rate_configs_.size() == 1U) {
+        std::tie (
+          rate_ema_alpha,
+          error_ema_alpha,
+          rate_step_change_margin_factor) = rate_configs_[0U];
+      }
+      rates_.push_back(
+        Rate(
+          ros_clock_->now(),
+          rate_ema_alpha,
+          error_ema_alpha,
+          rate_step_change_margin_factor));
+    } else {
+      rates_.push_back(Rate(ros_clock_->now()));
+    }
+  }
+
   // assumed data_mutex_ is locked
   void publish()
   {
@@ -158,52 +220,79 @@ private:
 
   struct Rate
   {
+    static constexpr double DEFAULT_RATE_EMA_ALPHA{0.9};
+    static constexpr double DEFAULT_ERROR_EMA_ALPHA{0.3};
+    static constexpr double DEFAULT_MARGIN_FACTOR{10.0};
+
     rclcpp::Time prev;
     double hz{0.0};
     double error{0.0};
+    double rate_ema_alpha{DEFAULT_RATE_EMA_ALPHA};
+    double error_ema_alpha{DEFAULT_ERROR_EMA_ALPHA};
+    double rate_step_change_margin_factor{DEFAULT_MARGIN_FACTOR};
     bool do_hz_init{true};
     bool do_error_init{true};
-    Rate(const rclcpp::Time &start)
-      : prev(start)
+
+    Rate(const rclcpp::Time & start)
+      : Rate(start, DEFAULT_RATE_EMA_ALPHA, DEFAULT_ERROR_EMA_ALPHA, DEFAULT_MARGIN_FACTOR)
     {
     }
 
-    bool operator>(const Rate &that) const
+    Rate(const rclcpp::Time & start,
+      const double & rate_ema_alpha, const double & error_ema_alpha,
+      const double & rate_step_change_margin_factor)
+      : prev{start},
+        rate_ema_alpha{rate_ema_alpha},
+        error_ema_alpha{error_ema_alpha},
+        rate_step_change_margin_factor{rate_step_change_margin_factor}
+    {
+      std::cout << "prev{" << prev.seconds() << 
+        "}, rate_ema_alpha{" << rate_ema_alpha << "}, error_ema_alpha{" << error_ema_alpha <<
+        "}, rate_step_change_margin_factor{" << rate_step_change_margin_factor << "}" << std::endl;
+    }
+
+    bool operator>(const Rate & that) const
     {
       return this->hz > that.hz;
     }
 
-    void compute_hz(const rclcpp::Time &now)
+    void compute_hz(const rclcpp::Time & now)
     {
-      double period = (now-prev).seconds();
-      if (do_hz_init) {
-        hz = 1.0/period;
-        do_hz_init = false;
-      } else {
-        if (do_error_init) {
-          error = fabs(hz - 1.0/period);
-          do_error_init = false;
+      bool step_change_detected = false;
+      do {
+        double period = (now-prev).seconds();
+        RCUTILS_ASSERT(period > 0.0 && "Multiple messages received and time is not updating.");
+        if (do_hz_init) {
+          hz = 1.0/period;
+          do_hz_init = false;
+          step_change_detected = false;
         } else {
-          if (fabs(hz - 1.0/period) > 10.0*error) {
-            // detected step change in rate so reset
-            do_hz_init = true;
-            do_error_init = true;
-            compute_hz(now);
-            return;
+          if (do_error_init) {
+            error = fabs(hz - 1.0/period);
+            do_error_init = false;
+          } else {
+            // check if rate is some multiple of mean error from mean
+            if (fabs(hz - 1.0/period) > rate_step_change_margin_factor*error) {
+              // detected step change in rate so reset
+              do_hz_init = true;
+              do_error_init = true;
+              step_change_detected = true;
+              continue;
+            }
+            // on-line mean error from mean
+            error = error_ema_alpha*fabs(hz - 1.0/period) + (1.0 - error_ema_alpha)*error;
           }
-          error = 0.7*error + 0.3*fabs(hz - 1.0/period);
+          hz = rate_ema_alpha/period + (1.0 - rate_ema_alpha)*hz;
         }
-        hz = 0.9/period + 0.1*hz;
-      }
+      } while (step_change_detected);
       prev = now;
     }
   };
 
   // assumed data_mutex_ is locked
   template <typename T>
-  std::vector<std::size_t> sort_indices(const std::vector<T> &v)
+  std::vector<std::size_t> sort_indices(const std::vector<T> & v)
   {
-
     // initialize original index locations
     std::vector<std::size_t> idx(v.size());
     std::iota(idx.begin(), idx.end(), 0U);
@@ -247,10 +336,18 @@ private:
     // find arg max rate
     std::vector<std::size_t> sorted_idx = sort_indices(rates_);
 
+    // use fastest message that isn't late as pivot
     for (size_t pivot : sorted_idx) {
+      std::cout << "checking pivot [" << pivot << "]" << std::endl;
       double period = (now-rates_[pivot].prev).seconds();
+      if (period == 0.0) {
+        // we just updated updated this one,
+        // and it's fastest, so use as pivot
+        std::cout << "I just updated and I'm fastest" << std::endl;
+        return pivot;
+      }
       double rate_delta = rates_[pivot].hz - 1.0/period;
-      double margin = 10.0*rates_[pivot].error;
+      double margin = rates_[pivot].rate_step_change_margin_factor*rates_[pivot].error;
       if (rate_delta > margin) {
         // this pivot is late
         continue;
@@ -265,9 +362,11 @@ private:
   std::vector<Rate> rates_;
   std::mutex data_mutex_;  // Protects all of the above
 
+  std::vector<RateConfig> rate_configs_;
+
   const int NO_PIVOT{9};
 
-  rclcpp::Clock ros_clock_;
+  rclcpp::Clock::SharedPtr ros_clock_{nullptr};
 };
 
 }  // namespace sync
