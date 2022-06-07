@@ -68,11 +68,8 @@ void callback(const sensor_msgs::CameraInfo::ConstPtr&, const sensor_msgs::Image
 #define MESSAGE_FILTERS__SYNC_LATEST_TIME_H_
 
 #include <algorithm>
-#include <cassert>
-#include <deque>
 #include <memory>
 #include <numeric>
-#include <string>
 #include <tuple>
 #include <vector>
 
@@ -168,14 +165,10 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 
     std::get<i>(events_) = evt;
     rclcpp::Time now = ros_clock_->now();
-    std::cout << "compute rate for [" << i << "]" << std::endl;
-    rates_[i].compute_hz(now);
-    if(i == find_pivot(now) && is_full())
+    bool valid_rate = rates_[i].compute_hz(now);
+    if(valid_rate && (i == find_pivot(now)) && is_full())
     {
-      std::cout << "I'm pivot! [" << i << "] rate [" << rates_[i].hz << "]" << std::endl;
       publish();
-    } else {
-      std::cout << "I'm not pivot... [" << i << "] rate [" << rates_[i].hz << "]" << std::endl;
     }
   }
 
@@ -246,9 +239,6 @@ private:
         error_ema_alpha{error_ema_alpha},
         rate_step_change_margin_factor{rate_step_change_margin_factor}
     {
-      std::cout << "prev{" << prev.seconds() << 
-        "}, rate_ema_alpha{" << rate_ema_alpha << "}, error_ema_alpha{" << error_ema_alpha <<
-        "}, rate_step_change_margin_factor{" << rate_step_change_margin_factor << "}" << std::endl;
     }
 
     bool operator>(const Rate & that) const
@@ -256,12 +246,16 @@ private:
       return this->hz > that.hz;
     }
 
-    void compute_hz(const rclcpp::Time & now)
+    bool compute_hz(const rclcpp::Time & now)
     {
       bool step_change_detected = false;
       do {
         double period = (now-prev).seconds();
-        RCUTILS_ASSERT(period > 0.0 && "Multiple messages received and time is not updating.");
+        if (period <= 0.0) {
+          // multiple messages and time isn't updating
+          return false;
+        }
+
         if (do_hz_init) {
           hz = 1.0/period;
           do_hz_init = false;
@@ -286,6 +280,7 @@ private:
         }
       } while (step_change_detected);
       prev = now;
+      return true;
     }
   };
 
@@ -338,13 +333,16 @@ private:
 
     // use fastest message that isn't late as pivot
     for (size_t pivot : sorted_idx) {
-      std::cout << "checking pivot [" << pivot << "]" << std::endl;
       double period = (now-rates_[pivot].prev).seconds();
       if (period == 0.0) {
-        // we just updated updated this one,
-        // and it's fastest, so use as pivot
-        std::cout << "I just updated and I'm fastest" << std::endl;
-        return pivot;
+        if (rates_[pivot].hz > 0.0) {
+          // we just updated updated this one,
+          // and it's fastest, so use as pivot
+          return pivot;
+        } else {
+          // haven't calculated rate for this message yet
+          continue;
+        }
       }
       double rate_delta = rates_[pivot].hz - 1.0/period;
       double margin = rates_[pivot].rate_step_change_margin_factor*rates_[pivot].error;
@@ -352,7 +350,13 @@ private:
         // this pivot is late
         continue;
       }
-      return pivot;
+      if (rates_[pivot].hz > 0.0) {
+        // found fastest message with a calculated rate
+        return pivot;
+      } else {
+        // haven't calculated rate for this message yet
+        continue;
+      }
     }
     return NO_PIVOT;
   }

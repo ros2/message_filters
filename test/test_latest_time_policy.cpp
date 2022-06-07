@@ -34,6 +34,10 @@
 
 #include <gtest/gtest.h>
 
+#include <functional>
+#include <memory>
+#include <vector>
+
 #include <rclcpp/rclcpp.hpp>
 #include "message_filters/synchronizer.h"
 #include "message_filters/sync_policies/latest_time.h"
@@ -54,28 +58,12 @@ struct Msg
 typedef std::shared_ptr<Msg> MsgPtr;
 typedef std::shared_ptr<Msg const> MsgConstPtr;
 
-namespace message_filters
-{
-namespace message_traits
-{
-template<>
-struct TimeStamp<Msg>
-{
-  static rclcpp::Time value(const Msg& m)
-  {
-    return m.header.stamp;
-  }
-};
-}
-}
-
 class Helper
 {
 public:
   Helper()
-  : count_(0),
-    ros_clock_(RCL_ROS_TIME)
-  {}
+  {
+  }
 
   void cb(const MsgConstPtr& p, const MsgConstPtr& q, const MsgConstPtr& r)
   {
@@ -87,9 +75,8 @@ public:
     ++count_;
   }
 
-  MsgConstPtr p_, q_, r_;
-  uint16_t count_;
-  rclcpp::Clock ros_clock_;
+  MsgConstPtr p_{nullptr}, q_{nullptr}, r_{nullptr};
+  uint16_t count_{0U};
 };
 
 typedef LatestTime<Msg, Msg, Msg> Policy3;
@@ -98,7 +85,7 @@ typedef Synchronizer<Policy3> Sync3;
 class LatestTimePolicy : public ::testing::Test
 {
 protected:
-  Sync3 sync;//{1};
+  Sync3 sync;
   Helper h;
   std::vector<MsgPtr> p;
   std::vector<MsgPtr> q;
