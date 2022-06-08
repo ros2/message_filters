@@ -344,12 +344,17 @@ private:
           continue;
         }
       }
-      double rate_delta = rates_[pivot].hz - 1.0/period;
-      double margin = rates_[pivot].rate_step_change_margin_factor*rates_[pivot].error;
-      if (rate_delta > margin) {
-        // this pivot is late
-        continue;
+
+      if (!rates_[pivot].do_error_init) {
+        // can now check if new messages are late
+        double rate_delta = rates_[pivot].hz - 1.0/period;
+        double margin = rates_[pivot].rate_step_change_margin_factor * rates_[pivot].error;
+        if (rate_delta > margin) {
+          // this pivot is late
+          continue;
+        }
       }
+
       if (rates_[pivot].hz > 0.0) {
         // found fastest message with a calculated rate
         return pivot;
