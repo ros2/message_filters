@@ -109,11 +109,7 @@ public:
     const rmw_qos_profile_t qos,
     rclcpp::SubscriptionOptions options)
   {
-    (void) options;
-    RCLCPP_ERROR(
-      node->get_logger(),
-      "SubscriberBase::subscribe with four arguments has not been overridden");
-    this->subscribe(node, topic, qos);
+    this->subscribe(node, topic, qos, options);
   }
 
   /**
