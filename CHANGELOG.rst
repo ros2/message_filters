@@ -2,8 +2,8 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.4.1 (2022-06-20)
+------------------
 * Adding fix to subscribe() call with raw node pointer and subscriber options (`#76 <https://github.com/ros2/message_filters/issues/76>`_)
 * Corrected function arguments in example description (`#35 <https://github.com/ros2/message_filters/issues/35>`_)
 * Contributors: Martin Ganeff, Steve Macenski
