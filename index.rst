@@ -68,7 +68,8 @@ Another example for syncronizing one image topic and one pointcloud2 topic using
             # do your stuff here
             pass
 
-**Note**: It is **VERY IMPORTANT** that each subscriber has the same ``qos_profile`` than the one specified in the corresponding publisher code for each topic you want to subscribe to. If they don't match, the callback won't be executed (without any warning) and you will be very frustrated.
+**Note**: It is **VERY IMPORTANT** that each subscriber has the same ``qos_profile`` as the one specified in the corresponding publisher code for each topic you want to subscribe to.
+If they don't match, the callback won't be executed (without any warning) and you will be very frustrated.
 
 
 The message filter interface
