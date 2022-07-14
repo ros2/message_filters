@@ -2,6 +2,53 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.4.1 (2022-06-20)
+------------------
+* Adding fix to subscribe() call with raw node pointer and subscriber options (`#76 <https://github.com/ros2/message_filters/issues/76>`_)
+* Corrected function arguments in example description (`#35 <https://github.com/ros2/message_filters/issues/35>`_)
+* Contributors: Martin Ganeff, Steve Macenski
+
+4.4.0 (2022-04-29)
+------------------
+
+4.3.1 (2022-03-25)
+------------------
+* Use RCL_ROS_TIME for message_traits::TimeStamp  (`#72 <https://github.com/ros2/message_filters/issues/72>`_)
+* Contributors: Kenji Brameld
+
+4.3.0 (2022-03-01)
+------------------
+* Install includes to include/${PROJECT_NAME} (`#71 <https://github.com/ros2/message_filters/issues/71>`_)
+* Update maintainers (`#67 <https://github.com/ros2/message_filters/issues/67>`_)
+* Contributors: Audrow Nash, Shane Loretz
+
+4.2.0 (2021-10-18)
+------------------
+* Suppress rclcpp deprecation warnings in unit tests (`#62 <https://github.com/ros2/message_filters/issues/62>`_)
+* Contributors: Abrar Rahman Protyasha
+
+4.1.0 (2021-07-29)
+------------------
+* Add missing overrides to subscriber.h (`#60 <https://github.com/ros2/message_filters/issues/60>`_)
+* Add lifecycle node support (`#59 <https://github.com/ros2/message_filters/issues/59>`_)
+* Correct package.xml and CMakeLists.txt (`#58 <https://github.com/ros2/message_filters/issues/58>`_)
+* Contributors: Hunter L. Allen, Michel Hidalgo, Rebecca Butler
+
+4.0.0 (2021-05-26)
+------------------
+* Expose Subscription Options - V2 (`#56 <https://github.com/ros2/message_filters/issues/56>`_)
+* Contributors: Audrow Nash
+
+3.2.6 (2021-05-12)
+------------------
+* Find and export dependencies properly (`#54 <https://github.com/ros2/message_filters/issues/54>`_)
+* Contributors: Michel Hidalgo
+
+3.2.5 (2020-12-10)
+------------------
+* Add pytest.ini so local tests don't display warning (`#47 <https://github.com/ros2/message_filters/issues/47>`_)
+* Contributors: Chris Lalancette
+
 3.2.4 (2020-06-03)
 ------------------
 * export targets in a addition to include directories / libraries (`#46 <https://github.com/ros2/message_filters/issues/46>`_)
