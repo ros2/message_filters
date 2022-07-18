@@ -20,7 +20,7 @@ Here's a simple example of using a Subscriber with a Cache::
     def myCallback(posemsg):
        print posemsg
 
-    sub = message_filters.Subscriber("pose_topic", robot_msgs.msg.Pose)
+    sub = message_filters.Subscriber(node_object, "pose_topic", robot_msgs.msg.Pose)
     cache = message_filters.Cache(sub, 10)
     cache.registerCallback(myCallback)
 
@@ -36,9 +36,40 @@ Using the time synchronizer::
         assert image.header.stamp == camerainfo.header.stamp
         print "got an Image and CameraInfo"
 
-    tss = TimeSynchronizer(Subscriber("/wide_stereo/left/image_rect_color", sensor_msgs.msg.Image),
-                           Subscriber("/wide_stereo/left/camera_info", sensor_msgs.msg.CameraInfo))
+    tss = TimeSynchronizer(Subscriber(node_object, "/wide_stereo/left/image_rect_color", sensor_msgs.msg.Image),
+                           Subscriber(node_object, "/wide_stereo/left/camera_info", sensor_msgs.msg.CameraInfo))
     tss.registerCallback(gotimage)
+
+Another example for syncronizing one image topic and one pointcloud2 topic using approximate synchronizer::
+
+
+    from rclpy.node import Node
+    from rclpy.qos import qos_profile_sensor_data
+    from message_filters import ApproximateTimeSynchronizer, Subscriber
+    from sensor_msgs.msg import Image, PointCloud2
+
+    class ExampleNode(Node):
+        def __init__(self):
+            super().__init__("ExampleNode")
+
+            self.image_sub = Subscriber(self, Image, "/image_topic")
+            self.plc_sub = Subscriber(
+                self, PointCloud2, "/point_cloud_topic", qos_profile=qos_profile_sensor_data
+            )
+            queue_size = 30
+            # you can use ApproximateTimeSynchronizer if msgs dont have exactly the same timestamp
+            self.ts = ApproximateTimeSynchronizer(
+                [self.image_sub, self.plc_sub],
+                queue_size,
+                0.01,  # defines the delay (in seconds) with which messages can be synchronized
+            )
+
+        def callback(self, image_msg, pcl_msg):
+            # do your stuff here
+            pass
+
+**Note**: It is **VERY IMPORTANT** that each subscriber has the same ``qos_profile`` as the one specified in the corresponding publisher code for each topic you want to subscribe to.
+If they don't match, the callback won't be executed (without any warning) and you will be very frustrated.
 
 
 The message filter interface
