@@ -34,16 +34,24 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
 #include <functional>
 #include <memory>
+#include <thread>
 #include <vector>
 
 #include <rclcpp/rclcpp.hpp>
+#include "rclcpp/time_source.hpp"
 #include "message_filters/synchronizer.h"
 #include "message_filters/sync_policies/latest_time.h"
 
+#include "rosgraph_msgs/msg/clock.hpp"
+
+
 using namespace message_filters;
 using namespace message_filters::sync_policies;
+using namespace std::chrono;
+
 
 struct Header
 {
@@ -85,6 +93,8 @@ typedef Synchronizer<Policy3> Sync3;
 class LatestTimePolicy : public ::testing::Test
 {
 protected:
+  rclcpp::Node::SharedPtr node;
+  rclcpp::SyncParametersClient::SharedPtr param_client;
   Sync3 sync;
   Helper h;
   std::vector<MsgPtr> p;
@@ -93,6 +103,13 @@ protected:
 
   virtual void SetUp()
   {
+    // Shutdown in case there was a dangling global context from other test fixtures
+    rclcpp::shutdown();
+    rclcpp::init(0, nullptr);
+    node = std::make_shared<rclcpp::Node>("clock_sleep_node");
+    param_client = std::make_shared<rclcpp::SyncParametersClient>(node);
+    ASSERT_TRUE(param_client->wait_for_service(5s));
+
     sync.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1,
                                                      std::placeholders::_2,
                                                      std::placeholders::_3));
@@ -111,6 +128,12 @@ protected:
         MsgPtr r_idx(std::make_shared<Msg>()); r_idx->data = idx; r.push_back(r_idx);
       }
     }
+  }
+
+  void TearDown()
+  {
+    node.reset();
+    rclcpp::shutdown();
   }
 };
 
@@ -183,7 +206,17 @@ TEST_F(LatestTimePolicy, Trailing)
 
 TEST_F(LatestTimePolicy, ChangeRateLeading)
 {
-  rclcpp::Rate rate(50.0);
+  param_client->set_parameters({rclcpp::Parameter("use_sim_time", true)});
+  auto clock = std::make_shared<rclcpp::Clock>(RCL_ROS_TIME);
+  auto clock_publisher = node->create_publisher<rosgraph_msgs::msg::Clock>(
+    "/clock", rclcpp::ClockQoS());
+  rclcpp::TimeSource time_source;
+  time_source.attachNode(node);
+  time_source.attachClock(clock);
+  sync.setClock(clock);
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node);
+
   for(std::size_t idx = 0U; idx < 12U; ++idx)
   {
     if(idx % 2U == 0U)
@@ -246,13 +279,30 @@ TEST_F(LatestTimePolicy, ChangeRateLeading)
       EXPECT_FALSE(h.r_);
     }
 
-    rate.sleep();
+    double period = 20e6;
+    auto new_time = clock->now() + rclcpp::Duration(0, (size_t)period);
+    auto msg = rosgraph_msgs::msg::Clock();
+    msg.clock = rclcpp::Time(new_time);
+    clock_publisher->publish(msg);
+    while (rclcpp::ok() && clock->now() < new_time) {
+      executor.spin_once(10ms);
+    }
   }
-
 }
+
 TEST_F(LatestTimePolicy, ChangeRateTrailing)
 {
-  rclcpp::Rate rate(50.0);
+  param_client->set_parameters({rclcpp::Parameter("use_sim_time", true)});
+  auto clock = std::make_shared<rclcpp::Clock>(RCL_ROS_TIME);
+  auto clock_publisher = node->create_publisher<rosgraph_msgs::msg::Clock>(
+    "/clock", rclcpp::ClockQoS());
+  rclcpp::TimeSource time_source;
+  time_source.attachNode(node);
+  time_source.attachClock(clock);
+  sync.setClock(clock);
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node);
+
   for(std::size_t idx = 0U; idx < 12U; ++idx)
   {
     if(idx % 2U == 1U)
@@ -319,7 +369,14 @@ TEST_F(LatestTimePolicy, ChangeRateTrailing)
       EXPECT_FALSE(h.r_);
     }
 
-    rate.sleep();
+    double period = 20e6;
+    auto new_time = clock->now() + rclcpp::Duration(0, (size_t)period);
+    auto msg = rosgraph_msgs::msg::Clock();
+    msg.clock = rclcpp::Time(new_time);
+    clock_publisher->publish(msg);
+    while (rclcpp::ok() && clock->now() < new_time) {
+      executor.spin_once(10ms);
+    }
   }
 }
 

@@ -144,6 +144,11 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
     rate_configs_.assign(1U, config);
   }
 
+  void setClock(rclcpp::Clock::SharedPtr clock)
+  {
+    ros_clock_ = clock;
+  }
+
   template<int i>
   void add(const typename std::tuple_element<i, Events>::type & evt)
   {
