@@ -343,7 +343,7 @@ private:
         if (rates_[pivot].hz > 0.0) {
           // we just updated updated this one,
           // and it's fastest, so use as pivot
-          return pivot;
+          return static_cast<int>(pivot);
         } else {
           // haven't calculated rate for this message yet
           continue;
@@ -362,7 +362,7 @@ private:
 
       if (rates_[pivot].hz > 0.0) {
         // found fastest message with a calculated rate
-        return pivot;
+        return static_cast<int>(pivot);
       } else {
         // haven't calculated rate for this message yet
         continue;

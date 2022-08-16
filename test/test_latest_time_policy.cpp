@@ -61,7 +61,7 @@ struct Header
 struct Msg
 {
   Header header;
-  int data;
+  size_t data;
 };
 typedef std::shared_ptr<Msg> MsgPtr;
 typedef std::shared_ptr<Msg const> MsgConstPtr;
@@ -280,7 +280,7 @@ TEST_F(LatestTimePolicy, ChangeRateLeading)
     }
 
     double period = 20e6;
-    auto new_time = clock->now() + rclcpp::Duration(0, (size_t)period);
+    auto new_time = clock->now() + rclcpp::Duration(0, static_cast<uint32_t>(period));
     auto msg = rosgraph_msgs::msg::Clock();
     msg.clock = rclcpp::Time(new_time);
     clock_publisher->publish(msg);
@@ -370,7 +370,7 @@ TEST_F(LatestTimePolicy, ChangeRateTrailing)
     }
 
     double period = 20e6;
-    auto new_time = clock->now() + rclcpp::Duration(0, (size_t)period);
+    auto new_time = clock->now() + rclcpp::Duration(0, static_cast<uint32_t>(period));
     auto msg = rosgraph_msgs::msg::Clock();
     msg.clock = rclcpp::Time(new_time);
     clock_publisher->publish(msg);
