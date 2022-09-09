@@ -131,7 +131,6 @@ public:
         sync_.add<1>(q);
       }
     }
-    //printf("Done running test\n");
     EXPECT_EQ(output_.size(), output_position_);
   }
 
