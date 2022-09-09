@@ -117,7 +117,6 @@ public:
     if (number_of_non_empty_events_ == RealTypeCount::value) {
       process();
     } else if (events_of_this_type.size() > queue_size_) {
-      // erase_old_events();
       erase_beginning_of_vector<i>();
     }
   }
