@@ -203,12 +203,6 @@ private:
       older, std::make_index_sequence<9u>());
   }
 
-  // void erase_old_events()
-  // {
-  //   auto old = get_older_timestamp();
-  //   erase_old_events_within_ts(old);
-  // }
-
   template<size_t Is>
   void
   erase_begin_of_vector()
