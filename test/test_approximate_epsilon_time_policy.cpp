@@ -115,18 +115,20 @@ public:
 
   void run()
   {
-    for (unsigned int i = 0; i < input_.size(); i++)
+    for (const auto & time_topic: input_)
     {
-      if (input_[i].second == 0)
+      const rclcpp::Time & time = time_topic.first;
+      const unsigned int & topic = time_topic.second;
+      if (topic == 0)
       {
         MsgPtr p(std::make_shared<Msg>());
-        p->header.stamp = input_[i].first;
+        p->header.stamp = time;
         sync_.add<0>(p);
       }
       else
       {
         MsgPtr q(std::make_shared<Msg>());
-        q->header.stamp = input_[i].first;
+        q->header.stamp = time;
         sync_.add<1>(q);
       }
     }
