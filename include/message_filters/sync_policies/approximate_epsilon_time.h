@@ -118,7 +118,7 @@ public:
       process();
     } else if (events_of_this_type.size() > queue_size_) {
       // erase_old_events();
-      erase_begin_of_vector<i>();
+      erase_beginning_of_vector<i>();
     }
   }
 
@@ -205,7 +205,7 @@ private:
 
   template<size_t Is>
   void
-  erase_begin_of_vector()
+  erase_beginning_of_vector()
   {
     if constexpr (Is >= RealTypeCount::value) {
       return;
@@ -221,19 +221,19 @@ private:
 
   template <size_t ... Is>
   void
-  erase_begin_of_vectors_helper(std::index_sequence<Is...> const &)
+  erase_beginning_of_vectors_helper(std::index_sequence<Is...> const &)
   {
-    ((erase_begin_of_vector<Is>()), ...);
+    ((erase_beginning_of_vector<Is>()), ...);
   }
 
-  void erase_begin_of_vectors()
+  void erase_beginning_of_vectors()
   {
-    return erase_begin_of_vectors_helper(std::make_index_sequence<9u>());
+    return erase_beginning_of_vectors_helper(std::make_index_sequence<9u>());
   }
 
   template<size_t Is>
   void
-  erase_begin_of_vector_if_within_ts(rclcpp::Time timestamp)
+  erase_beginning_of_vector_if_within_ts(rclcpp::Time timestamp)
   {
     namespace mt = message_filters::message_traits;
     using ThisEventType = typename std::tuple_element<Is, Events>::type;
@@ -259,7 +259,7 @@ private:
   void
   erase_old_events_within_ts_helper(rclcpp::Time timestamp, std::index_sequence<Is...> const &)
   {
-    ((erase_begin_of_vector_if_within_ts<Is>(timestamp)), ...);
+    ((erase_beginning_of_vector_if_within_ts<Is>(timestamp)), ...);
   }
 
   void erase_old_events_within_ts(rclcpp::Time timestamp)
@@ -321,7 +321,7 @@ private:
       auto old_ts = get_older_timestamp();
       if (check_all_timestamp_within_epsilon(old_ts)) {
         signal();
-        erase_begin_of_vectors();
+        erase_beginning_of_vectors();
       } else {
         erase_old_events_within_ts(old_ts.first);
       }
