@@ -109,7 +109,6 @@ public:
 
     std::lock_guard<std::mutex> lock(mutex_);
 
-    // Tuple& t = tuples_[mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(*evt.getMessage())];
     auto & events_of_this_type = std::get<i>(events_);
     if (0u == events_of_this_type.size()) {
       ++number_of_non_empty_events_;
