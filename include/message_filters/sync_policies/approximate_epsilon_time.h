@@ -123,7 +123,6 @@ public:
   }
 
 private:
-  // using mt = message_filters::message_traits;
   using TimeIndexPair = std::pair<rclcpp::Time, size_t>;
 
   template <size_t Is>
