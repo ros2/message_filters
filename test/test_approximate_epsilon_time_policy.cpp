@@ -35,7 +35,6 @@
 
 #include <vector>
 
-
 #include <gtest/gtest.h>
 #include <rclcpp/rclcpp.hpp>
 
