@@ -232,7 +232,7 @@ private:
 
   template<size_t Is>
   void
-  erase_beginning_of_vector_if_within_ts(rclcpp::Time timestamp)
+  erase_beginning_of_vector_if_on_sync_with_ts(rclcpp::Time timestamp)
   {
     namespace mt = message_filters::message_traits;
     using ThisEventType = typename std::tuple_element<Is, Events>::type;
@@ -256,14 +256,14 @@ private:
 
   template <size_t ... Is>
   void
-  erase_old_events_within_ts_helper(rclcpp::Time timestamp, std::index_sequence<Is...> const &)
+  erase_old_events_if_on_sync_with_ts_helper(rclcpp::Time timestamp, std::index_sequence<Is...> const &)
   {
-    ((erase_beginning_of_vector_if_within_ts<Is>(timestamp)), ...);
+    ((erase_beginning_of_vector_if_on_sync_with_ts<Is>(timestamp)), ...);
   }
 
-  void erase_old_events_within_ts(rclcpp::Time timestamp)
+  void erase_old_events_if_on_sync_with_ts(rclcpp::Time timestamp)
   {
-    return erase_old_events_within_ts_helper(timestamp, std::make_index_sequence<9u>());
+    return erase_old_events_if_on_sync_with_ts_helper(timestamp, std::make_index_sequence<9u>());
   }
 
   void signal()
@@ -322,7 +322,7 @@ private:
         signal();
         erase_beginning_of_vectors();
       } else {
-        erase_old_events_within_ts(old_ts.first);
+        erase_old_events_if_on_sync_with_ts(old_ts.first);
       }
     }
   }
