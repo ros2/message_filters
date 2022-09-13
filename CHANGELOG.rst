@@ -2,8 +2,8 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.5.0 (2022-09-13)
+------------------
 * Add latest time zero-order-hold sync policy (`#73 <https://github.com/ros2/message_filters/issues/73>`_)
 * Fix python examples and add a new example in documentation (`#79 <https://github.com/ros2/message_filters/issues/79>`_)
 * Mirror rolling to master
