@@ -2,6 +2,13 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add latest time zero-order-hold sync policy (`#73 <https://github.com/ros2/message_filters/issues/73>`_)
+* Fix python examples and add a new example in documentation (`#79 <https://github.com/ros2/message_filters/issues/79>`_)
+* Mirror rolling to master
+* Contributors: Audrow Nash, Carlos Andrés Álvarez Restrepo, andermi
+
 4.4.1 (2022-06-20)
 ------------------
 * Adding fix to subscribe() call with raw node pointer and subscriber options (`#76 <https://github.com/ros2/message_filters/issues/76>`_)
@@ -115,9 +122,9 @@ Changelog for package message_filters
 * Add noncopyable base class
 * Deboostify and change from ros::Time to rclcpp::Time
 * Convert to ament_cmake
-* Changed invocation to `add` to conform template syntax (`#1388 <https://github.com/ros2/message_filters/issues/1388>`_)
+* Changed invocation to `add` to conform template syntax (`#1388 <https://github.com/ros2/message_filters/issues/1388>`__)
   This change fixes issue `#1383 <https://github.com/ros2/message_filters/issues/1383>`_
-* fix sphinx warning (`#1371 <https://github.com/ros2/message_filters/issues/1371>`_)
+* fix sphinx warning (`#1371 <https://github.com/ros2/message_filters/issues/1371>`__)
 * Contributors: Dirk Thomas, Ethan Gao, Gary Liu, Jørgen Nordmoen, Michael Carroll, Tully Foote
 
 
@@ -129,8 +136,8 @@ Changelog for package message_filters
 
 1.14.0 (2018-05-21)
 -------------------
-* change invocation to `add` to conform template syntax (`#1388 <https://github.com/ros/ros_comm/issues/1388>`_)
-* fix sphinx warning (`#1371 <https://github.com/ros/ros_comm/issues/1371>`_)
+* change invocation to `add` to conform template syntax (`#1388 <https://github.com/ros/ros_comm/issues/1388>`__)
+* fix sphinx warning (`#1371 <https://github.com/ros/ros_comm/issues/1371>`__)
 
 1.13.6 (2018-02-05)
 -------------------
