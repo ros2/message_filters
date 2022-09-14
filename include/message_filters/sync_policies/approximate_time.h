@@ -32,8 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS__SYNC_APPROXIMATE_TIME_H_
-#define MESSAGE_FILTERS__SYNC_APPROXIMATE_TIME_H_
+#ifndef MESSAGE_FILTERS__SYNC_POLICIES__APPROXIMATE_TIME_H_
+#define MESSAGE_FILTERS__SYNC_POLICIES__APPROXIMATE_TIME_H_
 
 #include <cassert>
 #include <deque>
@@ -860,4 +860,4 @@ private:
 }  // namespace sync
 }  // namespace message_filters
 
-#endif // MESSAGE_FILTERS__SYNC_APPROXIMATE_TIME_H_
+#endif // MESSAGE_FILTERS__SYNC_POLICIES__APPROXIMATE_TIME_H_

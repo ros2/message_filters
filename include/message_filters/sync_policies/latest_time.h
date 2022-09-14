@@ -64,8 +64,8 @@ void callback(const sensor_msgs::CameraInfo::ConstPtr&, const sensor_msgs::Image
  *
  */
 
-#ifndef MESSAGE_FILTERS__SYNC_LATEST_TIME_H_
-#define MESSAGE_FILTERS__SYNC_LATEST_TIME_H_
+#ifndef MESSAGE_FILTERS__SYNC_POLICIES__LATEST_TIME_H_
+#define MESSAGE_FILTERS__SYNC_POLICIES__LATEST_TIME_H_
 
 #include <algorithm>
 #include <memory>
@@ -386,4 +386,4 @@ private:
 }  // namespace sync
 }  // namespace message_filters
 
-#endif // MESSAGE_FILTERS__SYNC_LATEST_TIME_H_
+#endif // MESSAGE_FILTERS__SYNC_POLICIES__LATEST_TIME_H_

@@ -32,8 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS__SYNC_EXACT_TIME_H_
-#define MESSAGE_FILTERS__SYNC_EXACT_TIME_H_
+#ifndef MESSAGE_FILTERS__SYNC_POLICIES__EXACT_TIME_H_
+#define MESSAGE_FILTERS__SYNC_POLICIES__EXACT_TIME_H_
 
 #include <deque>
 #include <string>
@@ -224,5 +224,5 @@ private:
 }  // namespace sync_policies
 }  // namespace message_filters
 
-#endif  // MESSAGE_FILTERS__SYNC_EXACT_TIME_H_
+#endif  // MESSAGE_FILTERS__SYNC_POLICIES__EXACT_TIME_H_
 
