@@ -2,8 +2,8 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.6.1 (2022-10-05)
+------------------
 * Add a simpler aproximate time sync policy: ApproximateEpsilonTime (`#84 <https://github.com/ros2/message_filters/issues/84>`_)
 * Contributors: Ivan Santiago Paunovic
 
