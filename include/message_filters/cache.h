@@ -47,7 +47,6 @@
 
 namespace message_filters
 {
-using namespace std::placeholders;
 /**
  * \brief Stores a time history of messages
  *
@@ -90,7 +89,7 @@ public:
   template<class F>
   void connectInput(F& f)
   {
-    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(std::bind(&Cache::callback, this, _1)));
+    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(std::bind(&Cache::callback, this, std::placeholders::_1)));
   }
 
   ~Cache()
