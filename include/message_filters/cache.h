@@ -89,7 +89,8 @@ public:
   template<class F>
   void connectInput(F& f)
   {
-    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(std::bind(&Cache::callback, this, std::placeholders::_1)));
+    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(
+      std::bind(&Cache::callback, this, std::placeholders::_1)));
   }
 
   ~Cache()
