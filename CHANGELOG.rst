@@ -2,6 +2,13 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update message_filters to C++17. (`#88 <https://github.com/ros2/message_filters/issues/88>`_)
+* Fix cache.h std::placeholder namespace (`#87 <https://github.com/ros2/message_filters/issues/87>`_)
+* [rolling] Update maintainers - 2022-11-07 (`#85 <https://github.com/ros2/message_filters/issues/85>`_)
+* Contributors: Audrow Nash, Chris Lalancette, Haoru Xue
+
 4.6.1 (2022-10-05)
 ------------------
 * Add a simpler aproximate time sync policy: ApproximateEpsilonTime (`#84 <https://github.com/ros2/message_filters/issues/84>`_)
