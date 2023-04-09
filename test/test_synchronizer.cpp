@@ -56,12 +56,11 @@ typedef std::shared_ptr<Msg> MsgPtr;
 typedef std::shared_ptr<Msg const> MsgConstPtr;
 
 
-template<typename M0, typename M1, typename M2 = NullType, typename M3 = NullType, typename M4 = NullType,
-         typename M5 = NullType, typename M6 = NullType, typename M7 = NullType, typename M8 = NullType>
-struct NullPolicy : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
+template<typename... Ms>
+struct NullPolicy : public PolicyBase<Ms...>
 {
   typedef Synchronizer<NullPolicy> Sync;
-  typedef PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8> Super;
+  typedef PolicyBase<Ms...> Super;
   typedef typename Super::Messages Messages;
   typedef typename Super::Signal Signal;
   typedef typename Super::Events Events;
