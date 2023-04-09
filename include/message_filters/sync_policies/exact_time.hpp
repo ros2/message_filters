@@ -48,26 +48,15 @@ namespace message_filters
 namespace sync_policies
 {
 
-template<typename M0, typename M1, typename M2 = NullType, typename M3 = NullType,
-  typename M4 = NullType, typename M5 = NullType, typename M6 = NullType,
-  typename M7 = NullType, typename M8 = NullType>
-struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
+template<typename ... Ms>
+struct ExactTime : public PolicyBase<Ms...>
 {
   typedef Synchronizer<ExactTime> Sync;
-  typedef PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8> Super;
+  typedef PolicyBase<Ms...> Super;
   typedef typename Super::Messages Messages;
   typedef typename Super::Signal Signal;
   typedef typename Super::Events Events;
   typedef typename Super::RealTypeCount RealTypeCount;
-  typedef typename Super::M0Event M0Event;
-  typedef typename Super::M1Event M1Event;
-  typedef typename Super::M2Event M2Event;
-  typedef typename Super::M3Event M3Event;
-  typedef typename Super::M4Event M4Event;
-  typedef typename Super::M5Event M5Event;
-  typedef typename Super::M6Event M6Event;
-  typedef typename Super::M7Event M7Event;
-  typedef typename Super::M8Event M8Event;
   typedef Events Tuple;
 
   ExactTime(uint32_t queue_size)  // NOLINT(runtime/explicit)
@@ -105,8 +94,9 @@ struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 
     std::lock_guard<std::mutex> lock(mutex_);
 
-    Tuple & t = tuples_[mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(
-          *evt.getMessage())];
+    Tuple & t =
+      tuples_[mt::TimeStamp<typename std::tuple_element<i,
+        Messages>::type>::value(*evt.getMessage())];
     std::get<i>(t) = evt;
 
     checkTuple(t);
@@ -136,41 +126,27 @@ struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
     return drop_signal_.addCallback(callback, t);
   }
 
-  rclcpp::Time getLastSignalTime() const
+private:
+  template<std::size_t... Is>
+  static bool isFull(const Tuple & t, std::index_sequence<Is...>)
   {
-    return last_signal_time_;
+    /* *INDENT-OFF* */
+    // uncrustify messes with the brackets which are required (at least by GCC)
+    return (... && static_cast<bool>(std::get<Is>(t).getMessage()));
+    /* *INDENT-ON* */
   }
 
-private:
   // assumes mutex_ is already locked
   void checkTuple(Tuple & t)
   {
     namespace mt = message_filters::message_traits;
 
-    bool full = true;
-    full = full && static_cast<bool>(std::get<0>(t).getMessage());
-    full = full && static_cast<bool>(std::get<1>(t).getMessage());
-    full = full && (RealTypeCount::value > 2 ?
-      static_cast<bool>(std::get<2>(t).getMessage()) : true);
-    full = full && (RealTypeCount::value > 3 ?
-      static_cast<bool>(std::get<3>(t).getMessage()) : true);
-    full = full && (RealTypeCount::value > 4 ?
-      static_cast<bool>(std::get<4>(t).getMessage()) : true);
-    full = full && (RealTypeCount::value > 5 ?
-      static_cast<bool>(std::get<5>(t).getMessage()) : true);
-    full = full && (RealTypeCount::value > 6 ?
-      static_cast<bool>(std::get<6>(t).getMessage()) : true);
-    full = full && (RealTypeCount::value > 7 ?
-      static_cast<bool>(std::get<7>(t).getMessage()) : true);
-    full = full && (RealTypeCount::value > 8 ?
-      static_cast<bool>(std::get<8>(t).getMessage()) : true);
+    const bool full = isFull(t, std::make_index_sequence<std::tuple_size_v<Tuple>>{});
 
     if (full) {
-      parent_->signal(
-        std::get<0>(t), std::get<1>(t), std::get<2>(t),
-        std::get<3>(t), std::get<4>(t), std::get<5>(t),
-        std::get<6>(t), std::get<7>(t), std::get<8>(t));
+      std::apply([this](auto &&... args) {this->parent_->signal(args ...);}, t);
 
+      using M0 = std::tuple_element_t<0, std::tuple<Ms...>>;
       last_signal_time_ = mt::TimeStamp<M0>::value(*std::get<0>(t).getMessage());
 
       tuples_.erase(last_signal_time_);
@@ -181,10 +157,7 @@ private:
     if (queue_size_ > 0) {
       while (tuples_.size() > queue_size_) {
         Tuple & t2 = tuples_.begin()->second;
-        drop_signal_.call(
-          std::get<0>(t2), std::get<1>(t2), std::get<2>(t2),
-          std::get<3>(t2), std::get<4>(t2), std::get<5>(t2),
-          std::get<6>(t2), std::get<7>(t2), std::get<8>(t2));
+        std::apply([this](auto &&... args) {this->drop_signal_.call(args ...);}, t2);
         tuples_.erase(tuples_.begin());
       }
     }
@@ -201,10 +174,7 @@ private:
         ++it;
 
         Tuple & t = old->second;
-        drop_signal_.call(
-          std::get<0>(t), std::get<1>(t), std::get<2>(t),
-          std::get<3>(t), std::get<4>(t), std::get<5>(t),
-          std::get<6>(t), std::get<7>(t), std::get<8>(t));
+        std::apply([this](auto &&... args) {this->drop_signal_.call(args ...);}, t);
         tuples_.erase(old);
       } else {
         // the map is sorted by time, so we can ignore anything after this if this one's time is ok
