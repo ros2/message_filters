@@ -2,6 +2,11 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.3.3 (2023-04-25)
+------------------
+* Add latest time zero-order-hold sync policy (`#73 <https://github.com/ros2/message_filters/issues/73>`_) (`#89 <https://github.com/ros2/message_filters/issues/89>`_)
+* Contributors: mergify[bot]
+
 4.3.2 (2022-06-20)
 ------------------
 * Adding fix to subscribe() call with raw node pointer and subscriber options (`#76 <https://github.com/ros2/message_filters/issues/76>`_) (`#77 <https://github.com/ros2/message_filters/issues/77>`_)
