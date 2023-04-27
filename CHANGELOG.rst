@@ -2,6 +2,9 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.8.0 (2023-04-27)
+------------------
+
 4.7.0 (2023-02-13)
 ------------------
 * Update message_filters to C++17. (`#88 <https://github.com/ros2/message_filters/issues/88>`_)
