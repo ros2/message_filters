@@ -118,6 +118,12 @@ if(BUILD_TESTING)
     ament_target_dependencies(${PROJECT_NAME}-test_fuzz "rclcpp" "sensor_msgs")
   endif()
 
+  ament_add_gtest(${PROJECT_NAME}-test_message_traits test/test_message_traits.cpp)
+  if(TARGET ${PROJECT_NAME}-test_message_traits)
+    target_link_libraries(${PROJECT_NAME}-test_message_traits ${PROJECT_NAME})
+    ament_target_dependencies(${PROJECT_NAME}-test_message_traits "rclcpp" "std_msgs")
+  endif()
+
   # Provides PYTHON_EXECUTABLE_DEBUG
   find_package(PythonExtra REQUIRED)
   set(_PYTHON_EXECUTABLE "${PYTHON_EXECUTABLE}")
