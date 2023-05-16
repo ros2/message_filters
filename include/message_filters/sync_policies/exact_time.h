@@ -138,6 +138,11 @@ struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
     return drop_signal_.addCallback(callback, t);
   }
 
+  rclcpp::Time getLastSignalTime() const
+  {
+    return last_signal_time_;
+  }
+
 private:
 
   // assumes mutex_ is already locked
