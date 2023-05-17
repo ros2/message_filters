@@ -36,6 +36,7 @@
 #define MESSAGE_FILTERS__SUBSCRIBER_H_
 
 #include <stdexcept>
+#include <type_traits>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -143,12 +144,34 @@ using SubscriberBasePtr = std::shared_ptr<SubscriberBase<T>>;
 void callback(const std::shared_ptr<M const>&);
 \endverbatim
  */
+
+template <typename M, bool is_adapter>
+struct message_type;
+
+template <typename M> 
+struct message_type <M, true>
+{
+  using type = typename M::custom_type;
+};
+
+template <typename M> 
+struct message_type <M, false> 
+{
+  using type = M;
+};
+
+
 template<class M, class NodeType = rclcpp::Node>
-class Subscriber : public SubscriberBase<NodeType>, public SimpleFilter<M>
+class Subscriber 
+: public SubscriberBase<NodeType>
+, public SimpleFilter<typename message_type<M, rclcpp::is_type_adapter<M>::value>::type>
 {
 public:
   typedef std::shared_ptr<NodeType> NodePtr;
-  typedef MessageEvent<M const> EventType;
+
+  using MessageType = typename message_type<M, rclcpp::is_type_adapter<M>::value>::type;
+  using EventType = MessageEvent<MessageType const>;
+
 
   /**
    * \brief Constructor
@@ -283,10 +306,17 @@ public:
       rclcpp_qos.get_rmw_qos_profile() = qos;
       qos_ = qos;
       options_ = options;
-      sub_ = node->template create_subscription<M>(topic, rclcpp_qos,
-               [this](std::shared_ptr<M const> msg) {
-                 this->cb(EventType(msg));
-               }, options);
+      if constexpr(!rclcpp::is_type_adapter<M>::value){
+		    sub_ = node->template create_subscription<M>(topic, rclcpp_qos,
+           [this](std::shared_ptr<M const> msg) {
+             this->cb(EventType(msg));
+           }, options);
+      } else {
+        sub_ = node->template create_subscription<M>(topic, rclcpp_qos,
+           [this](std::shared_ptr<typename M::custom_type const> msg) {
+             this->cb(EventType(msg));
+           }, options);
+      }
 
       node_raw_ = node;
     }
