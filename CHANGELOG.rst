@@ -2,6 +2,11 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Use RCL_ROS_TIME for message_traits::TimeStamp  (`#72 <https://github.com/ros2/message_filters/issues/72>`_) (`#81 <https://github.com/ros2/message_filters/issues/81>`_)
+* Contributors: Paul Schalkwijk, Kenji Brameld, Sivert Havso
+
 3.2.5 (2020-12-10)
 ------------------
 * Add pytest.ini so local tests don't display warning (`#47 <https://github.com/ros2/message_filters/issues/47>`_)
