@@ -2,8 +2,8 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.2.7 (2023-06-06)
+------------------
 * Use RCL_ROS_TIME for message_traits::TimeStamp  (`#72 <https://github.com/ros2/message_filters/issues/72>`_) (`#81 <https://github.com/ros2/message_filters/issues/81>`_)
 * Contributors: Paul Schalkwijk, Kenji Brameld, Sivert Havso
 
