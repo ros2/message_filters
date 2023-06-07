@@ -2,8 +2,8 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.9.0 (2023-06-07)
+------------------
 * feat: add signal time functions to ExactTime policy (`#94 <https://github.com/ros2/message_filters/issues/94>`_)
 * Contributors: Russ
 
