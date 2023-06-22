@@ -18,9 +18,9 @@ The filters currently implemented in this package are:
 Here's a simple example of using a Subscriber with a Cache::
 
     def myCallback(posemsg):
-       print posemsg
+       print(posemsg)
 
-    sub = message_filters.Subscriber(node_object, "pose_topic", robot_msgs.msg.Pose)
+    sub = message_filters.Subscriber(node_object, robot_msgs.msg.Pose, "pose_topic")
     cache = message_filters.Cache(sub, 10)
     cache.registerCallback(myCallback)
 
@@ -34,10 +34,10 @@ Using the time synchronizer::
 
     def gotimage(image, camerainfo):
         assert image.header.stamp == camerainfo.header.stamp
-        print "got an Image and CameraInfo"
+        print("got an Image and CameraInfo")
 
-    tss = TimeSynchronizer(Subscriber(node_object, "/wide_stereo/left/image_rect_color", sensor_msgs.msg.Image),
-                           Subscriber(node_object, "/wide_stereo/left/camera_info", sensor_msgs.msg.CameraInfo))
+    tss = TimeSynchronizer(Subscriber(node_object, sensor_msgs.msg.Image, "/wide_stereo/left/image_rect_color"),
+                           Subscriber(node_object, sensor_msgs.msg.CameraInfo, "/wide_stereo/left/camera_info"))
     tss.registerCallback(gotimage)
 
 Another example for syncronizing one image topic and one pointcloud2 topic using approximate synchronizer::
