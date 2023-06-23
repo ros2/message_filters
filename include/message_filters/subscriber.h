@@ -306,17 +306,10 @@ public:
       rclcpp_qos.get_rmw_qos_profile() = qos;
       qos_ = qos;
       options_ = options;
-      if constexpr(!rclcpp::is_type_adapter<M>::value){
-		    sub_ = node->template create_subscription<M>(topic, rclcpp_qos,
-           [this](std::shared_ptr<M const> msg) {
-             this->cb(EventType(msg));
-           }, options);
-      } else {
-        sub_ = node->template create_subscription<M>(topic, rclcpp_qos,
-           [this](std::shared_ptr<typename M::custom_type const> msg) {
-             this->cb(EventType(msg));
-           }, options);
-      }
+      sub_ = node->template create_subscription<M>(topic, rclcpp_qos,
+          [this](std::shared_ptr<MessageType const> msg) {
+            this->cb(EventType(msg));
+          }, options);
 
       node_raw_ = node;
     }
