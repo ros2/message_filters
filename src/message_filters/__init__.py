@@ -66,10 +66,10 @@ class SimpleFilter(object):
 class Subscriber(SimpleFilter):
     
     """
-    ROS2 subscription filter,Identical arguments as :class:`rclpy.Subscriber`.
+    ROS 2 subscription filter, takes identical arguments as :class:`rclpy.Subscriber`.
 
     This class acts as a highest-level filter, simply passing messages
-    from a ROS2 subscription through to the filters which have connected
+    from a ROS 2 subscription through to the filters which have connected
     to it.
     """
     def __init__(self, *args, **kwargs):
