@@ -4,7 +4,7 @@
   <name>message_filters</name>
   <version>4.9.0</version>
   <description>
-    A set of ROS2 message filters which take in messages and may output those messages at a later time, based on the conditions that filter needs met.
+    A set of ROS 2 message filters which take in messages and may output those messages at a later time, based on the conditions that filter needs met.
   </description>
 
   <maintainer email="geoff@openrobotics.org">Geoffrey Biggs</maintainer>
