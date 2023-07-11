@@ -2,8 +2,8 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.9.1 (2023-07-11)
+------------------
 * Cleanup a few minor things in the filters. (`#100 <https://github.com/ros2/message_filters/issues/100>`_)
 * Fix python examples (`#99 <https://github.com/ros2/message_filters/issues/99>`_)
 * Contributors: Chris Lalancette, Ricardo de Azambuja
