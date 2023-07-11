@@ -2,6 +2,12 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Cleanup a few minor things in the filters. (`#100 <https://github.com/ros2/message_filters/issues/100>`_)
+* Fix python examples (`#99 <https://github.com/ros2/message_filters/issues/99>`_)
+* Contributors: Chris Lalancette, Ricardo de Azambuja
+
 4.9.0 (2023-06-07)
 ------------------
 * feat: add signal time functions to ExactTime policy (`#94 <https://github.com/ros2/message_filters/issues/94>`_)
