@@ -34,6 +34,7 @@
 #include <type_traits>
 
 #include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/header.hpp>
 
 namespace message_filters
 {
@@ -41,12 +42,19 @@ namespace message_traits
 {
 
 /**
- * \brief HasHeader informs whether or not there is a header that gets serialized as the first thing in the message
+ * False if the message does not have a header
+ * @tparam M
  */
-template<typename M, typename = void> struct HasHeader : public std::false_type {};
+template<typename M, typename = void>
+struct HasHeader : public std::false_type {};
 
+/**
+ * True if the message has a field named 'header' with a type of std_msgs::msg::Header
+ * @tparam M
+ */
 template <typename M>
-struct HasHeader<M, decltype((void) M::header)> : std::true_type {};
+struct HasHeader<M, typename std::enable_if<std::is_same<std_msgs::msg::Header,
+  decltype(M().header)>::value>::type>: public std::true_type {};
 
 /**
  * \brief FrameId trait.  In the default implementation pointer()
@@ -59,7 +67,7 @@ struct FrameId
   static std::string* pointer(M& m) { (void)m; return nullptr; }
   static std::string const* pointer(const M& m) { (void)m; return nullptr; }
 };
- template<typename M>
+template<typename M>
 struct FrameId<M, typename std::enable_if<HasHeader<M>::value>::type >
 {
   static std::string* pointer(M& m) { return &m.header.frame_id; }

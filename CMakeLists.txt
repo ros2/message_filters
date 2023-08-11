@@ -16,6 +16,7 @@ find_package(ament_cmake_python REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rcutils REQUIRED)
+find_package(std_msgs REQUIRED)
 
 add_library(${PROJECT_NAME} src/connection.cpp)
 if(WIN32)
@@ -29,6 +30,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 ament_target_dependencies(${PROJECT_NAME}
   "rclcpp"
   "rcutils"
+  "std_msgs"
 )
 
 install(
@@ -53,12 +55,12 @@ ament_export_libraries(${PROJECT_NAME})
 # Export modern CMake targets
 ament_export_targets(${PROJECT_NAME})
 
-ament_export_dependencies(rclcpp rcutils)
+ament_export_dependencies(rclcpp rcutils std_msgs)
 
 if(BUILD_TESTING)
-  find_package(sensor_msgs REQUIRED)
   find_package(ament_lint_auto REQUIRED)
   find_package(rclcpp_lifecycle REQUIRED)
+  find_package(sensor_msgs REQUIRED)
 
   ament_lint_auto_find_test_dependencies()
 
@@ -114,7 +116,7 @@ if(BUILD_TESTING)
   if(TARGET ${PROJECT_NAME}-test_approximate_epsilon_time_policy)
     target_link_libraries(${PROJECT_NAME}-test_approximate_epsilon_time_policy ${PROJECT_NAME})
   endif()
-  
+
   ament_add_gtest(${PROJECT_NAME}-test_latest_time_policy test/test_latest_time_policy.cpp)
   if(TARGET ${PROJECT_NAME}-test_latest_time_policy)
     target_link_libraries(${PROJECT_NAME}-test_latest_time_policy ${PROJECT_NAME})
