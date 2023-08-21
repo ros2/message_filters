@@ -2,6 +2,12 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update the HasHeader check to be more specific. (`#101 <https://github.com/ros2/message_filters/issues/101>`_)
+* TypeAdapters support (`#95 <https://github.com/ros2/message_filters/issues/95>`_) (`#96 <https://github.com/ros2/message_filters/issues/96>`_)
+* Contributors: Chris Lalancette, Patrick Roncagliolo
+
 4.9.1 (2023-07-11)
 ------------------
 * Cleanup a few minor things in the filters. (`#100 <https://github.com/ros2/message_filters/issues/100>`_)
