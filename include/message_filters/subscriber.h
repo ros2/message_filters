@@ -307,7 +307,7 @@ public:
       qos_ = qos;
       options_ = options;
       sub_ = node->template create_subscription<M>(topic, rclcpp_qos,
-          [this](std::shared_ptr<const MessageType const> msg) {
+          [this](const std::shared_ptr<MessageType const> msg) {
             this->cb(EventType(msg));
           }, options);
 
