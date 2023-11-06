@@ -2,8 +2,8 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.10.1 (2023-11-06)
+-------------------
 * Mark subscription cb parameter const (`#103 <https://github.com/ros2/message_filters/issues/103>`_)
 * Contributors: Patrick Roncagliolo
 
