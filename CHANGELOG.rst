@@ -2,6 +2,11 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Mark subscription cb parameter const (`#103 <https://github.com/ros2/message_filters/issues/103>`_)
+* Contributors: Patrick Roncagliolo
+
 4.10.0 (2023-08-21)
 -------------------
 * Update the HasHeader check to be more specific. (`#101 <https://github.com/ros2/message_filters/issues/101>`_)
