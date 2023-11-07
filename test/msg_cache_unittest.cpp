@@ -34,13 +34,14 @@
 
 #include <gtest/gtest.h>
 
-#include <rclcpp/rclcpp.hpp>
-#include <memory>
 #include <functional>
+#include <memory>
+#include <vector>
+
+#include <rclcpp/rclcpp.hpp>
 #include "message_filters/cache.h"
 #include "message_filters/message_traits.h"
 
-using namespace std ;
 using namespace message_filters ;
 
 struct Header
@@ -90,7 +91,7 @@ TEST(Cache, easyInterval)
   Cache<Msg> cache(10) ;
   fillCacheEasy(cache, 0, 5) ;
 
-  vector<std::shared_ptr<Msg const> > interval_data = cache.getInterval(rclcpp::Time(5, 0), rclcpp::Time(35, 0)) ;
+  std::vector<std::shared_ptr<Msg const> > interval_data = cache.getInterval(rclcpp::Time(5, 0), rclcpp::Time(35, 0)) ;
 
   ASSERT_EQ(interval_data.size(), (unsigned int) 3) ;
   EXPECT_EQ(interval_data[0]->data, 1) ;
@@ -112,7 +113,7 @@ TEST(Cache, easySurroundingInterval)
   Cache<Msg> cache(10);
   fillCacheEasy(cache, 1, 6);
 
-  vector<std::shared_ptr<Msg const> > interval_data;
+  std::vector<std::shared_ptr<Msg const> > interval_data;
   interval_data = cache.getSurroundingInterval(rclcpp::Time(15,0), rclcpp::Time(35,0)) ;
   ASSERT_EQ(interval_data.size(), (unsigned int) 4);
   EXPECT_EQ(interval_data[0]->data, 1);
@@ -155,7 +156,7 @@ TEST(Cache, easyUnsorted)
   cache.add(buildMsg( 5, 0)) ;
   cache.add(buildMsg(20, 2)) ;
 
-  vector<std::shared_ptr<Msg const> > interval_data = cache.getInterval(rclcpp::Time(3, 0), rclcpp::Time(15, 0)) ;
+  std::vector<std::shared_ptr<Msg const> > interval_data = cache.getInterval(rclcpp::Time(3, 0), rclcpp::Time(15, 0)) ;
 
   ASSERT_EQ(interval_data.size(), (unsigned int) 2) ;
   EXPECT_EQ(interval_data[0]->data, 0) ;
