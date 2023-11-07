@@ -42,8 +42,6 @@
 #include "message_filters/cache.h"
 #include "message_filters/message_traits.h"
 
-using namespace message_filters ;
-
 struct Header
 {
   rclcpp::Time stamp ;
@@ -71,25 +69,22 @@ struct TimeStamp<Msg>
 }
 }
 
-
-void fillCacheEasy(Cache<Msg>& cache, unsigned int start, unsigned int end)
-
+void fillCacheEasy(message_filters::Cache<Msg>& cache, unsigned int start, unsigned int end)
 {
-  for (unsigned int i=start; i < end; i++)
-  {
-    Msg* msg = new Msg ;
-    msg->data = i ;
-    msg->header.stamp= rclcpp::Time(i*10, 0) ;
+  for (unsigned int i = start; i < end; i++) {
+    Msg * msg = new Msg;
+    msg->data = i;
+    msg->header.stamp = rclcpp::Time(i * 10, 0);
 
-    std::shared_ptr<Msg const> msg_ptr(msg) ;
-    cache.add(msg_ptr) ;
+    std::shared_ptr<Msg const> msg_ptr(msg);
+    cache.add(msg_ptr);
   }
 }
 
 TEST(Cache, easyInterval)
 {
-  Cache<Msg> cache(10) ;
-  fillCacheEasy(cache, 0, 5) ;
+  message_filters::Cache<Msg> cache(10);
+  fillCacheEasy(cache, 0, 5);
 
   std::vector<std::shared_ptr<Msg const> > interval_data = cache.getInterval(rclcpp::Time(5, 0), rclcpp::Time(35, 0)) ;
 
@@ -110,7 +105,7 @@ TEST(Cache, easyInterval)
 
 TEST(Cache, easySurroundingInterval)
 {
-  Cache<Msg> cache(10);
+  message_filters::Cache<Msg> cache(10);
   fillCacheEasy(cache, 1, 6);
 
   std::vector<std::shared_ptr<Msg const> > interval_data;
@@ -148,7 +143,7 @@ std::shared_ptr<Msg const> buildMsg(int32_t seconds, int data)
 
 TEST(Cache, easyUnsorted)
 {
-  Cache<Msg> cache(10) ;
+  message_filters::Cache<Msg> cache(10);
 
   cache.add(buildMsg(10, 1)) ;
   cache.add(buildMsg(30, 3)) ;
@@ -175,8 +170,8 @@ TEST(Cache, easyUnsorted)
 
 TEST(Cache, easyElemBeforeAfter)
 {
-  Cache<Msg> cache(10) ;
-  std::shared_ptr<Msg const> elem_ptr ;
+  message_filters::Cache<Msg> cache(10);
+  std::shared_ptr<Msg const> elem_ptr;
 
   fillCacheEasy(cache, 5, 10) ;
 
@@ -196,29 +191,30 @@ TEST(Cache, easyElemBeforeAfter)
 struct EventHelper
 {
 public:
-  void cb(const MessageEvent<Msg const>& evt)
+  void cb(const message_filters::MessageEvent<Msg const> & evt)
   {
     event_ = evt;
   }
 
-  MessageEvent<Msg const> event_;
+  message_filters::MessageEvent<Msg const> event_;
 };
 
 TEST(Cache, eventInEventOut)
 {
-  Cache<Msg> c0(10);
-  Cache<Msg> c1(c0, 10);
+  message_filters::Cache<Msg> c0(10);
+  message_filters::Cache<Msg> c1(c0, 10);
   EventHelper h;
   c1.registerCallback(&EventHelper::cb, &h);
 
-  MessageEvent<Msg const> evt(std::make_shared<Msg const>(), rclcpp::Time(4, 0));
+  message_filters::MessageEvent<Msg const> evt(std::make_shared<Msg const>(), rclcpp::Time(4, 0));
   c0.add(evt);
 
   EXPECT_EQ(h.event_.getReceiptTime(), evt.getReceiptTime());
   EXPECT_EQ(h.event_.getMessage(), evt.getMessage());
 }
 
-int main(int argc, char **argv){
+int main(int argc, char **argv)
+{
   testing::InitGoogleTest(&argc, argv);
   rclcpp::init(argc, argv);
   return RUN_ALL_TESTS();
