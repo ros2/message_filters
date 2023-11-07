@@ -36,6 +36,9 @@
 // https://github.com/ros2/message_filters/blob/1866ddb86db5b5c7746556ea7544b6f34c00415b/test/time_sequencer_unittest.cpp
 
 #include <gtest/gtest.h>
+
+#include <functional>
+#include <memory>
 #include <random>
 
 #include <rclcpp/rclcpp.hpp>
@@ -45,8 +48,6 @@
 #include "message_filters/chain.h"
 #include "sensor_msgs/msg/imu.hpp"
 
-using namespace std::placeholders;
-using namespace message_filters;
 typedef sensor_msgs::msg::Imu Msg;
 typedef std::shared_ptr<sensor_msgs::msg::Imu const> MsgConstPtr;
 typedef std::shared_ptr<sensor_msgs::msg::Imu> MsgPtr;
@@ -70,21 +71,22 @@ public:
   int32_t count_;
 };
 
-static void fuzz_msg(MsgPtr msg) {
-    static std::random_device seeder;
-    std::mt19937 gen(seeder());
-    std::uniform_real_distribution<float> distr(1.0, 3.0);
-    msg->linear_acceleration.x = distr(gen);
-    msg->linear_acceleration.y = distr(gen);
-    msg->linear_acceleration.z = distr(gen);
+static void fuzz_msg(MsgPtr msg)
+{
+  static std::random_device seeder;
+  std::mt19937 gen(seeder());
+  std::uniform_real_distribution<float> distr(1.0, 3.0);
+  msg->linear_acceleration.x = distr(gen);
+  msg->linear_acceleration.y = distr(gen);
+  msg->linear_acceleration.z = distr(gen);
 }
 
 TEST(TimeSequencer, fuzz_sequencer)
 {
   rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("test_node");
-  TimeSequencer<Msg> seq(rclcpp::Duration(0, 10000000), rclcpp::Duration(0, 1000000), 10, node);
+  message_filters::TimeSequencer<Msg> seq(rclcpp::Duration(0, 10000000), rclcpp::Duration(0, 1000000), 10, node);
   Helper h;
-  seq.registerCallback(std::bind(&Helper::cb, &h, _1));
+  seq.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
   auto msg = std::make_shared<Msg>();
@@ -105,16 +107,15 @@ TEST(TimeSequencer, fuzz_sequencer)
 
 TEST(TimeSynchronizer, fuzz_synchronizer)
 {
-  TimeSynchronizer<Msg, Msg> sync(1);
+  message_filters::TimeSynchronizer<Msg, Msg> sync(1);
   Helper h;
-  sync.registerCallback(std::bind(&Helper::cb2, &h, _1, _2));
+  sync.registerCallback(std::bind(&Helper::cb2, &h, std::placeholders::_1, std::placeholders::_2));
 
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
   auto msg1 = std::make_shared<Msg>();
   auto msg2 = std::make_shared<Msg>();
-  while ((ros_clock.now() - start) < rclcpp::Duration(5, 0))
-  {
+  while ((ros_clock.now() - start) < rclcpp::Duration(5, 0)) {
     h.count_ = 0;
     fuzz_msg(msg1);
     msg1->header.stamp = rclcpp::Clock().now();
@@ -132,14 +133,13 @@ TEST(Subscriber, fuzz_subscriber)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
-  Subscriber<Msg> sub(node, "test_topic");
-  sub.registerCallback(std::bind(&Helper::cb, &h, _1));
+  message_filters::Subscriber<Msg> sub(node, "test_topic");
+  sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
   auto msg = std::make_shared<Msg>();
-  while ((ros_clock.now() - start) < rclcpp::Duration(5, 0))
-  {
+  while ((ros_clock.now() - start) < rclcpp::Duration(5, 0)) {
     h.count_ = 0;
     fuzz_msg(msg);
     msg->header.stamp = ros_clock.now();
@@ -151,7 +151,8 @@ TEST(Subscriber, fuzz_subscriber)
   rclcpp::spin_some(node);
 }
 
-int main(int argc, char **argv){
+int main(int argc, char **argv)
+{
   testing::InitGoogleTest(&argc, argv);
 
   rclcpp::init(argc, argv);
