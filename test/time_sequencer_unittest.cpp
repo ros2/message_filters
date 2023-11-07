@@ -34,16 +34,15 @@
 
 #include <gtest/gtest.h>
 
+#include <memory>
+
 #include <rclcpp/rclcpp.hpp>
 #include "message_filters/time_sequencer.h"
-
-using namespace message_filters;
 
 struct Header
 {
   rclcpp::Time stamp;
 };
-
 
 struct Msg
 {
@@ -86,7 +85,7 @@ public:
 TEST(TimeSequencer, simple)
 {
   rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("test_node");
-  TimeSequencer<Msg> seq(rclcpp::Duration(0, 250000000), rclcpp::Duration(0, 10000000), 10, node);
+  message_filters::TimeSequencer<Msg> seq(rclcpp::Duration(0, 250000000), rclcpp::Duration(0, 10000000), 10, node);
   Helper h;
   seq.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   MsgPtr msg(std::make_shared<Msg>());
@@ -107,35 +106,34 @@ TEST(TimeSequencer, simple)
 TEST(TimeSequencer, compilation)
 {
   rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("test_node");
-  TimeSequencer<Msg> seq(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, node);
-  TimeSequencer<Msg> seq2(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, node);
+  message_filters::TimeSequencer<Msg> seq(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, node);
+  message_filters::TimeSequencer<Msg> seq2(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, node);
   seq2.connectInput(seq);
 }
 
 struct EventHelper
 {
 public:
-  void cb(const MessageEvent<Msg const>& evt)
+  void cb(const message_filters::MessageEvent<Msg const> & evt)
   {
     event_ = evt;
   }
 
-  MessageEvent<Msg const> event_;
+  message_filters::MessageEvent<Msg const> event_;
 };
 
 TEST(TimeSequencer, eventInEventOut)
 {
   rclcpp::Node::SharedPtr nh = std::make_shared<rclcpp::Node>("test_node");
-  TimeSequencer<Msg> seq(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, nh);
-  TimeSequencer<Msg> seq2(seq, rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, nh);
+  message_filters::TimeSequencer<Msg> seq(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, nh);
+  message_filters::TimeSequencer<Msg> seq2(seq, rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, nh);
   EventHelper h;
   seq2.registerCallback(&EventHelper::cb, &h);
 
-  MessageEvent<Msg const> evt(std::make_shared<Msg const>(), rclcpp::Clock().now());
+  message_filters::MessageEvent<Msg const> evt(std::make_shared<Msg const>(), rclcpp::Clock().now());
   seq.add(evt);
 
-  while (!h.event_.getMessage())
-  {
+  while (!h.event_.getMessage()) {
     rclcpp::Rate(100).sleep();
     rclcpp::spin_some(nh);
   }
@@ -144,7 +142,8 @@ TEST(TimeSequencer, eventInEventOut)
   EXPECT_EQ(h.event_.getMessage(), evt.getMessage());
 }
 
-int main(int argc, char **argv){
+int main(int argc, char **argv)
+{
   testing::InitGoogleTest(&argc, argv);
 
   rclcpp::init(argc, argv);
