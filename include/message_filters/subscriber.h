@@ -102,16 +102,14 @@ public:
    *
    * \param node The rclcpp::Node to use to subscribe.
    * \param topic The topic to subscribe to.
-   * \param qos (optional) The rmw qos profile to use to subscribe
+   * \param qos The rmw qos profile to use to subscribe.
+   * \param options The subscription options to use to subscribe.
    */
   virtual void subscribe(
     NodeType * node,
     const std::string& topic,
     const rmw_qos_profile_t qos,
-    rclcpp::SubscriptionOptions options)
-  {
-    this->subscribe(node, topic, qos, options);
-  }
+    rclcpp::SubscriptionOptions options) = 0;
 
   /**
    * \brief Re-subscribe to a topic.  Only works if this subscriber has previously been subscribed to a topic.
