@@ -52,27 +52,19 @@ namespace message_filters
 namespace sync_policies
 {
 
-template<typename M0, typename M1, typename M2 = NullType, typename M3 = NullType, typename M4 = NullType,
-         typename M5 = NullType, typename M6 = NullType, typename M7 = NullType, typename M8 = NullType>
-class ApproximateEpsilonTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
+template<typename... Ms>
+class ApproximateEpsilonTime : public PolicyBase<Ms...>
 {
 public:
   typedef Synchronizer<ApproximateEpsilonTime> Sync;
-  typedef PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8> Super;
+  typedef PolicyBase<Ms...> Super;
   typedef typename Super::Messages Messages;
   typedef typename Super::Signal Signal;
   typedef typename Super::Events Events;
   typedef typename Super::RealTypeCount RealTypeCount;
-  typedef typename Super::M0Event M0Event;
-  typedef typename Super::M1Event M1Event;
-  typedef typename Super::M2Event M2Event;
-  typedef typename Super::M3Event M3Event;
-  typedef typename Super::M4Event M4Event;
-  typedef typename Super::M5Event M5Event;
-  typedef typename Super::M6Event M6Event;
-  typedef typename Super::M7Event M7Event;
-  typedef typename Super::M8Event M8Event;
   typedef Events Tuple;
+  
+  using Super::N_MESSAGES;
 
   ApproximateEpsilonTime(uint32_t queue_size, rclcpp::Duration epsilon)
   : parent_(nullptr)
@@ -158,7 +150,7 @@ private:
   TimeIndexPair
   get_older_timestamp()
   {
-    return get_older_timestamp_helper(std::make_index_sequence<9u>());
+    return get_older_timestamp_helper(std::make_index_sequence<N_MESSAGES>());
   }
 
   template <size_t Is>
@@ -199,7 +191,7 @@ private:
   check_all_timestamp_within_epsilon(const TimeIndexPair & older)
   {
     return check_all_timestamp_within_epsilon_helper(
-      older, std::make_index_sequence<9u>());
+      older, std::make_index_sequence<N_MESSAGES>());
   }
 
   template<size_t Is>
@@ -227,7 +219,7 @@ private:
 
   void erase_beginning_of_vectors()
   {
-    return erase_beginning_of_vectors_helper(std::make_index_sequence<9u>());
+    return erase_beginning_of_vectors_helper(std::make_index_sequence<N_MESSAGES>());
   }
 
   template<size_t Is>
@@ -263,54 +255,17 @@ private:
 
   void erase_old_events_if_on_sync_with_ts(rclcpp::Time timestamp)
   {
-    return erase_old_events_if_on_sync_with_ts_helper(timestamp, std::make_index_sequence<9u>());
+    return erase_old_events_if_on_sync_with_ts_helper(timestamp, std::make_index_sequence<N_MESSAGES>());
+  }
+
+  template<size_t ... Is>
+  void signalImpl(std::index_sequence<Is...>) {
+      parent_->signal(std::get<Is>(events_).at(0)...);
   }
 
   void signal()
   {
-    if constexpr (RealTypeCount::value == 2) {
-      parent_->signal(
-        std::get<0>(events_).at(0), std::get<1>(events_).at(0),
-        M2Event{}, M3Event{}, M4Event{}, M5Event{}, M6Event{}, M7Event{}, M8Event{});
-    } else if constexpr (RealTypeCount::value == 3) {
-      parent_->signal(
-        std::get<0>(events_).at(0), std::get<1>(events_).at(0), std::get<2>(events_).at(0),
-        M3Event{}, M4Event{}, M5Event{}, M6Event{}, M7Event{}, M8Event{});
-    } else if constexpr (RealTypeCount::value == 4) {
-      parent_->signal(
-        std::get<0>(events_).at(0), std::get<1>(events_).at(0), std::get<2>(events_).at(0),
-        std::get<3>(events_).at(0),
-        M4Event{}, M5Event{}, M6Event{}, M7Event{}, M8Event{});
-    } else if constexpr (RealTypeCount::value == 5) {
-      parent_->signal(
-        std::get<0>(events_).at(0), std::get<1>(events_).at(0), std::get<2>(events_).at(0),
-        std::get<3>(events_).at(0), std::get<4>(events_).at(0),
-        M5Event{}, M6Event{}, M7Event{}, M8Event{});
-    } else if constexpr (RealTypeCount::value == 6) {
-      parent_->signal(
-        std::get<0>(events_).at(0), std::get<1>(events_).at(0), std::get<2>(events_).at(0),
-        std::get<3>(events_).at(0), std::get<4>(events_).at(0), std::get<5>(events_).at(0),
-        M6Event{}, M7Event{}, M8Event{});
-    } else if constexpr (RealTypeCount::value == 7) {
-      parent_->signal(
-        std::get<0>(events_).at(0), std::get<1>(events_).at(0), std::get<2>(events_).at(0),
-        std::get<3>(events_).at(0), std::get<4>(events_).at(0), std::get<5>(events_).at(0),
-        std::get<6>(events_).at(0),
-        M7Event{}, M8Event{});
-    } else if constexpr (RealTypeCount::value == 8) {
-      parent_->signal(
-        std::get<0>(events_).at(0), std::get<1>(events_).at(0), std::get<2>(events_).at(0),
-        std::get<3>(events_).at(0), std::get<4>(events_).at(0), std::get<5>(events_).at(0),
-        std::get<6>(events_).at(0), std::get<7>(events_).at(0),
-        M8Event{});
-    } else if constexpr (RealTypeCount::value == 9) {
-      parent_->signal(
-        std::get<0>(events_).at(0), std::get<1>(events_).at(0), std::get<2>(events_).at(0),
-        std::get<3>(events_).at(0), std::get<4>(events_).at(0), std::get<5>(events_).at(0),
-        std::get<6>(events_).at(0), std::get<7>(events_).at(0), std::get<8>(events_).at(0));
-    } else {
-      static_assert("RealTypeCount::value should be >=2 and <=9");
-    }
+      signalImpl(std::make_index_sequence<N_MESSAGES>{});
   }
 
   // assumes mutex_ is already locked
@@ -332,10 +287,7 @@ private:
   uint32_t queue_size_;
   rclcpp::Duration epsilon_;
   size_t number_of_non_empty_events_{0};
-  using TupleOfVecOfEvents = std::tuple<
-    std::vector<M0Event>, std::vector<M1Event>, std::vector<M2Event>,
-    std::vector<M3Event>, std::vector<M4Event>, std::vector<M5Event>,
-    std::vector<M6Event>, std::vector<M7Event>, std::vector<M8Event>>;
+  using TupleOfVecOfEvents = typename std::tuple<std::vector<MessageEvent<Ms const>>...>;
   TupleOfVecOfEvents events_;
 
   std::mutex mutex_;

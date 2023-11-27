@@ -95,49 +95,49 @@ public:
 TEST(TimeSynchronizer, compile2)
 {
   NullFilter<Msg> f0, f1;
-  TimeSynchronizer<Msg, Msg> sync(f0, f1, 1);
+  TimeSynchronizer<Msg, Msg> sync(1, f0, f1);
 }
 
 TEST(TimeSynchronizer, compile3)
 {
   NullFilter<Msg> f0, f1, f2;
-  TimeSynchronizer<Msg, Msg, Msg> sync(f0, f1, f2, 1);
+  TimeSynchronizer<Msg, Msg, Msg> sync(1, f0, f1, f2);
 }
 
 TEST(TimeSynchronizer, compile4)
 {
   NullFilter<Msg> f0, f1, f2, f3;
-  TimeSynchronizer<Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, 1);
+  TimeSynchronizer<Msg, Msg, Msg, Msg> sync(1, f0, f1, f2, f3);
 }
 
 TEST(TimeSynchronizer, compile5)
 {
   NullFilter<Msg> f0, f1, f2, f3, f4;
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4, 1);
+  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg> sync(1, f0, f1, f2, f3, f4);
 }
 
 TEST(TimeSynchronizer, compile6)
 {
   NullFilter<Msg> f0, f1, f2, f3, f4, f5;
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4, f5, 1);
+  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg> sync(1, f0, f1, f2, f3, f4, f5);
 }
 
 TEST(TimeSynchronizer, compile7)
 {
   NullFilter<Msg> f0, f1, f2, f3, f4, f5, f6;
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4, f5, f6, 1);
+  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1, f0, f1, f2, f3, f4, f5, f6);
 }
 
 TEST(TimeSynchronizer, compile8)
 {
   NullFilter<Msg> f0, f1, f2, f3, f4, f5, f6, f7;
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4, f5, f6, f7, 1);
+  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1, f0, f1, f2, f3, f4, f5, f6, f7);
 }
 
 TEST(TimeSynchronizer, compile9)
 {
   NullFilter<Msg> f0, f1, f2, f3, f4, f5, f6, f7, f8;
-  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4, f5, f6, f7, f8, 1);
+  TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(1, f0, f1, f2, f3, f4, f5, f6, f7, f8);
 }
 
 void function2(const MsgConstPtr&, const MsgConstPtr&) {}
@@ -266,9 +266,9 @@ TEST(TimeSynchronizer, immediate2)
   MsgPtr m(std::make_shared<Msg>());
   m->header.stamp = rclcpp::Clock().now();
 
-  sync.add0(m);
+  sync.add<0>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add1(m);
+  sync.add<1>(m);
   ASSERT_EQ(h.count_, 1);
 }
 
@@ -280,11 +280,11 @@ TEST(TimeSynchronizer, immediate3)
   MsgPtr m(std::make_shared<Msg>());
   m->header.stamp = rclcpp::Clock().now();
 
-  sync.add0(m);
+  sync.add<0>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add1(m);
+  sync.add<1>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add2(m);
+  sync.add<2>(m);
   ASSERT_EQ(h.count_, 1);
 }
 
@@ -296,13 +296,13 @@ TEST(TimeSynchronizer, immediate4)
   MsgPtr m(std::make_shared<Msg>());
   m->header.stamp = rclcpp::Clock().now();
 
-  sync.add0(m);
+  sync.add<0>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add1(m);
+  sync.add<1>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add2(m);
+  sync.add<2>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add3(m);
+  sync.add<3>(m);
   ASSERT_EQ(h.count_, 1);
 }
 
@@ -314,15 +314,15 @@ TEST(TimeSynchronizer, immediate5)
   MsgPtr m(std::make_shared<Msg>());
   m->header.stamp = rclcpp::Clock().now();
 
-  sync.add0(m);
+  sync.add<0>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add1(m);
+  sync.add<1>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add2(m);
+  sync.add<2>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add3(m);
+  sync.add<3>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add4(m);
+  sync.add<4>(m);
   ASSERT_EQ(h.count_, 1);
 }
 
@@ -334,17 +334,17 @@ TEST(TimeSynchronizer, immediate6)
   MsgPtr m(std::make_shared<Msg>());
   m->header.stamp = rclcpp::Clock().now();
 
-  sync.add0(m);
+  sync.add<0>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add1(m);
+  sync.add<1>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add2(m);
+  sync.add<2>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add3(m);
+  sync.add<3>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add4(m);
+  sync.add<4>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add5(m);
+  sync.add<5>(m);
   ASSERT_EQ(h.count_, 1);
 }
 
@@ -356,19 +356,19 @@ TEST(TimeSynchronizer, immediate7)
   MsgPtr m(std::make_shared<Msg>());
   m->header.stamp = rclcpp::Clock().now();
 
-  sync.add0(m);
+  sync.add<0>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add1(m);
+  sync.add<1>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add2(m);
+  sync.add<2>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add3(m);
+  sync.add<3>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add4(m);
+  sync.add<4>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add5(m);
+  sync.add<5>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add6(m);
+  sync.add<6>(m);
   ASSERT_EQ(h.count_, 1);
 }
 
@@ -380,21 +380,21 @@ TEST(TimeSynchronizer, immediate8)
   MsgPtr m(std::make_shared<Msg>());
   m->header.stamp = rclcpp::Clock().now();
 
-  sync.add0(m);
+  sync.add<0>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add1(m);
+  sync.add<1>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add2(m);
+  sync.add<2>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add3(m);
+  sync.add<3>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add4(m);
+  sync.add<4>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add5(m);
+  sync.add<5>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add6(m);
+  sync.add<6>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add7(m);
+  sync.add<7>(m);
   ASSERT_EQ(h.count_, 1);
 }
 
@@ -406,23 +406,23 @@ TEST(TimeSynchronizer, immediate9)
   MsgPtr m(std::make_shared<Msg>());
   m->header.stamp = rclcpp::Clock().now();
 
-  sync.add0(m);
+  sync.add<0>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add1(m);
+  sync.add<1>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add2(m);
+  sync.add<2>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add3(m);
+  sync.add<3>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add4(m);
+  sync.add<4>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add5(m);
+  sync.add<5>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add6(m);
+  sync.add<6>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add7(m);
+  sync.add<7>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add8(m);
+  sync.add<8>(m);
   ASSERT_EQ(h.count_, 1);
 }
 
@@ -438,16 +438,16 @@ TEST(TimeSynchronizer, multipleTimes)
   MsgPtr m(std::make_shared<Msg>());
   m->header.stamp = rclcpp::Time();
 
-  sync.add0(m);
+  sync.add<0>(m);
   ASSERT_EQ(h.count_, 0);
 
   m = std::make_shared<Msg>();
   m->header.stamp = rclcpp::Time(100000000);
-  sync.add1(m);
+  sync.add<1>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add0(m);
+  sync.add<0>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add2(m);
+  sync.add<2>(m);
   ASSERT_EQ(h.count_, 1);
 }
 
@@ -459,21 +459,21 @@ TEST(TimeSynchronizer, queueSize)
   MsgPtr m(std::make_shared<Msg>());
   m->header.stamp = rclcpp::Time();
 
-  sync.add0(m);
+  sync.add<0>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add1(m);
+  sync.add<1>(m);
   ASSERT_EQ(h.count_, 0);
 
   m = std::make_shared<Msg>();
   m->header.stamp = rclcpp::Time(100000000);
-  sync.add1(m);
+  sync.add<1>(m);
   ASSERT_EQ(h.count_, 0);
 
   m = std::make_shared<Msg>();
   m->header.stamp = rclcpp::Time();
-  sync.add1(m);
+  sync.add<1>(m);
   ASSERT_EQ(h.count_, 0);
-  sync.add2(m);
+  sync.add<2>(m);
   ASSERT_EQ(h.count_, 0);
 }
 
@@ -486,10 +486,10 @@ TEST(TimeSynchronizer, dropCallback)
   MsgPtr m(std::make_shared<Msg>());
   m->header.stamp = rclcpp::Time(0, 0);
 
-  sync.add0(m);
+  sync.add<0>(m);
   ASSERT_EQ(h.drop_count_, 0);
   m->header.stamp = rclcpp::Time(100000000);
-  sync.add0(m);
+  sync.add<0>(m);
 
   ASSERT_EQ(h.drop_count_, 1);
 }
@@ -525,7 +525,7 @@ TEST(TimeSynchronizer, eventInEventOut)
 TEST(TimeSynchronizer, connectConstructor)
 {
   PassThrough<Msg> pt1, pt2;
-  TimeSynchronizer<Msg, Msg> sync(pt1, pt2, 1);
+  TimeSynchronizer<Msg, Msg> sync(1, pt1, pt2);
   Helper h;
   sync.registerCallback(std::bind(&Helper::cb, &h));
   MsgPtr m(std::make_shared<Msg>());
