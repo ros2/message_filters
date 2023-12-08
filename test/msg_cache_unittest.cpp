@@ -86,7 +86,7 @@ TEST(Cache, easyInterval)
   message_filters::Cache<Msg> cache(10);
   fillCacheEasy(cache, 0, 5);
 
-  std::vector<std::shared_ptr<Msg const> > interval_data = cache.getInterval(rclcpp::Time(5, 0), rclcpp::Time(35, 0)) ;
+  std::vector<std::shared_ptr<Msg const> > interval_data = cache.getInterval(rclcpp::Time(5, 0), rclcpp::Time(35, 0));
 
   ASSERT_EQ(interval_data.size(), (unsigned int) 3) ;
   EXPECT_EQ(interval_data[0]->data, 1) ;
@@ -151,7 +151,7 @@ TEST(Cache, easyUnsorted)
   cache.add(buildMsg( 5, 0)) ;
   cache.add(buildMsg(20, 2)) ;
 
-  std::vector<std::shared_ptr<Msg const> > interval_data = cache.getInterval(rclcpp::Time(3, 0), rclcpp::Time(15, 0)) ;
+  std::vector<std::shared_ptr<Msg const> > interval_data = cache.getInterval(rclcpp::Time(3, 0), rclcpp::Time(15, 0));
 
   ASSERT_EQ(interval_data.size(), (unsigned int) 2) ;
   EXPECT_EQ(interval_data[0]->data, 0) ;
