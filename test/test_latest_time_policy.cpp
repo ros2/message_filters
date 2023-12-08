@@ -47,11 +47,7 @@
 
 #include "rosgraph_msgs/msg/clock.hpp"
 
-
-using namespace message_filters;
-using namespace message_filters::sync_policies;
 using namespace std::chrono;
-
 
 struct Header
 {
@@ -73,7 +69,7 @@ public:
   {
   }
 
-  void cb(const MsgConstPtr& p, const MsgConstPtr& q, const MsgConstPtr& r)
+  void cb(const MsgConstPtr & p, const MsgConstPtr & q, const MsgConstPtr & r)
   {
     EXPECT_TRUE(p);
     EXPECT_TRUE(q);
@@ -87,8 +83,8 @@ public:
   uint16_t count_{0U};
 };
 
-typedef LatestTime<Msg, Msg, Msg> Policy3;
-typedef Synchronizer<Policy3> Sync3;
+typedef message_filters::sync_policies::LatestTime<Msg, Msg, Msg> Policy3;
+typedef message_filters::Synchronizer<Policy3> Sync3;
 
 class LatestTimePolicy : public ::testing::Test
 {
@@ -116,15 +112,12 @@ protected:
     p.reserve(12U);
     q.reserve(6U);
     r.reserve(3U);
-    for(std::size_t idx = 0U; idx < 12U; ++idx)
-    {
+    for(std::size_t idx = 0U; idx < 12U; ++idx) {
       MsgPtr p_idx(std::make_shared<Msg>()); p_idx->data = idx; p.push_back(p_idx);
-      if(idx % 2U == 0U)
-      {
+      if (idx % 2U == 0U) {
         MsgPtr q_idx(std::make_shared<Msg>()); q_idx->data = idx; q.push_back(q_idx);
       }
-      if(idx % 4U == 0U)
-      {
+      if (idx % 4U == 0U) {
         MsgPtr r_idx(std::make_shared<Msg>()); r_idx->data = idx; r.push_back(r_idx);
       }
     }
@@ -141,27 +134,21 @@ protected:
 TEST_F(LatestTimePolicy, Leading)
 {
   rclcpp::Rate rate(50.0);
-  for(std::size_t idx = 0U; idx < 8U; ++idx)
-  {
-    if(idx % 2U == 0U)
-    {
+  for (std::size_t idx = 0U; idx < 8U; ++idx) {
+    if (idx % 2U == 0U) {
       sync.add<1>(q[idx / 2U]);
     }
-    if(idx % 4U == 0U)
-    {
+    if (idx % 4U == 0U) {
       sync.add<2>(r[idx / 4U]);
     }
     sync.add<0>(p[idx]);
 
     EXPECT_EQ(h.count_, idx);
-    if(idx > 0)
-    {
+    if (idx > 0) {
       EXPECT_EQ(h.p_->data, p[idx]->data);
       EXPECT_EQ(h.q_->data, q[idx / 2U]->data);
       EXPECT_EQ(h.r_->data, r[idx / 4U]->data);
-    }
-    else
-    {
+    } else {
       EXPECT_FALSE(h.p_);
       EXPECT_FALSE(h.q_);
       EXPECT_FALSE(h.r_);
@@ -174,27 +161,21 @@ TEST_F(LatestTimePolicy, Leading)
 TEST_F(LatestTimePolicy, Trailing)
 {
   rclcpp::Rate rate(50.0);
-  for(std::size_t idx = 0U; idx < 8U; ++idx)
-  {
-    if(idx % 2U == 1U)
-    {
+  for (std::size_t idx = 0U; idx < 8U; ++idx) {
+    if (idx % 2U == 1U) {
       sync.add<1>(q[(idx - 1U) / 2U]);
     }
-    if(idx % 4U == 3U)
-    {
+    if (idx % 4U == 3U) {
       sync.add<2>(r[(idx - 3U) / 4U]);
     }
     sync.add<0>(p[idx]);
 
-    if (idx > 2U)
-    {
+    if (idx > 2U) {
       EXPECT_EQ(h.count_, idx - 2U);
       EXPECT_EQ(h.p_->data, p[idx]->data);
       EXPECT_EQ(h.q_->data, q[(idx - 1U) / 2U]->data);
       EXPECT_EQ(h.r_->data, r[(idx - 3U) / 4U]->data);
-    }
-    else
-    {
+    } else {
       EXPECT_FALSE(h.p_);
       EXPECT_FALSE(h.q_);
       EXPECT_FALSE(h.r_);
@@ -217,34 +198,26 @@ TEST_F(LatestTimePolicy, ChangeRateLeading)
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node);
 
-  for(std::size_t idx = 0U; idx < 12U; ++idx)
-  {
-    if(idx % 2U == 0U)
-    {
+  for (std::size_t idx = 0U; idx < 12U; ++idx) {
+    if (idx % 2U == 0U) {
       sync.add<1>(q[idx/2U]);
     }
 
-    if(idx % 4U == 0U)
-    {
+    if (idx % 4U == 0U) {
       sync.add<2>(r[idx/4U]);
     }
 
-    if (idx < 4U)
-    {
+    if (idx < 4U) {
       sync.add<0>(p[idx]);
-    }
-    else  // Change rate of p
-    {
-      if(idx % 3U == 0U)
-      {
+    } else { // Change rate of p
+      if (idx % 3U == 0U) {
         static std::size_t p_idx = 3U;
         sync.add<0>(p[++p_idx]);
       }
     }
 
     // operates like "Leading" test for idx <= 3
-    if (idx >= 1U && idx < 4U)
-    {
+    if (idx >= 1U && idx < 4U) {
       EXPECT_EQ(h.count_, idx);
       EXPECT_EQ(h.p_->data, p[idx]->data);
       EXPECT_EQ(h.q_->data, q[idx / 2U]->data);
@@ -255,8 +228,7 @@ TEST_F(LatestTimePolicy, ChangeRateLeading)
     // Will not publish again until idx==6 when q is found as new pivot.
     // Same behavior as initialization dropping faster messages until rates of all are known
     // or found to be late.
-    else if (idx >= 4U && idx < 6U)
-    {
+    else if (idx >= 4U && idx < 6U) {
       EXPECT_EQ(h.count_, (idx + 2U) / 2U);
       EXPECT_EQ(h.p_->data, p[3]->data);
       EXPECT_EQ(h.q_->data, q[1]->data);
@@ -265,15 +237,12 @@ TEST_F(LatestTimePolicy, ChangeRateLeading)
     // New actual rate of p computed when is received after q when idx==6
     // for idx >= 6, follows normal "Leading" pattern again
     // with pivot on q
-    else if (idx >= 6U)
-    {
+    else if (idx >= 6U) {
       EXPECT_EQ(h.count_, (idx + 2U) / 2U);
       EXPECT_EQ(h.p_->data, p[idx / 2U]->data);
       EXPECT_EQ(h.q_->data, q[idx / 2U]->data);
       EXPECT_EQ(h.r_->data, r[(idx - 2U) / 4U]->data);
-    }
-    else
-    {
+    } else {
       EXPECT_FALSE(h.p_);
       EXPECT_FALSE(h.q_);
       EXPECT_FALSE(h.r_);
@@ -303,34 +272,26 @@ TEST_F(LatestTimePolicy, ChangeRateTrailing)
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node);
 
-  for(std::size_t idx = 0U; idx < 12U; ++idx)
-  {
-    if(idx % 2U == 1U)
-    {
+  for (std::size_t idx = 0U; idx < 12U; ++idx) {
+    if(idx % 2U == 1U) {
       sync.add<1>(q[(idx - 1U) / 2U]);
     }
 
-    if(idx % 4U == 3U)
-    {
+    if (idx % 4U == 3U) {
       sync.add<2>(r[(idx - 3U) / 4U]);
     }
 
-    if (idx < 4U)
-    {
+    if (idx < 4U) {
       sync.add<0>(p[idx]);
-    }
-    else  // Change rate of p (still 1kHz @ idx == 4)
-    {
-      if(idx % 3U == 1U)
-      {
+    } else {  // Change rate of p (still 1kHz @ idx == 4)
+      if (idx % 3U == 1U) {
         static std::size_t p_idx = 3U;
         sync.add<0>(p[++p_idx]);
       }
     }
 
     // operates like "Trailing" test for idx <= 3
-    if (idx > 2U && idx <= 4U)
-    {
+    if (idx > 2U && idx <= 4U) {
       EXPECT_EQ(h.count_, idx - 2U);
       EXPECT_EQ(h.p_->data, p[idx]->data);
       EXPECT_EQ(h.q_->data, q[(idx - 1U) / 2U]->data);
@@ -341,8 +302,7 @@ TEST_F(LatestTimePolicy, ChangeRateTrailing)
     // At idx==5, policy still doesn't know that p is late when q is received.
     // Same behavior as initialization dropping faster messages until rates of all are known
     // or found to be late.
-    else if (idx > 4U && idx < 7U)
-    {
+    else if (idx > 4U && idx < 7U) {
       EXPECT_EQ(h.count_, 2U);
       EXPECT_EQ(h.p_->data, p[4U]->data);
       EXPECT_EQ(h.q_->data, q[1U]->data);
@@ -355,15 +315,12 @@ TEST_F(LatestTimePolicy, ChangeRateTrailing)
     // New actual rate of p computed when is received after q when idx==7
     // for idx >= 7, follows normal "Trailing" pattern again
     // with pivot on q
-    else if (idx >= 7U)
-    {
+    else if (idx >= 7U) {
       EXPECT_EQ(h.count_, (idx - 1U) / 2U);
       EXPECT_EQ(h.p_->data, p[(idx + 1U) / 2U]->data);
       EXPECT_EQ(h.q_->data, q[(idx - 1U) / 2U]->data);
       EXPECT_EQ(h.r_->data, r[(idx - 5U) / 4U]->data);
-    }
-    else
-    {
+    } else {
       EXPECT_FALSE(h.p_);
       EXPECT_FALSE(h.q_);
       EXPECT_FALSE(h.r_);
@@ -380,8 +337,8 @@ TEST_F(LatestTimePolicy, ChangeRateTrailing)
   }
 }
 
-
-int main(int argc, char **argv){
+int main(int argc, char **argv)
+{
   testing::InitGoogleTest(&argc, argv);
   rclcpp::init(argc, argv);
   return RUN_ALL_TESTS();

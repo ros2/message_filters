@@ -32,12 +32,12 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+#include <memory>
+
 #include <gtest/gtest.h>
 
 #include <rclcpp/rclcpp.hpp>
 #include "message_filters/chain.h"
-
-using namespace message_filters;
 
 struct Msg
 {
@@ -60,13 +60,13 @@ public:
   int32_t count_;
 };
 
-typedef std::shared_ptr<PassThrough<Msg> > PassThroughPtr;
+typedef std::shared_ptr<message_filters::PassThrough<Msg> > PassThroughPtr;
 
 TEST(Chain, simple)
 {
   Helper h;
-  Chain<Msg> c;
-  c.addFilter(std::make_shared<PassThrough<Msg> >());
+  message_filters::Chain<Msg> c;
+  c.addFilter(std::make_shared<message_filters::PassThrough<Msg> >());
   c.registerCallback(std::bind(&Helper::cb, &h));
 
   c.add(std::make_shared<Msg>());
@@ -78,11 +78,11 @@ TEST(Chain, simple)
 TEST(Chain, multipleFilters)
 {
   Helper h;
-  Chain<Msg> c;
-  c.addFilter(std::make_shared<PassThrough<Msg> >());
-  c.addFilter(std::make_shared<PassThrough<Msg> >());
-  c.addFilter(std::make_shared<PassThrough<Msg> >());
-  c.addFilter(std::make_shared<PassThrough<Msg> >());
+  message_filters::Chain<Msg> c;
+  c.addFilter(std::make_shared<message_filters::PassThrough<Msg> >());
+  c.addFilter(std::make_shared<message_filters::PassThrough<Msg> >());
+  c.addFilter(std::make_shared<message_filters::PassThrough<Msg> >());
+  c.addFilter(std::make_shared<message_filters::PassThrough<Msg> >());
   c.registerCallback(std::bind(&Helper::cb, &h));
 
   c.add(std::make_shared<Msg>());
@@ -94,16 +94,16 @@ TEST(Chain, multipleFilters)
 TEST(Chain, addingFilters)
 {
   Helper h;
-  Chain<Msg> c;
-  c.addFilter(std::make_shared<PassThrough<Msg> >());
-  c.addFilter(std::make_shared<PassThrough<Msg> >());
+  message_filters::Chain<Msg> c;
+  c.addFilter(std::make_shared<message_filters::PassThrough<Msg> >());
+  c.addFilter(std::make_shared<message_filters::PassThrough<Msg> >());
   c.registerCallback(std::bind(&Helper::cb, &h));
 
   c.add(std::make_shared<Msg>());
   EXPECT_EQ(h.count_, 1);
 
-  c.addFilter(std::make_shared<PassThrough<Msg> >());
-  c.addFilter(std::make_shared<PassThrough<Msg> >());
+  c.addFilter(std::make_shared<message_filters::PassThrough<Msg> >());
+  c.addFilter(std::make_shared<message_filters::PassThrough<Msg> >());
 
   c.add(std::make_shared<Msg>());
   EXPECT_EQ(h.count_, 2);
@@ -112,11 +112,11 @@ TEST(Chain, addingFilters)
 TEST(Chain, inputFilter)
 {
   Helper h;
-  Chain<Msg> c;
-  c.addFilter(std::make_shared<PassThrough<Msg> >());
+  message_filters::Chain<Msg> c;
+  c.addFilter(std::make_shared<message_filters::PassThrough<Msg> >());
   c.registerCallback(std::bind(&Helper::cb, &h));
 
-  PassThrough<Msg> p;
+  message_filters::PassThrough<Msg> p;
   c.connectInput(p);
   p.add(std::make_shared<Msg>());
   EXPECT_EQ(h.count_, 1);
@@ -128,8 +128,8 @@ TEST(Chain, inputFilter)
 TEST(Chain, nonSharedPtrFilter)
 {
   Helper h;
-  Chain<Msg> c;
-  PassThrough<Msg> p;
+  message_filters::Chain<Msg> c;
+  message_filters::PassThrough<Msg> p;
   c.addFilter(&p);
   c.registerCallback(std::bind(&Helper::cb, &h));
 
@@ -141,43 +141,44 @@ TEST(Chain, nonSharedPtrFilter)
 
 TEST(Chain, retrieveFilter)
 {
-  Chain<Msg> c;
+  message_filters::Chain<Msg> c;
 
-  ASSERT_FALSE(c.getFilter<PassThrough<Msg> >(0));
+  ASSERT_FALSE(c.getFilter<message_filters::PassThrough<Msg> >(0));
 
-  c.addFilter(std::make_shared<PassThrough<Msg> >());
+  c.addFilter(std::make_shared<message_filters::PassThrough<Msg> >());
 
-  ASSERT_TRUE(c.getFilter<PassThrough<Msg> >(0));
-  ASSERT_FALSE(c.getFilter<PassThrough<Msg> >(1));
+  ASSERT_TRUE(c.getFilter<message_filters::PassThrough<Msg> >(0));
+  ASSERT_FALSE(c.getFilter<message_filters::PassThrough<Msg> >(1));
 }
 
 TEST(Chain, retrieveFilterThroughBaseClass)
 {
-  Chain<Msg> c;
-  ChainBase* cb = &c;
+  message_filters::Chain<Msg> c;
+  message_filters::ChainBase * cb = &c;
 
-  ASSERT_FALSE(cb->getFilter<PassThrough<Msg> >(0));
+  ASSERT_FALSE(cb->getFilter<message_filters::PassThrough<Msg> >(0));
 
-  c.addFilter(std::make_shared<PassThrough<Msg> >());
+  c.addFilter(std::make_shared<message_filters::PassThrough<Msg> >());
 
-  ASSERT_TRUE(cb->getFilter<PassThrough<Msg> >(0));
-  ASSERT_FALSE(cb->getFilter<PassThrough<Msg> >(1));
+  ASSERT_TRUE(cb->getFilter<message_filters::PassThrough<Msg> >(0));
+  ASSERT_FALSE(cb->getFilter<message_filters::PassThrough<Msg> >(1));
 }
 
-struct PTDerived : public PassThrough<Msg>
+struct PTDerived : public message_filters::PassThrough<Msg>
 {
 
 };
 
 TEST(Chain, retrieveBaseClass)
 {
-  Chain<Msg> c;
+  message_filters::Chain<Msg> c;
   c.addFilter(std::make_shared<PTDerived>());
-  ASSERT_TRUE(c.getFilter<PassThrough<Msg> >(0));
+  ASSERT_TRUE(c.getFilter<message_filters::PassThrough<Msg> >(0));
   ASSERT_TRUE(c.getFilter<PTDerived>(0));
 }
 
-int main(int argc, char **argv){
+int main(int argc, char **argv)
+{
   testing::InitGoogleTest(&argc, argv);
   rclcpp::init(argc, argv);
   return RUN_ALL_TESTS();

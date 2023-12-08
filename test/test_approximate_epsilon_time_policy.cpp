@@ -33,6 +33,9 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+#include <functional>
+#include <memory>
+#include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -42,15 +45,10 @@
 #include "message_filters/sync_policies/approximate_epsilon_time.h"
 #include "message_filters/message_traits.h"
 
-using namespace std::placeholders;
-using namespace message_filters;
-using namespace message_filters::sync_policies;
-
 struct Header
 {
   rclcpp::Time stamp;
 };
-
 
 struct Msg
 {
@@ -98,9 +96,9 @@ public:
 				  const std::vector<TimePair> &output,
 				  uint32_t queue_size, rclcpp::Duration epsilon) :
     input_(input), output_(output), output_position_(0), sync_(
-      ApproximateEpsilonTime<Msg, Msg>{queue_size, epsilon})
+      message_filters::sync_policies::ApproximateEpsilonTime<Msg, Msg>{queue_size, epsilon})
   {
-    sync_.registerCallback(std::bind(&ApproximateEpsilonTimeSynchronizerTest::callback, this, _1, _2));
+    sync_.registerCallback(std::bind(&ApproximateEpsilonTimeSynchronizerTest::callback, this, std::placeholders::_1, std::placeholders::_2));
   }
 
   void callback(const MsgConstPtr& p, const MsgConstPtr& q)
@@ -136,10 +134,10 @@ public:
   }
 
 private:
-  const std::vector<TimeAndTopic> &input_;
-  const std::vector<TimePair> &output_;
+  const std::vector<TimeAndTopic> & input_;
+  const std::vector<TimePair> & output_;
   unsigned int output_position_;
-  typedef Synchronizer<ApproximateEpsilonTime<Msg, Msg> > Sync2;
+  typedef message_filters::Synchronizer<message_filters::sync_policies::ApproximateEpsilonTime<Msg, Msg>> Sync2;
 public:
   Sync2 sync_;
 };
@@ -157,10 +155,10 @@ TEST(ApproxTimeSync, ExactMatch) {
 
   input.push_back(TimeAndTopic(t,0));     // a
   input.push_back(TimeAndTopic(t,1));   // A
-  input.push_back(TimeAndTopic(t+s*3,0)); // b
-  input.push_back(TimeAndTopic(t+s*3,1)); // B
-  input.push_back(TimeAndTopic(t+s*6,0)); // c
-  input.push_back(TimeAndTopic(t+s*6,1)); // C
+  input.push_back(TimeAndTopic(t+s*3,0));  // b
+  input.push_back(TimeAndTopic(t+s*3,1));  // B
+  input.push_back(TimeAndTopic(t+s*6,0));  // c
+  input.push_back(TimeAndTopic(t+s*6,1));  // C
   output.push_back(TimePair(t, t));
   output.push_back(TimePair(t+s*3, t+s*3));
   output.push_back(TimePair(t+s*6, t+s*6));
@@ -225,7 +223,8 @@ TEST(ApproxTimeSync, ImperfectMatch) {
   sync_test.run();
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   testing::InitGoogleTest(&argc, argv);
   rclcpp::init(argc, argv);
 

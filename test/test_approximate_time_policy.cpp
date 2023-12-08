@@ -33,22 +33,20 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+#include <functional>
+#include <memory>
+#include <vector>
+
 #include <gtest/gtest.h>
 #include <rclcpp/rclcpp.hpp>
 #include "message_filters/synchronizer.h"
 #include "message_filters/sync_policies/approximate_time.h"
 #include "message_filters/message_traits.h"
-#include <vector>
-
-using namespace std::placeholders;
-using namespace message_filters;
-using namespace message_filters::sync_policies;
 
 struct Header
 {
   rclcpp::Time stamp;
 };
-
 
 struct Msg
 {
@@ -57,6 +55,7 @@ struct Msg
 };
 typedef std::shared_ptr<Msg> MsgPtr;
 typedef std::shared_ptr<Msg const> MsgConstPtr;
+
 namespace message_filters
 {
 namespace message_traits
@@ -64,7 +63,7 @@ namespace message_traits
 template<>
 struct TimeStamp<Msg>
 {
-  static rclcpp::Time value(const Msg& m)
+  static rclcpp::Time value(const Msg & m)
   {
     return m.header.stamp;
   }
@@ -94,18 +93,16 @@ class ApproximateTimeSynchronizerTest
 {
 public:
 
-  ApproximateTimeSynchronizerTest(const std::vector<TimeAndTopic> &input,
-				  const std::vector<TimePair> &output,
+  ApproximateTimeSynchronizerTest(const std::vector<TimeAndTopic> & input,
+				  const std::vector<TimePair> & output,
 				  uint32_t queue_size) :
     input_(input), output_(output), output_position_(0), sync_(queue_size)
   {
-    sync_.registerCallback(std::bind(&ApproximateTimeSynchronizerTest::callback, this, _1, _2));
+    sync_.registerCallback(std::bind(&ApproximateTimeSynchronizerTest::callback, this, std::placeholders::_1, std::placeholders::_2));
   }
 
-  void callback(const MsgConstPtr& p, const MsgConstPtr& q)
+  void callback(const MsgConstPtr & p, const MsgConstPtr & q)
   {
-    //printf("Call_back called\n");
-    //printf("Call back: <%f, %f>\n", p->header.stamp.toSec(), q->header.stamp.toSec());
     ASSERT_TRUE(p);
     ASSERT_TRUE(q);
     ASSERT_LT(output_position_, output_.size());
@@ -116,30 +113,25 @@ public:
 
   void run()
   {
-    for (unsigned int i = 0; i < input_.size(); i++)
-    {
-      if (input_[i].second == 0)
-      {
+    for (size_t i = 0; i < input_.size(); i++) {
+      if (input_[i].second == 0) {
         MsgPtr p(std::make_shared<Msg>());
         p->header.stamp = input_[i].first;
         sync_.add<0>(p);
-      }
-      else
-      {
+      } else {
         MsgPtr q(std::make_shared<Msg>());
         q->header.stamp = input_[i].first;
         sync_.add<1>(q);
       }
     }
-    //printf("Done running test\n");
     EXPECT_EQ(output_.size(), output_position_);
   }
 
 private:
-  const std::vector<TimeAndTopic> &input_;
-  const std::vector<TimePair> &output_;
+  const std::vector<TimeAndTopic> & input_;
+  const std::vector<TimePair> & output_;
   unsigned int output_position_;
-  typedef Synchronizer<ApproximateTime<Msg, Msg> > Sync2;
+  typedef message_filters::Synchronizer<message_filters::sync_policies::ApproximateTime<Msg, Msg>> Sync2;
 public:
   Sync2 sync_;
 };
@@ -152,18 +144,16 @@ class ApproximateTimeSynchronizerTestQuad
 {
 public:
 
-  ApproximateTimeSynchronizerTestQuad(const std::vector<TimeAndTopic> &input,
-				      const std::vector<TimeQuad> &output,
+  ApproximateTimeSynchronizerTestQuad(const std::vector<TimeAndTopic> & input,
+				      const std::vector<TimeQuad> & output,
 				      uint32_t queue_size) :
     input_(input), output_(output), output_position_(0), sync_(queue_size)
   {
-    sync_.registerCallback(std::bind(&ApproximateTimeSynchronizerTestQuad::callback, this, _1, _2, _3, _4));
+    sync_.registerCallback(std::bind(&ApproximateTimeSynchronizerTestQuad::callback, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
   }
 
-    void callback(const MsgConstPtr& p, const MsgConstPtr& q, const MsgConstPtr& r, const MsgConstPtr& s)
+  void callback(const MsgConstPtr & p, const MsgConstPtr & q, const MsgConstPtr & r, const MsgConstPtr & s)
   {
-    //printf("Call_back called\n");
-    //printf("Call back: <%f, %f>\n", p->header.stamp.toSec(), q->header.stamp.toSec());
     ASSERT_TRUE(p);
     ASSERT_TRUE(q);
     ASSERT_TRUE(r);
@@ -178,8 +168,7 @@ public:
 
   void run()
   {
-    for (unsigned int i = 0; i < input_.size(); i++)
-    {
+    for (size_t i = 0; i < input_.size(); i++) {
       MsgPtr p(std::make_shared<Msg>());
       p->header.stamp = input_[i].first;
       switch (input_[i].second)
@@ -198,7 +187,6 @@ public:
           break;
       }
     }
-    //printf("Done running test\n");
     EXPECT_EQ(output_.size(), output_position_);
   }
 
@@ -206,7 +194,7 @@ private:
   const std::vector<TimeAndTopic> &input_;
   const std::vector<TimeQuad> &output_;
   unsigned int output_position_;
-  typedef Synchronizer<ApproximateTime<Msg, Msg, Msg, Msg> > Sync4;
+  typedef message_filters::Synchronizer<message_filters::sync_policies::ApproximateTime<Msg, Msg, Msg, Msg> > Sync4;
 public:
   Sync4 sync_;
 };
@@ -534,7 +522,8 @@ TEST(ApproxTimeSync, RateBound) {
 }
 
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   testing::InitGoogleTest(&argc, argv);
   rclcpp::init(argc, argv);
 
