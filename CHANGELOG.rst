@@ -2,8 +2,8 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.11.0 (2023-12-26)
+-------------------
 * Remove 'using' keyword in message_filters (`#106 <https://github.com/ros2/message_filters/issues/106>`_)
 * Remove the use of ament_target_dependencies. (`#105 <https://github.com/ros2/message_filters/issues/105>`_)
 * Fixes pointed out by clang (`#104 <https://github.com/ros2/message_filters/issues/104>`_)
