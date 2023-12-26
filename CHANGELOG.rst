@@ -2,6 +2,13 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Remove 'using' keyword in message_filters (`#106 <https://github.com/ros2/message_filters/issues/106>`_)
+* Remove the use of ament_target_dependencies. (`#105 <https://github.com/ros2/message_filters/issues/105>`_)
+* Fixes pointed out by clang (`#104 <https://github.com/ros2/message_filters/issues/104>`_)
+* Contributors: Chris Lalancette
+
 4.10.1 (2023-11-06)
 -------------------
 * Mark subscription cb parameter const (`#103 <https://github.com/ros2/message_filters/issues/103>`_)
