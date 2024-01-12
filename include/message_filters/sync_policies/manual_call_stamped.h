@@ -32,10 +32,11 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS__SYNC_LatestStamped_H_
-#define MESSAGE_FILTERS__SYNC_LatestStamped_H_
+#ifndef MESSAGE_FILTERS__SYNC_POLICIES__MANUAL_CALL_STAMPED_H_
+#define MESSAGE_FILTERS__SYNC_POLICIES__MANUAL_CALL_STAMPED_H_
 
-#include <vector>
+#include <mutex>
+#include <tuple>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -51,15 +52,15 @@ namespace sync_policies
 {
 
 /**
- * The LatestStamped policy stores the LatestStamped received messages (based on their timestamp) and DO NOT call any callback automatically.
+ * The ManualCallStamped policy stores the ManualCallStamped received messages (based on their timestamp) and DO NOT call any callback automatically.
  * It is up to the programmer to call #call when it is time to process the information. This policy class
  * is meant to be used in networks where information is processed periodically.
  */
 template<typename M0, typename M1, typename M2 = NullType, typename M3 = NullType, typename M4 = NullType,
          typename M5 = NullType, typename M6 = NullType, typename M7 = NullType, typename M8 = NullType>
-struct LatestStamped : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
+struct ManualCallStamped : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 {
-  typedef Synchronizer<LatestStamped> Sync;
+  typedef Synchronizer<ManualCallStamped> Sync;
   typedef PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8> Super;
   typedef typename Super::Messages Messages;
   typedef typename Super::Signal Signal;
@@ -75,17 +76,17 @@ struct LatestStamped : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   typedef typename Super::M7Event M7Event;
   typedef typename Super::M8Event M8Event;
 
-  LatestStamped()
+  ManualCallStamped()
   : parent_(0)
   {
   }
 
-  LatestStamped(const LatestStamped& e)
+  ManualCallStamped(const ManualCallStamped& e)
   {
     *this = e;
   }
 
-  LatestStamped& operator=(const LatestStamped& rhs)
+  ManualCallStamped& operator=(const ManualCallStamped& rhs)
   {
     parent_ = rhs.parent_;
     events_ = rhs.events_;
@@ -109,16 +110,17 @@ struct LatestStamped : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 
     typedef typename std::tuple_element<i, Messages>::type MessageType;
     auto& evt_old = std::get<i>(events_);
-    bool has_old = (bool)evt_old.getMessage();
-    if (has_old)
+    if (evt_old.getMessage() != nullptr)
     {
       rclcpp::Time stamp_new = mt::TimeStamp<MessageType>::value(*evt.getMessage());
       rclcpp::Time stamp_old = mt::TimeStamp<MessageType>::value(*evt_old.getMessage());
-      if (stamp_new > stamp_old)
+      if (stamp_new > stamp_old) {
         evt_old = evt;
+      }
     }
-    else
+    else {
       evt_old = evt;
+    }
   }
 
   void call() const
@@ -139,4 +141,4 @@ private:
 }  // namespace sync_policies
 }  // namespace message_filters
 
-#endif  // MESSAGE_FILTERS__SYNC_LatestStamped_H_
+#endif  // MESSAGE_FILTERS__SYNC_POLICIES__MANUAL_CALL_STAMPED_H_

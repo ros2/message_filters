@@ -32,10 +32,11 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS__SYNC_Latest_H_
-#define MESSAGE_FILTERS__SYNC_Latest_H_
+#ifndef MESSAGE_FILTERS__SYNC_POLICIES__MANUAL_CALL_H_
+#define MESSAGE_FILTERS__SYNC_POLICIES__MANUAL_CALL_H_
 
-#include <vector>
+#include <mutex>
+#include <tuple>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -51,15 +52,15 @@ namespace sync_policies
 {
 
 /**
- * The Latest policy stores the last received messages and DO NOT call any callback automatically.
+ * The ManualCall policy stores the last received messages and DO NOT call any callback automatically.
  * It is up to the programmer to call #call when it is time to process the information. This policy class
  * is meant to be used in networks where information is processed periodically.
  */
 template<typename M0, typename M1, typename M2 = NullType, typename M3 = NullType, typename M4 = NullType,
          typename M5 = NullType, typename M6 = NullType, typename M7 = NullType, typename M8 = NullType>
-struct Latest : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
+struct ManualCall : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 {
-  typedef Synchronizer<Latest> Sync;
+  typedef Synchronizer<ManualCall> Sync;
   typedef PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8> Super;
   typedef typename Super::Messages Messages;
   typedef typename Super::Signal Signal;
@@ -75,17 +76,17 @@ struct Latest : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   typedef typename Super::M7Event M7Event;
   typedef typename Super::M8Event M8Event;
 
-  Latest()
+  ManualCall()
   : parent_(0)
   {
   }
 
-  Latest(const Latest& e)
+  ManualCall(const ManualCall& e)
   {
     *this = e;
   }
 
-  Latest& operator=(const Latest& rhs)
+  ManualCall& operator=(const ManualCall& rhs)
   {
     parent_ = rhs.parent_;
     events_ = rhs.events_;
@@ -127,4 +128,4 @@ private:
 }  // namespace sync_policies
 }  // namespace message_filters
 
-#endif  // MESSAGE_FILTERS__SYNC_Latest_H_
+#endif  // MESSAGE_FILTERS__SYNC_POLICIES__MANUAL_CALL_H_

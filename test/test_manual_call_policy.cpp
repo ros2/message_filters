@@ -36,8 +36,8 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include "message_filters/synchronizer.h"
-#include "message_filters/sync_policies/latest.h"
-#include "message_filters/sync_policies/latest_stamped.h"
+#include "message_filters/sync_policies/manual_call.h"
+#include "message_filters/sync_policies/manual_call_stamped.h"
 #include "message_filters/sync_policies/exact_time.h"
 
 using namespace message_filters;
@@ -113,10 +113,10 @@ struct EventHelperHeaderless
   MessageEvent<Msg const> e3_;
 };
 
-typedef LatestStamped<Msg, Msg, Msg> Policy;
+typedef ManualCallStamped<Msg, Msg, Msg> Policy;
 typedef Synchronizer<Policy> Sync;
 
-TEST(LatestStamped, eventInEventOut)
+TEST(ManualCallStamped, eventInEventOut)
 {
   Sync sync;
   EventHelper helper;
@@ -157,10 +157,10 @@ TEST(LatestStamped, eventInEventOut)
 }
 
 
-typedef Latest<Msg, MsgHeaderless, Msg> PolicyHeaderless;
+typedef ManualCall<Msg, MsgHeaderless, Msg> PolicyHeaderless;
 typedef Synchronizer<PolicyHeaderless> SyncHeaderless;
 
-TEST(Latest, eventInEventOut)
+TEST(ManualCall, eventInEventOut)
 {
   SyncHeaderless sync;
   EventHelperHeaderless helper;
@@ -203,5 +203,3 @@ int main(int argc, char **argv){
   rclcpp::init(argc, argv);
   return RUN_ALL_TESTS();
 }
-
-
