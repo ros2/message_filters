@@ -272,7 +272,7 @@ TEST(Subscriber, lifecycle)
 {
   auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("test_node");
   Helper h;
-  message_filters::Subscriber<Msg, rclcpp_lifecycle::LifecycleNode> sub(node, "test_topic");
+  message_filters::Subscriber<Msg> sub(node, "test_topic");
   sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
   pub->on_activate();
