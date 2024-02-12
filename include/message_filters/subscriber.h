@@ -48,15 +48,28 @@
 namespace message_filters
 {
 
+/// Utility struct for highlighting deprecated template parameters
+struct DeprecatedTemplateParameter {};
+
+template<class NodeType = DeprecatedTemplateParameter>
 class SubscriberBase
 {
 public:
+  [[deprecated]] typedef std::shared_ptr<NodeType> NodePtr;
+
   using NodeParametersInterface = rclcpp::node_interfaces::NodeParametersInterface;
   using NodeTopicsInterface = rclcpp::node_interfaces::NodeTopicsInterface;
 
   using RequiredInterfaces = rclcpp::node_interfaces::NodeInterfaces<NodeParametersInterface, NodeTopicsInterface>;
 
+  SubscriberBase() {
+    if constexpr (not std::is_same_v<NodeType, DeprecatedTemplateParameter>) {
+        // TODO: deprecation warning, similar to static_assert but only throwing a warning
+    }
+  }
+
   virtual ~SubscriberBase() = default;
+
   /**
    * \brief Subscribe to a topic.
    *
@@ -95,7 +108,8 @@ public:
   virtual void unsubscribe() = 0;
 };
 
-using SubscriberBasePtr = std::shared_ptr<SubscriberBase>;
+template <typename T>
+using SubscriberBasePtr = std::shared_ptr<SubscriberBase<T>>;
 
 /**
  * \brief ROS subscription filter.
@@ -135,14 +149,19 @@ struct message_type <M, false>
 template <typename M>
 using message_type_t = typename message_type<M>::type;
 
-template<class M>
-class Subscriber 
-: public SubscriberBase
+template<class M, class NodeType = DeprecatedTemplateParameter>
+class Subscriber
+: public SubscriberBase<NodeType>
 , public SimpleFilter<message_type_t<M>>
 {
 public:
   typedef message_type_t<M> MessageType;
   typedef MessageEvent<MessageType const> EventType;
+
+  // Note: can be removed once the deprecated template parameter NodeType is removed
+  using RequiredInterfaces = typename SubscriberBase<NodeType>::RequiredInterfaces;
+  using NodeParametersInterface = typename SubscriberBase<NodeType>::NodeParametersInterface;
+  using NodeTopicsInterface = typename SubscriberBase<NodeType>::NodeTopicsInterface;
 
   /**
    * \brief Constructor for rclcpp::Node / rclcpp_lifecycle::LifecycleNode.
@@ -154,6 +173,10 @@ public:
   Subscriber(RequiredInterfaces node_interfaces, const std::string& topic,
              const rmw_qos_profile_t qos = rmw_qos_profile_default)
   {
+    if constexpr (not std::is_same_v<NodeType, DeprecatedTemplateParameter>) {
+      // TODO: deprecation warning, similar to static_assert but only throwing a warning
+    }
+
     subscribe(node_interfaces, topic, qos);
   }
 
@@ -192,6 +215,10 @@ public:
              const rmw_qos_profile_t qos,
              rclcpp::SubscriptionOptions options)
   {
+    if constexpr (not std::is_same_v<NodeType, DeprecatedTemplateParameter>) {
+      // TODO: deprecation warning, similar to static_assert but only throwing a warning
+    }
+
     subscribe(node_interfaces, topic, qos, options);
   }
 
@@ -310,8 +337,8 @@ public:
       // Note: temporary variables are solely needed because the involved submodules are inconsistent about the passing
       //       of shared_ptr. While the node_interfaces return by value, the create_subscription function expects the
       //       shared_ptr to be passed via reference...
-      auto parameters_interface = node_interfaces.get<NodeParametersInterface>();
-      auto topics_interface = node_interfaces.get<NodeTopicsInterface>();
+      auto parameters_interface = node_interfaces.template get<NodeParametersInterface>();
+      auto topics_interface = node_interfaces.template get<NodeTopicsInterface>();
 
       sub_ = rclcpp::create_subscription<MessageType>(parameters_interface,
                                                       topics_interface,
