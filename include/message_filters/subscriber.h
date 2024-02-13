@@ -71,6 +71,18 @@ public:
   virtual ~SubscriberBase() = default;
 
   /**
+   * \brief Subscribe to a topic (deprecated in favor of NodeInterfaces interface).
+   */
+  [[deprecated]] virtual void subscribe(NodePtr /*node*/, const std::string& /*topic*/,
+                                        const rmw_qos_profile_t /*qos*/ = rmw_qos_profile_default) {};
+
+  /**
+   * \brief Subscribe to a topic (deprecated in favor of NodeInterfaces interface).
+   */
+  [[deprecated]] virtual void subscribe(NodeType * /*node*/, const std::string& /*topic*/,
+                                        const rmw_qos_profile_t /*qos*/ = rmw_qos_profile_default) {};
+
+  /**
    * \brief Subscribe to a topic.
    *
    * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
