@@ -62,11 +62,12 @@ public:
 
   using RequiredInterfaces = rclcpp::node_interfaces::NodeInterfaces<NodeParametersInterface, NodeTopicsInterface>;
 
-  SubscriberBase() {
-    if constexpr (not std::is_same_v<NodeType, DeprecatedTemplateParameter>) {
-        // TODO: deprecation warning, similar to static_assert but only throwing a warning
-    }
-  }
+  template<typename U = NodeType, std::enable_if_t<std::is_same<U, DeprecatedTemplateParameter>{}, int> = 0>
+  SubscriberBase() {}
+
+  template<typename U = NodeType, std::enable_if_t<!std::is_same<U, DeprecatedTemplateParameter>{}, int> = 0>
+  [[deprecated("Template parameter of SubscriberBase class has been deprecated and will be removed in future releases")]]
+  SubscriberBase() {}
 
   virtual ~SubscriberBase() = default;
 
@@ -176,19 +177,40 @@ public:
   using NodeTopicsInterface = typename SubscriberBase<NodeType>::NodeTopicsInterface;
 
   /**
+   * \brief Solely for highlighting deprecated template parameters with a compiler warning
+   */
+  template<typename U = NodeType, std::enable_if_t<!std::is_same<U, DeprecatedTemplateParameter>{}, int> = 0>
+  [[deprecated("Second template parameter of Subscriber class is deprecated and will be removed in a future release")]]
+  Subscriber(RequiredInterfaces node_interfaces,
+             const std::string& topic,
+             const rmw_qos_profile_t qos,
+             rclcpp::SubscriptionOptions options)
+  {
+      subscribe(node_interfaces, topic, qos, options);
+  }
+
+  /**
+   * \brief Solely for highlighting deprecated template parameters with a compiler warning
+   */
+  template<typename U = NodeType, std::enable_if_t<!std::is_same<U, DeprecatedTemplateParameter>{}, int> = 0>
+  [[deprecated("Second template parameter of Subscriber class is deprecated and will be removed in a future release")]]
+  Subscriber(RequiredInterfaces node_interfaces, const std::string& topic,
+             const rmw_qos_profile_t qos = rmw_qos_profile_default)
+  {
+      subscribe(node_interfaces, topic, qos);
+  }
+
+  /**
    * \brief Constructor for rclcpp::Node / rclcpp_lifecycle::LifecycleNode.
    *
    * \param node The NodeInterfaces to use to subscribe.
    * \param topic The topic to subscribe to.
    * \param qos (optional) The rmw qos profile to use to subscribe
    */
+  template<typename U = NodeType, std::enable_if_t<std::is_same<U, DeprecatedTemplateParameter>{}, int> = 0>
   Subscriber(RequiredInterfaces node_interfaces, const std::string& topic,
              const rmw_qos_profile_t qos = rmw_qos_profile_default)
   {
-    if constexpr (not std::is_same_v<NodeType, DeprecatedTemplateParameter>) {
-      // TODO: deprecation warning, similar to static_assert but only throwing a warning
-    }
-
     subscribe(node_interfaces, topic, qos);
   }
 
@@ -222,15 +244,12 @@ public:
    * \param qos The rmw qos profile to use to subscribe.
    * \param options The subscription options to use to subscribe.
    */
+  template<typename U = NodeType, std::enable_if_t<std::is_same<U, DeprecatedTemplateParameter>{}, int> = 0>
   Subscriber(RequiredInterfaces node_interfaces,
              const std::string& topic,
              const rmw_qos_profile_t qos,
              rclcpp::SubscriptionOptions options)
   {
-    if constexpr (not std::is_same_v<NodeType, DeprecatedTemplateParameter>) {
-      // TODO: deprecation warning, similar to static_assert but only throwing a warning
-    }
-
     subscribe(node_interfaces, topic, qos, options);
   }
 
