@@ -36,8 +36,9 @@ Using the time synchronizer::
         assert image.header.stamp == camerainfo.header.stamp
         print("got an Image and CameraInfo")
 
-    tss = TimeSynchronizer(Subscriber(node_object, sensor_msgs.msg.Image, "/wide_stereo/left/image_rect_color"),
-                           Subscriber(node_object, sensor_msgs.msg.CameraInfo, "/wide_stereo/left/camera_info"))
+    tss = TimeSynchronizer([Subscriber(node_object, sensor_msgs.msg.Image, "/wide_stereo/left/image_rect_color"),
+                            Subscriber(node_object, sensor_msgs.msg.CameraInfo, "/wide_stereo/left/camera_info")],
+                            queue_size=10)
     tss.registerCallback(gotimage)
 
 Another example for syncronizing one image topic and one pointcloud2 topic using approximate synchronizer::
