@@ -49,7 +49,7 @@ Synchronizer<latest_policy> sync_policies(latest_policy(), caminfo_sub, limage_s
 sync_policies.registerCallback(callback);
 \endverbatim
 
- * May also take an instance of a `rclcpp::Clock::SharedPtr` from `rclpp::Node::get_clock()` 
+ * May also take an instance of a `rclcpp::Clock::SharedPtr` from `rclpp::Node::get_clock()`
  * to use the node's time source (e.g. sim time) as in:
 \verbatim
 typedef LatestTime<sensor_msgs::CameraInfo, sensor_msgs::Image, sensor_msgs::Image> latest_policy;
@@ -112,6 +112,7 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   : parent_(0),
     ros_clock_{clock}
   {
+    rates_.resize(RealTypeCount::value, Rate(rclcpp::Time(0L, ros_clock_->get_clock_type())));
   }
 
   LatestTime(const LatestTime& e)
@@ -136,6 +137,8 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 
   void setRateConfigPerMessage(const std::vector<RateConfig> & configs)
   {
+    RCUTILS_ASSERT(configs.size() == RealTypeCount::value);
+    RCUTILS_LOG_ERROR("RateConfig vector size != number of topics -- using defaults");
     rate_configs_.assign(configs.begin(), configs.end());
   }
 
@@ -197,14 +200,13 @@ private:
           error_ema_alpha,
           rate_step_change_margin_factor) = rate_configs_[0U];
       }
-      rates_.push_back(
-        Rate(
-          ros_clock_->now(),
-          rate_ema_alpha,
-          error_ema_alpha,
-          rate_step_change_margin_factor));
+      rates_[i] = Rate(
+        ros_clock_->now(),
+        rate_ema_alpha,
+        error_ema_alpha,
+        rate_step_change_margin_factor);
     } else {
-      rates_.push_back(Rate(ros_clock_->now()));
+      rates_[i] = Rate(ros_clock_->now());
     }
   }
 
