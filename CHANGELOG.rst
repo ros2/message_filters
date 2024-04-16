@@ -2,6 +2,11 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.11.1 (2024-04-16)
+-------------------
+* Update TimeSynchronizer usage example. (`#115 <https://github.com/ros2/message_filters/issues/115>`_)
+* Contributors: rkeating-planted
+
 4.11.0 (2023-12-26)
 -------------------
 * Remove 'using' keyword in message_filters (`#106 <https://github.com/ros2/message_filters/issues/106>`_)
