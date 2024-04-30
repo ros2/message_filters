@@ -98,3 +98,19 @@ Output connections are registered through the ``registerCallback()`` function.
     :inherited-members:
 
 
+Tree
+====
+
+.. toctree::
+    :maxdepth: 2
+
+    self
+    tutorials
+    C++ API Docs <generated/index>
+    Python Modules <modules>
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`search`
