@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .. _Tutorials:
 
 Tutorials
@@ -21,3 +22,7 @@ Basic Tutorials
    Tutorials/Writing-A-Time-Synchronizer-Python
    Tutorials/Approximate-Synchronizer-Cpp
    Tutorials/Approximate-Synchronizer-Python
+=======
+Tutorials
+=========
+>>>>>>> b62d90d (Moving Docs from Wiki)
