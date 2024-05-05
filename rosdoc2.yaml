@@ -63,7 +63,6 @@ builders:
     }
     - sphinx: {
         name: 'message_filters',
-        ## This path is relative to output staging.
         doxygen_xml_directory: 'generated/doxygen/xml',
         output_dir: ''
     }

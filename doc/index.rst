@@ -259,8 +259,7 @@ If they don't match, the callback won't be executed (without any warning) and yo
 
     self
     tutorials
-    message_filters <generated/index>
-    modules <modules>
+    references
 
 Indices and tables
 ==================

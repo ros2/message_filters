@@ -1,9 +1,9 @@
 .. redirect-from::
 
-   Tutorials/Writing-A-Time_Synchronizer-Python
+   Tutorials/Approximate-Synchronizer-Python
 
-Time Synchronizer (Python):
----------------------------
+Approximate Time Synchronizer (Python):
+---------------------------------------
 
 Prerequisites
 ~~~~~~~~~~~~~
@@ -11,8 +11,7 @@ This tutorial assumes you have a working knowledge of ROS 2
 
 If you have not done so already `create a workspace <https://docs.ros.org/en/rolling/Tutorials/Beginner-Client-Libraries/Creating-A-Workspace/Creating-A-Workspace.html>`_ and `create a package <https://docs.ros.org/en/rolling/Tutorials/Beginner-Client-Libraries/Creating-Your-First-ROS2-Package.html>`_
 
-
-1. Create a Basic Node with Imports
+1. Create a Basic Node with Includes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: Python
@@ -22,7 +21,7 @@ If you have not done so already `create a workspace <https://docs.ros.org/en/rol
     from rclpy.qos import QoSProfile
     from rclpy.clock import Clock
 
-    from message_filters import Subscriber, TimeSynchronizer
+    from message_filters import Subscriber, ApproximateTimeSynchronizer
     from sensor_msgs.msg import Temperature, FluidPressure
 
 
@@ -37,19 +36,23 @@ If you have not done so already `create a workspace <https://docs.ros.org/en/rol
             self.fluid_sub = Subscriber(self, FluidPressure, "fluid")
 
             self.timer = self.create_timer(1, self.TimerCallback)
+            self.second_timer = self.create_timer(1.05, self.SecondTimerCallback)
 
             queue_size = 10
-            self.sync = TimeSynchronizer([self.temp_sub, self.fluid_sub], queue_size)
-            self.sync.registerCallback(self.SyncCallback)
+            max_delay = 0.05
+            self.time_sync = ApproximateTimeSynchronizer([self.temp_sub, self.fluid_sub],
+                                                         queue_size, max_delay)
+            self.time_sync.registerCallback(self.SyncCallback)
 
 
 For this example we will be using the ``temperature`` and ``fluid_pressure`` messages found in
 `sensor_msgs <https://github.com/ros2/common_interfaces/tree/rolling/sensor_msgs/msg>`_.
-To simulate a working ``TimeSynchronizer`` we will be publishing and subscribing to topics of those respective types, to showcase how real sensors would be working. To simulate them we will also need some sort of ``Timer``. Then, we will be utilizing said ``TimeSynchronizer`` to get these messages from the sensor topics aligned, seen with the two ``Subscribers`` conjoined in the ``TimeSynchronizer`` initialization.
+To simulate a working ``ApproximateTimeSynchronizer``. We will be publishing and subscribing to topics of those respective types, to showcase how real sensors would be working. To simulate them we will also need two ``Timers`` on different intervals. Then, we will be utilizing an ``ApproximateTimeSynchronizer`` to get these messages from the sensor topics aligned with a slight delay between messages..
 
-It is essential that the QoS is the same for all of the publishers and subscribers, otherwise the Message Filter cannot align the topics together. So, create one ``QoSProfile`` and stick with it, or find out what ``qos`` is being used in the native sensor code, and replicate it. For each class member, do basic construction of the object relating to the ``Node`` and callback methods that may be used in the future. Notice that we must call ``sync.registerCallback`` to sync up the two (or more) chosen topics.
 
-So, we must create some callbacks.
+It is essential that the QoS is the same for all of the publishers and subscribers, otherwise the Message Filter cannot align the topics together. So, create one ``QoSProfile`` and stick with it, or find out what ``qos`` is being used in the native sensor code, and replicate it. Do basic construction of each object relating to the ``Node`` and callback methods that may be used in the future. Both of the two timers we utilize will have different timer values of ``1`` and ``1.05`` which causes the timers to off at different points, which is an advantage of using ``ApproximateTime``. Notice that we must call ``sync->registerCallback`` to sync up the two (or more) chosen topics.
+
+So, we must create three (or more) private callbacks, one for the ``ApproximateTimeSynchronizer``, then two for our ``Timers`` which are each for a certain ``sensor_msg``.
 
 .. code-block:: Python
 
@@ -66,7 +69,6 @@ So, we must create some callbacks.
 
     def TimerCallback(self):
         temp = Temperature()
-        fluid = FluidPressure()
         self.now = Clock().now().to_msg()
 
         temp.header.stamp = self.now
@@ -74,30 +76,35 @@ So, we must create some callbacks.
         temp.temperature = 1.0
         self.temp_pub.publish(temp)
 
+    def SecondTimerCallback(self):
+        fluid = FluidPressure()
+        self.now = Clock().now().to_msg()
+
         fluid.header.stamp = self.now
         fluid.header.frame_id = "test"
         fluid.fluid_pressure = 2.0
         self.fluid_pub.publish(fluid)
 
-``SyncCallback`` takes a fluid_pressure and a temperature  relating to both topics becasue they will be taken at the exact time, from here you can compare these topics, set values, etc. This callback is the final goal of synching multiple topics and the reason why the qos and header stamps must be the same. This will be seen with the logging statement as both of the times will be the same. For the ``TimerCallback`` just initialize both the ``Temperature`` and ``FluidPressure`` in whatever way necessary, but make sure the header stamp of both have the same exact time, otherwise the ``TimeSynchronizer`` will be misaligned and won't do anything.
+
+``SyncCallback`` takes both messages relating to both topics, then, from here you can compare these topics, set values, etc. This callback is the final goal of synching multiple topics and the reason why the qos must be the same. This will be seen with the logging statement as both of the times will be the same. Though, the headers have to have the same ``stamp`` value, they don't have to be triggered at the same time using an ``ApproximateTimeSynchronizer`` which will be seen in a delay between logging calls. For both ``TimerCallbacks`` just initialize both the ``Temperature`` and ``FluidPressure`` in whatever way necessary. .
 
 Finally, create a main function and spin the node
 
 .. code-block:: Python
 
-  def main(args=None):
-      rclpy.init(args=args)
+    def main(args=None):
+        rclpy.init(args=args)
 
-      time_sync = TimeSyncNode()
+        time_sync = TimeSyncNode()
 
-      rclpy.spin(time_sync)
+        rclpy.spin(time_sync)
 
-      time_sync.destroy_node()
-      rclpy.shutdown()
+        time_sync.destroy_node()
+        rclpy.shutdown()
 
 
-  if __name__ == '__main__':
-      main()
+    if __name__ == '__main__':
+        main()
 
 2. Add the Node to Python Setup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -120,7 +127,7 @@ Add the following line between the 'console_scripts': brackets, with the name of
 
 .. code-block:: Python
 
-   'time_sync = pkg_name.time_sync:main',
+   'approximate_time_sync = pkg_name.approximate_time_sync:main',
 
 
 3. Build
@@ -138,10 +145,11 @@ Run replacing the package name with whatever you named your workspace.
 
 .. code-block:: bash
 
-   ros2 run pkg_name time_sync
+   ros2 run pkg_name approximate_time_sync
 
 You should end up with a result similar to the following:
 
 .. code-block:: bash
 
-   [INFO] [1714504937.157035000] [sync_node]: Sync callback with 1714504937 and 1714504937 as times
+   [INFO] [1714927893.485850000] [sync_node]: Sync callback with 1714927893 and 1714927893 as times
+   [INFO] [1714927894.489608000] [sync_node]: Sync callback with 1714927894 and 1714927894 as times

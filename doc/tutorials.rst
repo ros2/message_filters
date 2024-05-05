@@ -19,5 +19,5 @@ Basic Tutorials
 
    Tutorials/Writing-A-Time-Synchronizer-Cpp
    Tutorials/Writing-A-Time-Synchronizer-Python
-   Tutorials/Synchronizer-Policies-Cpp
-   Tutorials/Synchronizer-Policies-Python
+   Tutorials/Approximate-Synchronizer-Cpp
+   Tutorials/Approximate-Synchronizer-Python
