@@ -26,17 +26,15 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""
-Message Filter Objects
-======================
-"""
+
+"""Message Filter Objects."""
 
 from functools import reduce
 import itertools
 import threading
-import rclpy
+# import builtin_interfaces
 
-import builtin_interfaces
+import rclpy
 from rclpy.clock import ROSClock
 from rclpy.duration import Duration
 from rclpy.logging import LoggingSeverity
@@ -50,12 +48,12 @@ class SimpleFilter(object):
 
     def registerCallback(self, cb, *args):
         """
-        Register a callback function `cb` to be called when this filter
-        has output.
-        The filter calls the function ``cb`` with a filter-dependent
-        list of arguments,followed by the call-supplied arguments ``args``.
-        """
+        Register a callback `cb` to be called when this filter has output.
 
+        The filter calls the function ``cb`` with a filter-dependent.
+
+        list of arguments,followed by the call-supplied arguments ``args.``.
+        """
         conn = len(self.callbacks)
         self.callbacks[conn] = (cb, args)
         return conn
@@ -64,8 +62,8 @@ class SimpleFilter(object):
         for (cb, args) in self.callbacks.values():
             cb(*(msg + args))
 
+
 class Subscriber(SimpleFilter):
-    
     """
     ROS 2 subscription filter, takes identical arguments as :class:`rclpy.Subscriber`.
 
@@ -73,6 +71,7 @@ class Subscriber(SimpleFilter):
     from a ROS 2 subscription through to the filters which have connected
     to it.
     """
+
     def __init__(self, *args, **kwargs):
         SimpleFilter.__init__(self)
         self.node = args[0]
@@ -87,11 +86,11 @@ class Subscriber(SimpleFilter):
         return self.topic
 
     def __getattr__(self, key):
-        """Serve same API as rospy.Subscriber"""
+        """Serve same API as rospy.Subscriber."""
         return self.sub.__getattribute__(key)
 
-class Cache(SimpleFilter):
 
+class Cache(SimpleFilter):
     """
     Stores a time history of messages.
 
@@ -124,12 +123,12 @@ class Cache(SimpleFilter):
             if not self.allow_headerless:
                 msg_filters_logger = rclpy.logging.get_logger('message_filters_cache')
                 msg_filters_logger.set_level(LoggingSeverity.INFO)
-                msg_filters_logger.warn("can not use message filters messages "
-                                        "without timestamp infomation when "
-                                        "'allow_headerless' is disabled. "
-                                        "auto assign ROSTIME to headerless "
-                                        "messages once enabling constructor "
-                                        "option of 'allow_headerless'.")
+                msg_filters_logger.warn('can not use message filters messages '
+                                        'without timestamp infomation when '
+                                        '"allow_headerless" is disabled. '
+                                        'auto assign ROSTIME to headerless '
+                                        'messages once enabling constructor '
+                                        'option of "allow_headerless".')
 
                 return
 
@@ -184,7 +183,7 @@ class Cache(SimpleFilter):
         if not self.cache_times:
             return None
         return self.cache_times[0]
-        
+
     def getLast(self):
         if self.getLastestTime() is None:
             return None
@@ -192,7 +191,6 @@ class Cache(SimpleFilter):
 
 
 class TimeSynchronizer(SimpleFilter):
-
     """
     Synchronizes messages by their timestamps.
 
@@ -240,8 +238,8 @@ class TimeSynchronizer(SimpleFilter):
                 del q[t]
         self.lock.release()
 
-class ApproximateTimeSynchronizer(TimeSynchronizer):
 
+class ApproximateTimeSynchronizer(TimeSynchronizer):
     """
     Approximately synchronizes messages by their timestamps.
 
@@ -264,11 +262,12 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
             if not self.allow_headerless:
                 msg_filters_logger = rclpy.logging.get_logger('message_filters_approx')
                 msg_filters_logger.set_level(LoggingSeverity.INFO)
-                msg_filters_logger.warn("can not use message filters for "
-                              "messages without timestamp infomation when "
-                              "'allow_headerless' is disabled. auto assign "
-                              "ROSTIME to headerless messages once enabling "
-                              "constructor option of 'allow_headerless'.")
+                msg_filters_logger.warn('can not use message filters messages '
+                                        'without timestamp infomation when '
+                                        '"allow_headerless" is disabled. '
+                                        'auto assign ROSTIME to headerless '
+                                        'messages once enabling constructor '
+                                        'option of "allow_headerless".')
                 return
 
             stamp = ROSClock().now()
@@ -296,7 +295,8 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
                 if stamp_delta > self.slop:
                     continue  # far over the slop
                 topic_stamps.append(((Time(nanoseconds=s,
-                                   clock_type=stamp.clock_type)), stamp_delta))
+                                           clock_type=stamp.clock_type)),
+                                    stamp_delta))
             if not topic_stamps:
                 self.lock.release()
                 return
@@ -308,11 +308,11 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
             if my_queue_index is not None:
                 vv.insert(my_queue_index, stamp)
             qt = list(zip(self.queues, vv))
-            if ( ((max(vv) - min(vv)) < self.slop) and
-                (len([1 for q,t in qt if t.nanoseconds not in q]) == 0) ):
-                msgs = [q[t.nanoseconds] for q,t in qt]
+            if (((max(vv) - min(vv)) < self.slop) and
+               (len([1 for q, t in qt if t.nanoseconds not in q]) == 0)):
+                msgs = [q[t.nanoseconds] for q, t in qt]
                 self.signalMessage(*msgs)
-                for q,t in qt:
+                for q, t in qt:
                     del q[t.nanoseconds]
                 break  # fast finish after the synchronization
         self.lock.release()
