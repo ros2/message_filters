@@ -36,6 +36,7 @@
 #define MESSAGE_FILTERS__SYNCHRONIZER_H_
 
 #include <deque>
+#include <memory>
 #include <string>
 #include <tuple>
 #include <type_traits>
@@ -198,14 +199,15 @@ public:
   }
 
   template<class F0, class F1, class F2, class F3, class F4, class F5, class F6, class F7, class F8>
-  Synchronizer(const Policy& policy, F0& f0, F1& f1, F2& f2, F3& f3, F4& f4, F5& f5, F6& f6, F7& f7, F8& f8)
+  Synchronizer(const Policy& policy, F0& f0, F1& f1, F2& f2, F3& f3, F4& f4, F5& f5, F6& f6,
+    F7& f7, F8& f8)
   : Policy(policy)
   {
     connectInput(f0, f1, f2, f3, f4, f5, f6, f7, f8);
     init();
   }
 
-  Synchronizer(const Policy& policy)
+  explicit Synchronizer(const Policy& policy)
   : Policy(policy)
   {
     init();
@@ -275,15 +277,24 @@ public:
   {
     disconnectAll();
 
-    input_connections_[0] = f0.registerCallback(std::function<void(const M0Event&)>(std::bind(&Synchronizer::template cb<0>, this, std::placeholders::_1)));
-    input_connections_[1] = f1.registerCallback(std::function<void(const M1Event&)>(std::bind(&Synchronizer::template cb<1>, this, std::placeholders::_1)));
-    input_connections_[2] = f2.registerCallback(std::function<void(const M2Event&)>(std::bind(&Synchronizer::template cb<2>, this, std::placeholders::_1)));
-    input_connections_[3] = f3.registerCallback(std::function<void(const M3Event&)>(std::bind(&Synchronizer::template cb<3>, this, std::placeholders::_1)));
-    input_connections_[4] = f4.registerCallback(std::function<void(const M4Event&)>(std::bind(&Synchronizer::template cb<4>, this, std::placeholders::_1)));
-    input_connections_[5] = f5.registerCallback(std::function<void(const M5Event&)>(std::bind(&Synchronizer::template cb<5>, this, std::placeholders::_1)));
-    input_connections_[6] = f6.registerCallback(std::function<void(const M6Event&)>(std::bind(&Synchronizer::template cb<6>, this, std::placeholders::_1)));
-    input_connections_[7] = f7.registerCallback(std::function<void(const M7Event&)>(std::bind(&Synchronizer::template cb<7>, this, std::placeholders::_1)));
-    input_connections_[8] = f8.registerCallback(std::function<void(const M8Event&)>(std::bind(&Synchronizer::template cb<8>, this, std::placeholders::_1)));
+    input_connections_[0] = f0.registerCallback(std::function<void(const M0Event&)>(
+      std::bind(&Synchronizer::template cb<0>, this, std::placeholders::_1)));
+    input_connections_[1] = f1.registerCallback(std::function<void(const M1Event&)>(
+      std::bind(&Synchronizer::template cb<1>, this, std::placeholders::_1)));
+    input_connections_[2] = f2.registerCallback(std::function<void(const M2Event&)>(
+      std::bind(&Synchronizer::template cb<2>, this, std::placeholders::_1)));
+    input_connections_[3] = f3.registerCallback(std::function<void(const M3Event&)>(
+      std::bind(&Synchronizer::template cb<3>, this, std::placeholders::_1)));
+    input_connections_[4] = f4.registerCallback(std::function<void(const M4Event&)>(
+      std::bind(&Synchronizer::template cb<4>, this, std::placeholders::_1)));
+    input_connections_[5] = f5.registerCallback(std::function<void(const M5Event&)>(
+      std::bind(&Synchronizer::template cb<5>, this, std::placeholders::_1)));
+    input_connections_[6] = f6.registerCallback(std::function<void(const M6Event&)>(
+      std::bind(&Synchronizer::template cb<6>, this, std::placeholders::_1)));
+    input_connections_[7] = f7.registerCallback(std::function<void(const M7Event&)>(
+      std::bind(&Synchronizer::template cb<7>, this, std::placeholders::_1)));
+    input_connections_[8] = f8.registerCallback(std::function<void(const M8Event&)>(
+      std::bind(&Synchronizer::template cb<8>, this, std::placeholders::_1)));
   }
 
   template<class C>
@@ -314,8 +325,9 @@ public:
   const std::string& getName() { return name_; }
 
 
-  void signal(const M0Event& e0, const M1Event& e1, const M2Event& e2, const M3Event& e3, const M4Event& e4,
-              const M5Event& e5, const M6Event& e6, const M7Event& e7, const M8Event& e8)
+  void signal(const M0Event& e0, const M1Event& e1, const M2Event& e2, const M3Event& e3,
+    const M4Event& e4, const M5Event& e5, const M6Event& e6, const M7Event& e7,
+    const M8Event& e8)
   {
     signal_.call(e0, e1, e2, e3, e4, e5, e6, e7, e8);
   }
@@ -331,7 +343,6 @@ public:
   }
 
 private:
-
   void disconnectAll()
   {
     for (int i = 0; i < MAX_MESSAGES; ++i)
@@ -369,7 +380,7 @@ template<class T1, class... T> struct mp_plus<T1, T...>
 
 template<class L, class V> struct mp_count;
 template<template<class...> class L, class... T, class V>
-  struct mp_count<L<T...>, V>
+struct mp_count<L<T...>, V>
 {
   using type = typename mp_plus<std::is_same<T, V>...>::type;
 };
@@ -378,12 +389,13 @@ template<typename M0, typename M1, typename M2, typename M3, typename M4,
          typename M5, typename M6, typename M7, typename M8>
 struct PolicyBase
 {
-  typedef typename mp_count<std::tuple<M0, M1, M2, M3, M4, M5, M6, M7, M8>, NullType>::type RealTypeCount;
+  typedef typename mp_count<std::tuple<M0, M1, M2, M3, M4, M5, M6, M7, M8>, NullType>::type
+    RealTypeCount;
   typedef std::tuple<M0, M1, M2, M3, M4, M5, M6, M7, M8> Messages;
   typedef Signal9<M0, M1, M2, M3, M4, M5, M6, M7, M8> Signal;
   typedef std::tuple<MessageEvent<M0 const>, MessageEvent<M1 const>, MessageEvent<M2 const>,
                      MessageEvent<M3 const>, MessageEvent<M4 const>, MessageEvent<M5 const>,
-                     MessageEvent<M6 const>, MessageEvent<M7 const>, MessageEvent<M8 const> > Events;
+                     MessageEvent<M6 const>, MessageEvent<M7 const>, MessageEvent<M8 const>> Events;
 
   typedef typename std::tuple_element<0, Events>::type M0Event;
   typedef typename std::tuple_element<1, Events>::type M1Event;

@@ -32,6 +32,7 @@
 #define MESSAGE_FILTERS__MESSAGE_TRAITS_H_
 
 #include <type_traits>
+#include <string>
 
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/header.hpp>

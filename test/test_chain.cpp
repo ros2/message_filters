@@ -32,9 +32,9 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#include <memory>
-
 #include <gtest/gtest.h>
+
+#include <memory>
 
 #include <rclcpp/rclcpp.hpp>
 #include "message_filters/chain.h"
@@ -166,7 +166,6 @@ TEST(Chain, retrieveFilterThroughBaseClass)
 
 struct PTDerived : public message_filters::PassThrough<Msg>
 {
-
 };
 
 TEST(Chain, retrieveBaseClass)

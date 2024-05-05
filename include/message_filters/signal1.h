@@ -37,6 +37,7 @@
 
 #include <memory>
 #include <mutex>
+#include <vector>
 
 #include "message_filters/connection.h"
 #include "message_filters/message_event.h"
@@ -63,7 +64,7 @@ public:
   typedef std::function<void(typename Adapter::Parameter)> Callback;
   typedef typename Adapter::Event Event;
 
-  CallbackHelper1T(const Callback& cb)
+  explicit CallbackHelper1T(const Callback& cb)
   : callback_(cb)
   {
   }
@@ -98,7 +99,8 @@ public:
   void removeCallback(const CallbackHelper1Ptr& helper)
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    typename V_CallbackHelper1::iterator it = std::find(callbacks_.begin(), callbacks_.end(), helper);
+    typename V_CallbackHelper1::iterator it = std::find(
+      callbacks_.begin(), callbacks_.end(), helper);
     if (it != callbacks_.end())
     {
       callbacks_.erase(it);
@@ -122,6 +124,6 @@ private:
   std::mutex mutex_;
   V_CallbackHelper1 callbacks_;
 };
-}  // message_filters
+}  // namespace message_filters
 
 #endif  // MESSAGE_FILTERS__SIGNAL1_H_

@@ -32,10 +32,11 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS__CHAIN_H
-#define MESSAGE_FILTERS__CHAIN_H
+#ifndef MESSAGE_FILTERS__CHAIN_H_
+#define MESSAGE_FILTERS__CHAIN_H_
 
 #include <vector>
+#include <memory>
 
 #include "message_filters/simple_filter.h"
 #include "message_filters/pass_through.h"
@@ -124,7 +125,7 @@ public:
    * \brief Constructor with filter.  Calls connectInput(f)
    */
   template<typename F>
-  Chain(F& f)
+  explicit Chain(F& f)
   {
     connectInput(f);
   }
@@ -153,13 +154,15 @@ public:
   size_t addFilter(const std::shared_ptr<F>& filter)
   {
     FilterInfo info;
-    info.add_func = std::bind((void(F::*)(const EventType&))&F::add, filter.get(), std::placeholders::_1);
+    info.add_func = std::bind(
+      (void(F::*)(const EventType&))&F::add, filter.get(), std::placeholders::_1);
     info.filter = filter;
     info.passthrough = std::make_shared<PassThrough<M> >();
 
     last_filter_connection_.disconnect();
     info.passthrough->connectInput(*filter);
-    last_filter_connection_ = info.passthrough->registerCallback(typename SimpleFilter<M>::EventCallback(std::bind(&Chain::lastFilterCB, this, std::placeholders::_1)));
+    last_filter_connection_ = info.passthrough->registerCallback(typename SimpleFilter<M>::
+      EventCallback(std::bind(&Chain::lastFilterCB, this, std::placeholders::_1)));
     if (!filters_.empty())
     {
       filter->connectInput(*filters_.back().passthrough);
@@ -195,7 +198,8 @@ public:
   void connectInput(F& f)
   {
     incoming_connection_.disconnect();
-    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(std::bind(&Chain::incomingCB, this, std::placeholders::_1)));
+    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(
+      std::bind(&Chain::incomingCB, this, std::placeholders::_1)));
   }
 
   /**
@@ -240,7 +244,7 @@ private:
   {
     std::function<void(const EventType&)> add_func;
     std::shared_ptr<void> filter;
-    std::shared_ptr<PassThrough<M> > passthrough;
+    std::shared_ptr<PassThrough<M>> passthrough;
   };
   typedef std::vector<FilterInfo> V_FilterInfo;
 

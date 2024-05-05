@@ -34,6 +34,8 @@
 
 #include <type_traits>
 #include <memory>
+#include <map>
+#include <string>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -43,12 +45,12 @@
 #define RCUTILS_ASSERT assert
 #endif
 // Uncomment below intead
-//#include <rcutils/assert.h>
+// #include <rcutils/assert.h>
 
 namespace message_filters
 {
-typedef std::map< std::string, std::string > 	M_string;
-typedef std::shared_ptr< M_string > 	M_stringPtr;
+typedef std::map<std::string, std::string> M_string;
+typedef std::shared_ptr<M_string>	M_stringPtr;
 
 template<typename M>
 struct DefaultMessageCreator
@@ -109,13 +111,14 @@ public:
 
   MessageEvent(const MessageEvent<void const>& rhs, const CreateFunction& create)
   {
-    init(std::const_pointer_cast<Message>(std::static_pointer_cast<ConstMessage>(rhs.getMessage())), rhs.getReceiptTime(), rhs.nonConstWillCopy(), create);
+    init(std::const_pointer_cast<Message>(std::static_pointer_cast<ConstMessage>(
+      rhs.getMessage())), rhs.getReceiptTime(), rhs.nonConstWillCopy(), create);
   }
 
   /**
    * \todo Make this explicit in ROS 2.0.  Keep as auto-converting for now to maintain backwards compatibility in some places (message_filters)
    */
-  MessageEvent(const ConstMessagePtr& message)
+  explicit MessageEvent(const ConstMessagePtr& message)
   {
     init(message, rclcpp::Clock().now(), true, message_filters::DefaultMessageCreator<Message>());
   }
@@ -125,12 +128,14 @@ public:
     init(message, receipt_time, true, message_filters::DefaultMessageCreator<Message>());
   }
 
-  MessageEvent(const ConstMessagePtr& message, rclcpp::Time receipt_time, bool nonconst_need_copy, const CreateFunction& create)
+  MessageEvent(const ConstMessagePtr& message, rclcpp::Time receipt_time,
+    bool nonconst_need_copy, const CreateFunction& create)
   {
     init(message, receipt_time, nonconst_need_copy, create);
   }
 
-  void init(const ConstMessagePtr& message, rclcpp::Time receipt_time, bool nonconst_need_copy, const CreateFunction& create)
+  void init(const ConstMessagePtr& message, rclcpp::Time receipt_time,
+    bool nonconst_need_copy, const CreateFunction& create)
   {
     message_ = message;
     receipt_time_ = receipt_time;
@@ -140,13 +145,16 @@ public:
 
   void operator=(const MessageEvent<Message>& rhs)
   {
-    init(std::static_pointer_cast<Message>(rhs.getMessage()), rhs.getReceiptTime(), rhs.nonConstWillCopy(), rhs.getMessageFactory());
+    init(std::static_pointer_cast<Message>(rhs.getMessage()), rhs.getReceiptTime(),
+      rhs.nonConstWillCopy(), rhs.getMessageFactory());
     message_copy_.reset();
   }
 
   void operator=(const MessageEvent<ConstMessage>& rhs)
   {
-    init(std::const_pointer_cast<Message>(std::static_pointer_cast<ConstMessage>(rhs.getMessage())), rhs.getReceiptTime(), rhs.nonConstWillCopy(), rhs.getMessageFactory());
+    init(std::const_pointer_cast<Message>(std::static_pointer_cast<ConstMessage>(
+      rhs.getMessage())), rhs.getReceiptTime(),
+      rhs.nonConstWillCopy(), rhs.getMessageFactory());
     message_copy_.reset();
   }
 
@@ -190,7 +198,8 @@ public:
 
   bool operator==(const MessageEvent<M>& rhs)
   {
-    return message_ == rhs.message_ && receipt_time_ == rhs.receipt_time_ && nonconst_need_copy_ == rhs.nonconst_need_copy_;
+    return message_ == rhs.message_ && receipt_time_ == rhs.receipt_time_ &&
+      nonconst_need_copy_ == rhs.nonconst_need_copy_;
   }
 
   bool operator!=(const MessageEvent<M>& rhs)
@@ -202,7 +211,8 @@ public:
 
 private:
   template<typename M2>
-  typename std::enable_if<!std::is_void<M2>::value, std::shared_ptr<M> >::type copyMessageIfNecessary() const
+  typename std::enable_if<!std::is_void<M2>::value, std::shared_ptr<M> >::type
+    copyMessageIfNecessary() const
   {
     if (std::is_const<M>::value || !nonconst_need_copy_)
     {
@@ -222,13 +232,15 @@ private:
   }
 
   template<typename M2>
-  typename std::enable_if<std::is_void<M2>::value, std::shared_ptr<M> >::type copyMessageIfNecessary() const
+  typename std::enable_if<std::is_void<M2>::value, std::shared_ptr<M>>::type
+    copyMessageIfNecessary() const
   {
     return std::const_pointer_cast<Message>(message_);
   }
 
   ConstMessagePtr message_;
-  // Kind of ugly to make this mutable, but it means we can pass a const MessageEvent to a callback and not worry about other things being modified
+  // Kind of ugly to make this mutable, but it means we can pass a const MessageEvent to a
+  // callback and not worry about other things being modified
   mutable MessagePtr message_copy_;
   rclcpp::Time receipt_time_;
   bool nonconst_need_copy_;
@@ -237,7 +249,8 @@ private:
   static const std::string s_unknown_publisher_string_;
 };
 
-template<typename M> const std::string MessageEvent<M>::s_unknown_publisher_string_("unknown_publisher");
+template<typename M> const std::string MessageEvent<M>::s_unknown_publisher_string_(
+  "unknown_publisher");
 
 }  // namespace message_filters
 

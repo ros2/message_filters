@@ -66,8 +66,8 @@ struct TimeStamp<Msg>
     return m.header.stamp;
   }
 };
-}
-}
+}  // namespace message_traits
+}  // namespace message_filters
 
 class Helper
 {
@@ -166,7 +166,8 @@ TEST(ExactTime, dropCallback)
 
 struct EventHelper
 {
-  void callback(const message_filters::MessageEvent<Msg const> & e1, const message_filters::MessageEvent<Msg const> & e2)
+  void callback(const message_filters::MessageEvent<Msg const> & e1,
+    const message_filters::MessageEvent<Msg const> & e2)
   {
     e1_ = e1;
     e2_ = e2;

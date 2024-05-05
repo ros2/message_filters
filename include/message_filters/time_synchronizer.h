@@ -32,8 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef MESSAGE_FILTERS_TIME_SYNCHRONIZER_H
-#define MESSAGE_FILTERS_TIME_SYNCHRONIZER_H
+#ifndef MESSAGE_FILTERS_TIME_SYNCHRONIZER_H_
+#define MESSAGE_FILTERS_TIME_SYNCHRONIZER_H_
 
 #include <memory>
 
@@ -79,8 +79,9 @@ void callback(const sensor_msgs::msg::CameraInfo::SharedPtr, const sensor_msgs::
  *
  */
 template<class M0, class M1, class M2 = NullType, class M3 = NullType, class M4 = NullType,
-         class M5 = NullType, class M6 = NullType, class M7 = NullType, class M8 = NullType>
-class TimeSynchronizer : public Synchronizer<sync_policies::ExactTime<M0, M1, M2, M3, M4, M5, M6, M7, M8> >
+  class M5 = NullType, class M6 = NullType, class M7 = NullType, class M8 = NullType>
+class TimeSynchronizer : public Synchronizer<sync_policies::ExactTime<
+                          M0, M1, M2, M3, M4, M5, M6, M7, M8> >
 {
 public:
   typedef sync_policies::ExactTime<M0, M1, M2, M3, M4, M5, M6, M7, M8> Policy;
@@ -154,20 +155,22 @@ public:
   }
 
   template<class F0, class F1, class F2, class F3, class F4, class F5, class F6, class F7>
-  TimeSynchronizer(F0& f0, F1& f1, F2& f2, F3& f3, F4& f4, F5& f5, F6& f6, F7& f7, uint32_t queue_size)
+  TimeSynchronizer(F0& f0, F1& f1, F2& f2, F3& f3, F4& f4, F5& f5, F6& f6, F7& f7,
+    uint32_t queue_size)
   : Base(Policy(queue_size))
   {
     connectInput(f0, f1, f2, f3, f4, f5, f6, f7);
   }
 
   template<class F0, class F1, class F2, class F3, class F4, class F5, class F6, class F7, class F8>
-  TimeSynchronizer(F0& f0, F1& f1, F2& f2, F3& f3, F4& f4, F5& f5, F6& f6, F7& f7, F8& f8, uint32_t queue_size)
+  TimeSynchronizer(F0& f0, F1& f1, F2& f2, F3& f3, F4& f4, F5& f5, F6& f6, F7& f7, F8& f8,
+    uint32_t queue_size)
   : Base(Policy(queue_size))
   {
     connectInput(f0, f1, f2, f3, f4, f5, f6, f7, f8);
   }
 
-  TimeSynchronizer(uint32_t queue_size)
+  explicit TimeSynchronizer(uint32_t queue_size)
   : Base(Policy(queue_size))
   {
   }
@@ -223,4 +226,4 @@ public:
 
 }  // namespace message_filters
 
-#endif  // MESSAGE_FILTERS_TIME_SYNCHRONIZER_H
+#endif  // MESSAGE_FILTERS_TIME_SYNCHRONIZER_H_

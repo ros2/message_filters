@@ -31,17 +31,20 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+# import time
+import unittest
+
 from message_filters import Cache, Subscriber
+
 import rclpy
 from rclpy.time import Time
 from rclpy.clock import ClockType
 from rclpy.clock import ROSClock
 from rclpy.duration import Duration
 from std_msgs.msg import String
-import time
-import unittest
 
 PKG = 'message_filters'
+
 
 class AnonymMsg:
     class AnonymHeader:
@@ -91,20 +94,20 @@ class TestCache(unittest.TestCase):
         msg.header.stamp = Time(seconds=4)
         cache.add(msg)
 
-        l = len(cache.getInterval(Time(seconds=2.5),
-                                  Time(seconds=3.5)))
-        self.assertEqual(l, 1, "invalid number of messages" +
-                                " returned in getInterval 1")
+        len1 = len(cache.getInterval(Time(seconds=2.5),
+                                     Time(seconds=3.5)))
+        self.assertEqual(len1, 1, "invalid number of messages" +
+                         " returned in getInterval 1")
 
-        l = len(cache.getInterval(Time(seconds=2),
-                                  Time(seconds=3)))
-        self.assertEqual(l, 2, "invalid number of messages" +
-                                " returned in getInterval 2")
+        len2 = len(cache.getInterval(Time(seconds=2),
+                                     Time(seconds=3)))
+        self.assertEqual(len2, 2, "invalid number of messages" +
+                         " returned in getInterval 2")
 
-        l = len(cache.getInterval(Time(),
-                                  Time(seconds=4)))
-        self.assertEqual(l, 5, "invalid number of messages" +
-                                " returned in getInterval 5")
+        len3 = len(cache.getInterval(Time(),
+                                     Time(seconds=4)))
+        self.assertEqual(len3, 5, "invalid number of messages" +
+                         " returned in getInterval 5")
 
         s = cache.getElemAfterTime(Time()).header.stamp
         self.assertEqual(s, Time(), "invalid msg return by getElemAfterTime")
@@ -150,7 +153,6 @@ class TestCache(unittest.TestCase):
         currentRosTime = ROSClock().now()
         s = cache.getElemAfterTime(currentRosTime)
         self.assertIsNone(s, "invalid msg returned in headerless scenario")
-
 
         cache.add(msg)
 

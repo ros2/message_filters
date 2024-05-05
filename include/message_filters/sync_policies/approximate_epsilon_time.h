@@ -36,8 +36,11 @@
 #define MESSAGE_FILTERS__SYNC_POLICIES__APPROXIMATE_EPSILON_TIME_H_
 
 #include <deque>
+#include <limits>
 #include <string>
 #include <tuple>
+#include <utility>
+#include <vector>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -52,8 +55,9 @@ namespace message_filters
 namespace sync_policies
 {
 
-template<typename M0, typename M1, typename M2 = NullType, typename M3 = NullType, typename M4 = NullType,
-         typename M5 = NullType, typename M6 = NullType, typename M7 = NullType, typename M8 = NullType>
+template<typename M0, typename M1, typename M2 = NullType, typename M3 = NullType,
+  typename M4 = NullType, typename M5 = NullType, typename M6 = NullType,
+  typename M7 = NullType, typename M8 = NullType>
 class ApproximateEpsilonTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 {
 public:
@@ -138,7 +142,8 @@ private:
       // this condition should not happen
       return current;
     }
-    auto candidate = mt::TimeStamp<typename ThisEventType::Message>::value(*events_of_this_type.at(0).getMessage());
+    auto candidate = mt::TimeStamp<typename ThisEventType::Message>::value(
+      *events_of_this_type.at(0).getMessage());
     if (current.first > candidate) {
       return std::make_pair(candidate, Is);
     }
@@ -150,7 +155,8 @@ private:
   get_older_timestamp_helper(std::index_sequence<Is...> const &)
   {
     TimeIndexPair older{
-      rclcpp::Time(std::numeric_limits<int64_t>::max(), RCL_ROS_TIME), std::numeric_limits<size_t>::max()};
+      rclcpp::Time(std::numeric_limits<int64_t>::max(), RCL_ROS_TIME),
+        std::numeric_limits<size_t>::max()};
     ((older = get_older_timestamp_between<Is>(older)), ...);
     return older;
   }
@@ -178,7 +184,8 @@ private:
       // this condition should not happen
       return false;
     }
-    auto ts = mt::TimeStamp<typename ThisEventType::Message>::value(*events_of_this_type.at(0).getMessage());
+    auto ts = mt::TimeStamp<typename ThisEventType::Message>::value(
+      *events_of_this_type.at(0).getMessage());
     if (older.first + epsilon_ >= ts) {
       return true;
     }
@@ -256,7 +263,8 @@ private:
 
   template <size_t ... Is>
   void
-  erase_old_events_if_on_sync_with_ts_helper(rclcpp::Time timestamp, std::index_sequence<Is...> const &)
+  erase_old_events_if_on_sync_with_ts_helper(
+    rclcpp::Time timestamp, std::index_sequence<Is...> const &)
   {
     ((erase_beginning_of_vector_if_on_sync_with_ts<Is>(timestamp)), ...);
   }

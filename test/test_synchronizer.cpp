@@ -55,8 +55,10 @@ typedef std::shared_ptr<Msg> MsgPtr;
 typedef std::shared_ptr<Msg const> MsgConstPtr;
 
 
-template<typename M0, typename M1, typename M2 = message_filters::NullType, typename M3 = message_filters::NullType, typename M4 = message_filters::NullType,
-         typename M5 = message_filters::NullType, typename M6 = message_filters::NullType, typename M7 = message_filters::NullType, typename M8 = message_filters::NullType>
+template<typename M0, typename M1, typename M2 = message_filters::NullType,
+  typename M3 = message_filters::NullType, typename M4 = message_filters::NullType,
+  typename M5 = message_filters::NullType, typename M6 = message_filters::NullType,
+  typename M7 = message_filters::NullType, typename M8 = message_filters::NullType>
 struct NullPolicy : public message_filters::PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 {
   typedef message_filters::Synchronizer<NullPolicy> Sync;
@@ -73,7 +75,7 @@ struct NullPolicy : public message_filters::PolicyBase<M0, M1, M2, M3, M4, M5, M
     }
   }
 
-  void initParent(Sync*)
+  void initParent(Sync * sync)
   {
   }
 
@@ -146,10 +148,15 @@ void function2(const MsgConstPtr&, const MsgConstPtr&) {}
 void function3(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
 void function4(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
 void function5(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function6(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function7(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function8(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function9(const MsgConstPtr&, MsgConstPtr, const MsgPtr&, MsgPtr, const Msg&, Msg, const message_filters::MessageEvent<Msg const>&, const message_filters::MessageEvent<Msg>&, const MsgConstPtr&) {}
+void function6(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&,
+  const MsgConstPtr&, const MsgConstPtr&) {}
+void function7(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&,
+  const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
+void function8(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&,
+  const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
+void function9(const MsgConstPtr&, MsgConstPtr, const MsgPtr&, MsgPtr, const Msg&, Msg,
+  const message_filters::MessageEvent<Msg const>&,
+  const message_filters::MessageEvent<Msg>&, const MsgConstPtr&) {}
 
 TEST(Synchronizer, compileFunction2)
 {
@@ -204,10 +211,14 @@ struct MethodHelper
   void method2(const MsgConstPtr&, const MsgConstPtr&) {}
   void method3(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
   void method4(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-  void method5(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-  void method6(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-  void method7(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-  void method8(const MsgConstPtr&, MsgConstPtr, const MsgPtr&, MsgPtr, const Msg&, Msg, const message_filters::MessageEvent<Msg const>&, const message_filters::MessageEvent<Msg>&) {}
+  void method5(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&,
+    const MsgConstPtr&, const MsgConstPtr&) {}
+  void method6(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&,
+    const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
+  void method7(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&,
+    const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
+  void method8(const MsgConstPtr&, MsgConstPtr, const MsgPtr&, MsgPtr, const Msg&, Msg,
+    const message_filters::MessageEvent<Msg const>&, const message_filters::MessageEvent<Msg>&) {}
   // Can only do 8 here because the object instance counts as a parameter and bind only supports 9
 };
 

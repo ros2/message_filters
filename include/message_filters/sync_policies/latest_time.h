@@ -49,7 +49,7 @@ Synchronizer<latest_policy> sync_policies(latest_policy(), caminfo_sub, limage_s
 sync_policies.registerCallback(callback);
 \endverbatim
 
- * May also take an instance of a `rclcpp::Clock::SharedPtr` from `rclpp::Node::get_clock()` 
+ * May also take an instance of a `rclcpp::Clock::SharedPtr` from `rclpp::Node::get_clock()`
  * to use the node's time source (e.g. sim time) as in:
 \verbatim
 typedef LatestTime<sensor_msgs::CameraInfo, sensor_msgs::Image, sensor_msgs::Image> latest_policy;
@@ -108,7 +108,7 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   {
   }
 
-  LatestTime(rclcpp::Clock::SharedPtr clock)
+  explicit LatestTime(rclcpp::Clock::SharedPtr clock)
   : parent_(0),
     ros_clock_{clock}
   {
@@ -231,7 +231,7 @@ private:
     bool do_hz_init{true};
     bool do_error_init{true};
 
-    Rate(const rclcpp::Time & start)
+    explicit Rate(const rclcpp::Time & start)
       : Rate(start, DEFAULT_RATE_EMA_ALPHA, DEFAULT_ERROR_EMA_ALPHA, DEFAULT_MARGIN_FACTOR)
     {
     }
@@ -383,7 +383,7 @@ private:
   rclcpp::Clock::SharedPtr ros_clock_{nullptr};
 };
 
-}  // namespace sync
+}  // namespace sync_policies
 }  // namespace message_filters
 
-#endif // MESSAGE_FILTERS__SYNC_POLICIES__LATEST_TIME_H_
+#endif  // MESSAGE_FILTERS__SYNC_POLICIES__LATEST_TIME_H_

@@ -36,6 +36,7 @@
 #define MESSAGE_FILTERS__PASS_THROUGH_H_
 
 #include <vector>
+#include <memory>
 
 #include "message_filters/simple_filter.h"
 
@@ -56,7 +57,7 @@ public:
   }
 
   template<typename F>
-  PassThrough(F& f)
+  explicit PassThrough(F& f)
   {
     connectInput(f);
   }
@@ -65,7 +66,8 @@ public:
   void connectInput(F& f)
   {
     incoming_connection_.disconnect();
-    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(std::bind(&PassThrough::cb, this, std::placeholders::_1)));
+    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(
+      std::bind(&PassThrough::cb, this, std::placeholders::_1)));
   }
 
   void add(const MConstPtr& msg)

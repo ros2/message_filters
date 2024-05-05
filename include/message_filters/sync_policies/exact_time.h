@@ -36,6 +36,7 @@
 #define MESSAGE_FILTERS__SYNC_POLICIES__EXACT_TIME_H_
 
 #include <deque>
+#include <map>
 #include <string>
 #include <tuple>
 
@@ -52,8 +53,9 @@ namespace message_filters
 namespace sync_policies
 {
 
-template<typename M0, typename M1, typename M2 = NullType, typename M3 = NullType, typename M4 = NullType,
-         typename M5 = NullType, typename M6 = NullType, typename M7 = NullType, typename M8 = NullType>
+template<typename M0, typename M1, typename M2 = NullType, typename M3 = NullType,
+  typename M4 = NullType, typename M5 = NullType, typename M6 = NullType,
+  typename M7 = NullType, typename M8 = NullType>
 struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 {
   typedef Synchronizer<ExactTime> Sync;
@@ -73,7 +75,7 @@ struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   typedef typename Super::M8Event M8Event;
   typedef Events Tuple;
 
-  ExactTime(uint32_t queue_size)
+  explicit ExactTime(uint32_t queue_size)
   : parent_(0)
   , queue_size_(queue_size)
   {
@@ -108,7 +110,8 @@ struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 
     std::lock_guard<std::mutex> lock(mutex_);
 
-    Tuple& t = tuples_[mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(*evt.getMessage())];
+    Tuple& t = tuples_[mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(
+      *evt.getMessage())];
     std::get<i>(t) = evt;
 
     checkTuple(t);
@@ -144,7 +147,6 @@ struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   }
 
 private:
-
   // assumes mutex_ is already locked
   void checkTuple(Tuple& t)
   {
@@ -204,8 +206,7 @@ private:
                           std::get<3>(t), std::get<4>(t), std::get<5>(t),
                           std::get<6>(t), std::get<7>(t), std::get<8>(t));
         tuples_.erase(old);
-      }
-      else
+      } else
       {
         // the map is sorted by time, so we can ignore anything after this if this one's time is ok
         break;

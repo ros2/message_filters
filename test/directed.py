@@ -13,16 +13,19 @@
 #
 #    wide.registerCallback(boost::bind(&PersonDataRecorder::wideCB, this, _1, _2, _3, _4));
 
-import rclpy
 import random
 import unittest
 
+# import rclpy
+
 from builtin_interfaces.msg import Time as TimeMsg
-from message_filters import SimpleFilter, Subscriber, Cache, TimeSynchronizer
+from message_filters import SimpleFilter, TimeSynchronizer
+# from message_filters import Cache, Subscriber
 
 
 class MockHeader:
     pass
+
 
 class MockMessage:
     def __init__(self, stamp, data):
@@ -30,8 +33,10 @@ class MockMessage:
         self.header.stamp = TimeMsg(sec=stamp)
         self.data = data
 
+
 class MockFilter(SimpleFilter):
     pass
+
 
 class TestDirected(unittest.TestCase):
 
@@ -73,6 +78,7 @@ class TestDirected(unittest.TestCase):
             for msg in random.sample(seq1, N):
                 m1.signalMessage(msg)
             self.assertEqual(set(self.collector), set(zip(seq0, seq1)))
+
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()

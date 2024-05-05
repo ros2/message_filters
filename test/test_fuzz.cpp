@@ -84,7 +84,8 @@ static void fuzz_msg(MsgPtr msg)
 TEST(TimeSequencer, fuzz_sequencer)
 {
   rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("test_node");
-  message_filters::TimeSequencer<Msg> seq(rclcpp::Duration(0, 10000000), rclcpp::Duration(0, 1000000), 10, node);
+  message_filters::TimeSequencer<Msg> seq(rclcpp::Duration(0, 10000000),
+    rclcpp::Duration(0, 1000000), 10, node);
   Helper h;
   seq.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   rclcpp::Clock ros_clock;

@@ -64,8 +64,8 @@ struct TimeStamp<Msg>
     return m.header.stamp;
   }
 };
-}
-}
+}  // namespace message_traits
+}  // namespace message_filters
 
 class Helper
 {
@@ -85,7 +85,8 @@ public:
 TEST(TimeSequencer, simple)
 {
   rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("test_node");
-  message_filters::TimeSequencer<Msg> seq(rclcpp::Duration(0, 250000000), rclcpp::Duration(0, 10000000), 10, node);
+  message_filters::TimeSequencer<Msg> seq(rclcpp::Duration(0, 250000000),
+    rclcpp::Duration(0, 10000000), 10, node);
   Helper h;
   seq.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   MsgPtr msg(std::make_shared<Msg>());
@@ -106,8 +107,10 @@ TEST(TimeSequencer, simple)
 TEST(TimeSequencer, compilation)
 {
   rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("test_node");
-  message_filters::TimeSequencer<Msg> seq(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, node);
-  message_filters::TimeSequencer<Msg> seq2(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, node);
+  message_filters::TimeSequencer<Msg> seq(rclcpp::Duration(1, 0),
+    rclcpp::Duration(0, 10000000), 10, node);
+  message_filters::TimeSequencer<Msg> seq2(rclcpp::Duration(1, 0),
+    rclcpp::Duration(0, 10000000), 10, node);
   seq2.connectInput(seq);
 }
 
@@ -125,12 +128,15 @@ public:
 TEST(TimeSequencer, eventInEventOut)
 {
   rclcpp::Node::SharedPtr nh = std::make_shared<rclcpp::Node>("test_node");
-  message_filters::TimeSequencer<Msg> seq(rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, nh);
-  message_filters::TimeSequencer<Msg> seq2(seq, rclcpp::Duration(1, 0), rclcpp::Duration(0, 10000000), 10, nh);
+  message_filters::TimeSequencer<Msg> seq(rclcpp::Duration(1, 0),
+    rclcpp::Duration(0, 10000000), 10, nh);
+  message_filters::TimeSequencer<Msg> seq2(seq, rclcpp::Duration(1, 0),
+    rclcpp::Duration(0, 10000000), 10, nh);
   EventHelper h;
   seq2.registerCallback(&EventHelper::cb, &h);
 
-  message_filters::MessageEvent<Msg const> evt(std::make_shared<Msg const>(), rclcpp::Clock().now());
+  message_filters::MessageEvent<Msg const> evt(std::make_shared<Msg const>(),
+    rclcpp::Clock().now());
   seq.add(evt);
 
   while (!h.event_.getMessage()) {
