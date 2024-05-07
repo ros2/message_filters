@@ -69,8 +69,8 @@ struct TimeStamp<Msg>
     return m.header.stamp;
   }
 };
-}  // message_traits
-}  // message_filters
+}  // namespace message_traits
+}  // namespace message_filters
 
 typedef std::pair<rclcpp::Time, rclcpp::Time> TimePair;
 typedef std::pair<rclcpp::Time, unsigned int> TimeAndTopic;
@@ -94,7 +94,7 @@ class ApproximateTimeSynchronizerTest
 {
 public:
   ApproximateTimeSynchronizerTest(const std::vector<TimeAndTopic> & input,
-	  const std::vector<TimePair> & output,
+    const std::vector<TimePair> & output,
 	  uint32_t queue_size) :
     input_(input), output_(output), output_position_(0), sync_(queue_size)
   {
@@ -154,7 +154,8 @@ public:
       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
   }
 
-  void callback(const MsgConstPtr & p, const MsgConstPtr & q, const MsgConstPtr & r, const MsgConstPtr & s)
+  void callback(const MsgConstPtr & p, const MsgConstPtr & q, const MsgConstPtr & r,
+    const MsgConstPtr & s)
   {
     ASSERT_TRUE(p);
     ASSERT_TRUE(q);
@@ -407,8 +408,8 @@ TEST(ApproxTimeSync, DoublePublish) {
 
   input.push_back(TimeAndTopic(t, 0));     // a
   input.push_back(TimeAndTopic(t+s, 1));   // A
-  input.push_back(TimeAndTopic(t+rclcpp::Duration(3, 0), 1)); // B
-  input.push_back(TimeAndTopic(t+rclcpp::Duration(3, 0), 0)); // b
+  input.push_back(TimeAndTopic(t+rclcpp::Duration(3, 0), 1));  // B
+  input.push_back(TimeAndTopic(t+rclcpp::Duration(3, 0), 0));  // b
   output.push_back(TimePair(t, t+s));
   output.push_back(TimePair(t+rclcpp::Duration(3, 0), t+rclcpp::Duration(3, 0)));
 

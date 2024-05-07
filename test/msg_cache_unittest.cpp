@@ -117,16 +117,16 @@ TEST(Cache, easySurroundingInterval)
   EXPECT_EQ(interval_data[2]->data, 3);
   EXPECT_EQ(interval_data[3]->data, 4);
 
-  interval_data = cache.getSurroundingInterval(rclcpp::Time(0,0), rclcpp::Time(35,0));
+  interval_data = cache.getSurroundingInterval(rclcpp::Time(0, 0), rclcpp::Time(35, 0));
   ASSERT_EQ(interval_data.size(), (unsigned int) 4);
   EXPECT_EQ(interval_data[0]->data, 1);
 
-  interval_data = cache.getSurroundingInterval(rclcpp::Time(35,0), rclcpp::Time(35,0));
+  interval_data = cache.getSurroundingInterval(rclcpp::Time(35, 0), rclcpp::Time(35, 0));
   ASSERT_EQ(interval_data.size(), (unsigned int) 2);
   EXPECT_EQ(interval_data[0]->data, 3);
   EXPECT_EQ(interval_data[1]->data, 4);
 
-  interval_data = cache.getSurroundingInterval(rclcpp::Time(55,0), rclcpp::Time(55,0));
+  interval_data = cache.getSurroundingInterval(rclcpp::Time(55, 0), rclcpp::Time(55, 0));
   ASSERT_EQ(interval_data.size(), (unsigned int) 1);
   EXPECT_EQ(interval_data[0]->data, 5);
 }

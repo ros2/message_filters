@@ -147,7 +147,8 @@ TEST(Synchronizer, compile9)
 void function2(const MsgConstPtr&, const MsgConstPtr&) {}
 void function3(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
 void function4(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function5(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
+void function5(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&,
+  const MsgConstPtr&) {}
 void function6(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&,
   const MsgConstPtr&, const MsgConstPtr&) {}
 void function7(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&,

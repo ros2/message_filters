@@ -117,12 +117,12 @@ TEST(SimpleFilter, callbackTypes)
   f.registerCallback<const Msg&>(std::bind(&Helper::cb1, &h, std::placeholders::_1));
   f.registerCallback<MsgConstPtr>(std::bind(&Helper::cb2, &h, std::placeholders::_1));
   f.registerCallback<const message_filters::MessageEvent<Msg const>&>(std::bind(
-    &Helper::cb3, &h, std::placeholders::_1));
+      &Helper::cb3, &h, std::placeholders::_1));
   f.registerCallback<Msg>(std::bind(&Helper::cb4, &h, std::placeholders::_1));
   f.registerCallback<const MsgPtr&>(std::bind(&Helper::cb5, &h, std::placeholders::_1));
   f.registerCallback<MsgPtr>(std::bind(&Helper::cb6, &h, std::placeholders::_1));
   f.registerCallback<const message_filters::MessageEvent<Msg>&>(std::bind(
-    &Helper::cb7, &h, std::placeholders::_1));
+      &Helper::cb7, &h, std::placeholders::_1));
 
   f.add(Filter::EventType(std::make_shared<Msg>()));
   EXPECT_EQ(h.counts_[0], 1);

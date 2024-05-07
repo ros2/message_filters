@@ -32,10 +32,10 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+#include <gtest/gtest.h>
+
 #include <functional>
 #include <memory>
-
-#include <gtest/gtest.h>
 
 #include <rclcpp/rclcpp.hpp>
 #include "message_filters/synchronizer.h"

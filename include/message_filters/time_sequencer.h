@@ -35,11 +35,11 @@
 #ifndef MESSAGE_FILTERS__TIME_SEQUENCER_H_
 #define MESSAGE_FILTERS__TIME_SEQUENCER_H_
 
-#include <rclcpp/rclcpp.hpp>
-
 #include <memory>
 #include <set>
 #include <vector>
+
+#include <rclcpp/rclcpp.hpp>
 
 #include "message_filters/connection.h"
 #include "message_filters/message_traits.h"
@@ -204,8 +204,7 @@ private:
           last_time_ = stamp;
           to_call.push_back(e);
           messages_.erase(messages_.begin());
-        }  else
-        {
+        }  else {
           break;
         }
       }

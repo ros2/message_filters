@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Software License Agreement (BSD License)
 #
 # Copyright 2015 Martin Llofriu, Open Source Robotics Foundation, Inc.

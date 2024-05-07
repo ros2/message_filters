@@ -102,4 +102,3 @@ struct TimeStamp<M, typename std::enable_if<HasHeader<M>::value>::type >
 }  // namespace message_filters
 
 #endif  // MESSAGE_FILTERS__MESSAGE_TRAITS_H_
-

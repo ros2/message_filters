@@ -116,7 +116,7 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   typedef std::tuple<M0Vector, M1Vector, M2Vector, M3Vector, M4Vector, M5Vector, M6Vector,
           M7Vector, M8Vector> VectorTuple;
 
-  explicit ApproximateTime(uint32_t queue_size)
+  ApproximateTime(uint32_t queue_size)
   : parent_(0)
   , queue_size_(queue_size)
   , num_non_empty_deques_(0)
@@ -189,8 +189,7 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
       const typename std::tuple_element<i, Messages>::type &previous_msg = *(v.back()).getMessage();
       previous_msg_time =
         mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(previous_msg);
-    } else
-    {
+    } else {
       // There are at least 2 elements in the deque.
       // Check that the gap respects the bound if it was provided.
       const typename std::tuple_element<i, Messages>::type &previous_msg =
@@ -202,8 +201,7 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
     {
       RCUTILS_LOG_WARN_ONCE("Messages of type %d arrived out of order (will print only once)", i);
       warned_about_incorrect_bound_[i] = true;
-    } else if ((msg_time - previous_msg_time) < inter_message_lower_bounds_[i])
-    {
+    } else if ((msg_time - previous_msg_time) < inter_message_lower_bounds_[i]) {
       RCUTILS_LOG_WARN_ONCE("Messages of type %d arrived closer ("
         "%" PRId64 ") than the lower bound you provided ("
         "%" PRId64 ") (will print only once)",
@@ -230,8 +228,7 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
         // All deques have messages
         process();
       }
-    } else
-    {
+    } else {
       checkInterMessageBound<i>();
     }
     // Check whether we have more messages than allowed in the queue.
@@ -276,7 +273,7 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   void setInterMessageLowerBound(int i, rclcpp::Duration lower_bound) {
     // For correctness we only need lower_bound > -1.0,
     // but most likely a negative lower_bound is a mistake.
-    RCUTILS_ASSERT(lower_bound >= rclcpp::Duration(0,0));
+    RCUTILS_ASSERT(lower_bound >= rclcpp::Duration(0, 0));
     inter_message_lower_bounds_[i] = lower_bound;
   }
 
@@ -758,8 +755,7 @@ private:
         pivot_ = end_index;
         pivot_time_ = end_time;
         dequeMoveFrontToPast(start_index);
-      } else
-      {
+      } else {
         // We already have a candidate
         // Is this one better than the current candidate?
         // INVARIANT: has_dropped_messages_ is all false
@@ -767,8 +763,7 @@ private:
         {
           // This is not a better candidate, move to the next
           dequeMoveFrontToPast(start_index);
-        } else
-        {
+        } else {
           // This is a better candidate
           makeCandidate();
           candidate_start_ = start_time;
@@ -784,16 +779,15 @@ private:
       {
         // We have exhausted all possible candidates for this pivot, we now can output the best one
         publishCandidate();
-      }  else if ((end_time - candidate_end_) * (1 + age_penalty_) >= (pivot_time_ - candidate_start_))
-      {
+      }  else if ((end_time - candidate_end_) * (1 + age_penalty_) >=
+          (pivot_time_ - candidate_start_)) {
         // We have not exhausted all candidates, but this candidate is already provably optimal
         // Indeed, any future candidate must contain the interval [pivot_time_ end_time], which
         // is already too big.
         // Note: this case is subsumed by the next, but it may save some unnecessary work and
         //       it makes things (a little) easier to understand
         publishCandidate();
-      } else if (num_non_empty_deques_ < (uint32_t)RealTypeCount::value)
-      {
+      } else if (num_non_empty_deques_ < (uint32_t)RealTypeCount::value) {
         uint32_t num_non_empty_deques_before_virtual_search = num_non_empty_deques_;
 
         // Before giving up, use the rate bounds, if provided, to further try to prove optimality
@@ -818,8 +812,8 @@ private:
             // Indeed, we have a virtual (i.e. optimistic) candidate that is better than
             // the current candidate
             // Cleanup the virtual search:
-            num_non_empty_deques_ = 0; // We will recompute it from scratch
-	          recover<0>(num_virtual_moves[0]);
+            num_non_empty_deques_ = 0;  // We will recompute it from scratch
+            recover<0>(num_virtual_moves[0]);
             recover<1>(num_virtual_moves[1]);
             recover<2>(num_virtual_moves[2]);
             recover<3>(num_virtual_moves[3]);
@@ -833,13 +827,13 @@ private:
             break;
           }
 
-        // Note: we cannot reach this point with start_index == pivot_ since in that case
-        // we would have start_time == pivot_time, in which case  the two tests  above are
-        // the negation of each other, so that one must be true.
-        // Therefore the while loop always terminates.
+          // Note: we cannot reach this point with start_index == pivot_ since in that case
+          // we would have start_time == pivot_time, in which case  the two tests  above are
+          // the negation of each other, so that one must be true.
+          // Therefore the while loop always terminates.
 
-	RCUTILS_ASSERT(start_index != pivot_);
-	RCUTILS_ASSERT(start_time < pivot_time_);
+          RCUTILS_ASSERT(start_index != pivot_);
+          RCUTILS_ASSERT(start_time < pivot_time_);
           dequeMoveFrontToPast(start_index);
           num_virtual_moves[start_index]++;
         }  // while(1)
@@ -871,7 +865,7 @@ private:
   std::vector<bool> warned_about_incorrect_bound_;
 };
 
-}  // namespace sync
+}  // namespace sync_policies
 }  // namespace message_filters
 
 #endif  // MESSAGE_FILTERS__SYNC_POLICIES__APPROXIMATE_TIME_H_

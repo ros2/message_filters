@@ -249,7 +249,7 @@ public:
 
     MConstPtr out;
 
-    unsigned int i= 0;
+    unsigned int i = 0;
     int elem_index = -1;
     while (i<cache_.size() && mt::TimeStamp<M>::value(*cache_[i].getMessage()) < time)
     {
@@ -278,7 +278,7 @@ public:
 
     int i = static_cast<int>(cache_.size()) - 1;
     int elem_index = -1;
-    while (i>=0 && mt::TimeStamp<M>::value(*cache_[i].getMessage()) > time)
+    while (i >= 0 && mt::TimeStamp<M>::value(*cache_[i].getMessage()) > time)
     {
       elem_index = i;
       i--;

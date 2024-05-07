@@ -50,7 +50,7 @@
 namespace message_filters
 {
 typedef std::map<std::string, std::string> M_string;
-typedef std::shared_ptr<M_string>	M_stringPtr;
+typedef std::shared_ptr<M_string> M_stringPtr;
 
 template<typename M>
 struct DefaultMessageCreator
@@ -118,7 +118,7 @@ public:
   /**
    * \todo Make this explicit in ROS 2.0.  Keep as auto-converting for now to maintain backwards compatibility in some places (message_filters)
    */
-  explicit MessageEvent(const ConstMessagePtr& message)
+  MessageEvent(const ConstMessagePtr& message)
   {
     init(message, rclcpp::Clock().now(), true, message_filters::DefaultMessageCreator<Message>());
   }

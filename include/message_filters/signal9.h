@@ -107,11 +107,12 @@ private:
   typedef typename A8::Event M8Event;
 
 public:
-  typedef std::function<void(typename A0::Parameter, typename A1::Parameter, typename A2::Parameter,
-                               typename A3::Parameter, typename A4::Parameter, typename A5::Parameter,
-                               typename A6::Parameter, typename A7::Parameter, typename A8::Parameter)> Callback;
+  typedef std::function<void(typename A0::Parameter, typename A1::Parameter,
+    typename A2::Parameter, typename A3::Parameter, typename A4::Parameter,
+    typename A5::Parameter, typename A6::Parameter, typename A7::Parameter,
+    typename A8::Parameter)> Callback;
 
-  CallbackHelper9T(const Callback& cb)
+  explicit CallbackHelper9T(const Callback& cb)
   : callback_(cb)
   {
   }
@@ -220,7 +221,8 @@ public:
   Connection addCallback(void(*callback)(P0, P1, P2, P3, P4, P5))
   {
     return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, NullP, NullP, NullP)>(
-      std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,      std::placeholders::_4, std::placeholders::_5, std::placeholders::_6)));
+      std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5, std::placeholders::_6)));
   }
 
   template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5,

@@ -47,8 +47,6 @@
 
 #include "rosgraph_msgs/msg/clock.hpp"
 
-using namespace std::chrono;
-
 struct Header
 {
   rclcpp::Time stamp;
@@ -104,7 +102,7 @@ protected:
     rclcpp::init(0, nullptr);
     node = std::make_shared<rclcpp::Node>("clock_sleep_node");
     param_client = std::make_shared<rclcpp::SyncParametersClient>(node);
-    ASSERT_TRUE(param_client->wait_for_service(5s));
+    ASSERT_TRUE(param_client->wait_for_service(std::chrono::seconds(5)));
 
     sync.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1,
                                                      std::placeholders::_2,
@@ -252,7 +250,7 @@ TEST_F(LatestTimePolicy, ChangeRateLeading)
     msg.clock = rclcpp::Time(new_time);
     clock_publisher->publish(msg);
     while (rclcpp::ok() && clock->now() < new_time) {
-      executor.spin_once(10ms);
+      executor.spin_once(std::chrono::milliseconds(10));
     }
   }
 }
@@ -328,7 +326,7 @@ TEST_F(LatestTimePolicy, ChangeRateTrailing)
     msg.clock = rclcpp::Time(new_time);
     clock_publisher->publish(msg);
     while (rclcpp::ok() && clock->now() < new_time) {
-      executor.spin_once(10ms);
+      executor.spin_once(std::chrono::milliseconds(10));
     }
   }
 }

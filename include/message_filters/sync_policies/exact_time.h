@@ -75,7 +75,7 @@ struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   typedef typename Super::M8Event M8Event;
   typedef Events Tuple;
 
-  explicit ExactTime(uint32_t queue_size)
+  ExactTime(uint32_t queue_size)
   : parent_(0)
   , queue_size_(queue_size)
   {
@@ -206,8 +206,7 @@ private:
                           std::get<3>(t), std::get<4>(t), std::get<5>(t),
                           std::get<6>(t), std::get<7>(t), std::get<8>(t));
         tuples_.erase(old);
-      } else
-      {
+      } else {
         // the map is sorted by time, so we can ignore anything after this if this one's time is ok
         break;
       }
