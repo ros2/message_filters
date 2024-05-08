@@ -94,8 +94,7 @@ class ApproximateTimeSynchronizerTest
 {
 public:
   ApproximateTimeSynchronizerTest(const std::vector<TimeAndTopic> & input,
-    const std::vector<TimePair> & output,
-	  uint32_t queue_size) :
+    const std::vector<TimePair> & output, uint32_t queue_size) :
     input_(input), output_(output), output_position_(0), sync_(queue_size)
   {
     sync_.registerCallback(std::bind(&ApproximateTimeSynchronizerTest::callback,
@@ -146,8 +145,7 @@ class ApproximateTimeSynchronizerTestQuad
 {
 public:
   ApproximateTimeSynchronizerTestQuad(const std::vector<TimeAndTopic> & input,
-	  const std::vector<TimeQuad> & output,
-	  uint32_t queue_size) :
+    const std::vector<TimeQuad> & output, uint32_t queue_size) :
     input_(input), output_(output), output_position_(0), sync_(queue_size)
   {
     sync_.registerCallback(std::bind(&ApproximateTimeSynchronizerTestQuad::callback, this,

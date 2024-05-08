@@ -32,12 +32,12 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import message_filters
-from message_filters import ApproximateTimeSynchronizer
-
 import random
 
 import unittest
+
+import message_filters
+from message_filters import ApproximateTimeSynchronizer
 
 # import rclpy
 from rclpy.clock import ROSClock

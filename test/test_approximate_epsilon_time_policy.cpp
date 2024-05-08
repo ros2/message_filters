@@ -93,8 +93,7 @@ class ApproximateEpsilonTimeSynchronizerTest
 {
 public:
   ApproximateEpsilonTimeSynchronizerTest(const std::vector<TimeAndTopic> &input,
-    const std::vector<TimePair> &output,
-	  uint32_t queue_size, rclcpp::Duration epsilon) :
+    const std::vector<TimePair> &output, uint32_t queue_size, rclcpp::Duration epsilon) :
     input_(input), output_(output), output_position_(0), sync_(
       message_filters::sync_policies::ApproximateEpsilonTime<Msg, Msg>{queue_size, epsilon})
   {
