@@ -26,10 +26,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-"""
-Message Filter Objects
-======================
-"""
+"""Message Filter Objects."""
 
 from functools import reduce
 import itertools
@@ -50,12 +47,12 @@ class SimpleFilter(object):
 
     def registerCallback(self, cb, *args):
         """
-        Register a callback function `cb` to be called when this filter
-        has output.
+        Register a callback `cb` to be called when this filter has output.
+
         The filter calls the function ``cb`` with a filter-dependent.
+
         list of arguments,followed by the call-supplied arguments ``args.``.
         """
-
         conn = len(self.callbacks)
         self.callbacks[conn] = (cb, args)
         return conn
@@ -125,12 +122,12 @@ class Cache(SimpleFilter):
             if not self.allow_headerless:
                 msg_filters_logger = rclpy.logging.get_logger('message_filters_cache')
                 msg_filters_logger.set_level(LoggingSeverity.INFO)
-                msg_filters_logger.warn("can not use message filters messages "
-                                        "without timestamp infomation when "
-                                        "'allow_headerless' is disabled. "
-                                        "auto assign ROSTIME to headerless "
-                                        "messages once enabling constructor "
-                                        "option of 'allow_headerless'.")
+                msg_filters_logger.warn('can not use message filters messages '
+                                        'without timestamp infomation when '
+                                        '"allow_headerless" is disabled. '
+                                        'auto assign ROSTIME to headerless '
+                                        'messages once enabling constructor '
+                                        'option of "allow_headerless".')
 
                 return
 
@@ -264,12 +261,12 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
             if not self.allow_headerless:
                 msg_filters_logger = rclpy.logging.get_logger('message_filters_approx')
                 msg_filters_logger.set_level(LoggingSeverity.INFO)
-                msg_filters_logger.warn("can not use message filters messages "
-                                        "without timestamp infomation when "
-                                        "'allow_headerless' is disabled. "
-                                        "auto assign ROSTIME to headerless "
-                                        "messages once enabling constructor "
-                                        "option of 'allow_headerless'.")
+                msg_filters_logger.warn('can not use message filters messages '
+                                        'without timestamp infomation when '
+                                        '"allow_headerless" is disabled. '
+                                        'auto assign ROSTIME to headerless '
+                                        'messages once enabling constructor '
+                                        'option of "allow_headerless".')
                 return
 
             stamp = ROSClock().now()
