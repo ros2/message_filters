@@ -1,49 +1,47 @@
-#!/usr/bin/env python3
-#
-# Software License Agreement (BSD License)
-#
-# Copyright (c) 2009, Willow Garage, Inc.
-# All rights reserved.
+# Copyright 2009, Willow Garage, Inc. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
+# modification, are permitted provided that the following conditions are met:
 #
-#  * Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#  * Redistributions in binary form must reproduce the above
-#    copyright notice, this list of conditions and the following
-#    disclaimer in the documentation and/or other materials provided
-#    with the distribution.
-#  * Neither the name of the Willow Garage nor the names of its
-#    contributors may be used to endorse or promote products derived
-#    from this software without specific prior written permission.
+#    * Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#    * Redistributions in binary form must reproduce the above copyright
+#      notice, this list of conditions and the following disclaimer in the
+#      documentation and/or other materials provided with the distribution.
+#
+#    * Neither the name of the Willow Garage nor the names of its
+#      contributors may be used to endorse or promote products derived from
+#      this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+
+import random
+
+import unittest
 
 import message_filters
 from message_filters import ApproximateTimeSynchronizer
 
-import random
-import rclpy
+# import rclpy
 from rclpy.clock import ROSClock
 from rclpy.duration import Duration
 from rclpy.time import Time
-import unittest
+
 
 class MockHeader:
     pass
+
 
 class MockMessage:
     def __init__(self, stamp, data):
@@ -51,12 +49,15 @@ class MockMessage:
         self.header.stamp = stamp
         self.data = data
 
+
 class MockHeaderlessMessage:
     def __init__(self, data):
         self.data = data
 
+
 class MockFilter(message_filters.SimpleFilter):
     pass
+
 
 class TestApproxSync(unittest.TestCase):
 
@@ -86,9 +87,9 @@ class TestApproxSync(unittest.TestCase):
         for N in range(1, 10):
             m0 = MockFilter()
             m1 = MockFilter()
-            seq0 = [MockMessage(Time(seconds=t), random.random())\
+            seq0 = [MockMessage(Time(seconds=t), random.random())
                     for t in range(N)]
-            seq1 = [MockMessage(Time(seconds=t), random.random())\
+            seq1 = [MockMessage(Time(seconds=t), random.random())
                     for t in range(N)]
             # random.shuffle(seq0)
             ts = ApproximateTimeSynchronizer([m0, m1], N, 0.1)
@@ -123,6 +124,7 @@ class TestApproxSync(unittest.TestCase):
                 msg = seq1[i]
                 m1.signalMessage(msg)
             self.assertEqual(set(self.collector), set(zip(seq0, seq1)))
+
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()

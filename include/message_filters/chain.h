@@ -1,41 +1,36 @@
-/*********************************************************************
-* Software License Agreement (BSD License)
-*
-*  Copyright (c) 2010, Willow Garage, Inc.
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*   * Redistributions in binary form must reproduce the above
-*     copyright notice, this list of conditions and the following
-*     disclaimer in the documentation and/or other materials provided
-*     with the distribution.
-*   * Neither the name of the Willow Garage nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************/
+// Copyright 2010, Willow Garage, Inc. All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the Willow Garage nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MESSAGE_FILTERS__CHAIN_H
-#define MESSAGE_FILTERS__CHAIN_H
+#ifndef MESSAGE_FILTERS__CHAIN_H_
+#define MESSAGE_FILTERS__CHAIN_H_
 
 #include <vector>
+#include <memory>
 
 #include "message_filters/simple_filter.h"
 #include "message_filters/pass_through.h"
@@ -124,7 +119,7 @@ public:
    * \brief Constructor with filter.  Calls connectInput(f)
    */
   template<typename F>
-  Chain(F& f)
+  explicit Chain(F& f)
   {
     connectInput(f);
   }
@@ -153,13 +148,15 @@ public:
   size_t addFilter(const std::shared_ptr<F>& filter)
   {
     FilterInfo info;
-    info.add_func = std::bind((void(F::*)(const EventType&))&F::add, filter.get(), std::placeholders::_1);
+    info.add_func = std::bind(
+      (void(F::*)(const EventType&))&F::add, filter.get(), std::placeholders::_1);
     info.filter = filter;
     info.passthrough = std::make_shared<PassThrough<M> >();
 
     last_filter_connection_.disconnect();
     info.passthrough->connectInput(*filter);
-    last_filter_connection_ = info.passthrough->registerCallback(typename SimpleFilter<M>::EventCallback(std::bind(&Chain::lastFilterCB, this, std::placeholders::_1)));
+    last_filter_connection_ = info.passthrough->registerCallback(typename SimpleFilter<M>::
+      EventCallback(std::bind(&Chain::lastFilterCB, this, std::placeholders::_1)));
     if (!filters_.empty())
     {
       filter->connectInput(*filters_.back().passthrough);
@@ -195,7 +192,8 @@ public:
   void connectInput(F& f)
   {
     incoming_connection_.disconnect();
-    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(std::bind(&Chain::incomingCB, this, std::placeholders::_1)));
+    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(
+      std::bind(&Chain::incomingCB, this, std::placeholders::_1)));
   }
 
   /**
@@ -240,7 +238,7 @@ private:
   {
     std::function<void(const EventType&)> add_func;
     std::shared_ptr<void> filter;
-    std::shared_ptr<PassThrough<M> > passthrough;
+    std::shared_ptr<PassThrough<M>> passthrough;
   };
   typedef std::vector<FilterInfo> V_FilterInfo;
 

@@ -1,39 +1,33 @@
-/*********************************************************************
-* Software License Agreement (BSD License)
-*
-*  Copyright (c) 2009, Willow Garage, Inc.
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*   * Redistributions in binary form must reproduce the above
-*     copyright notice, this list of conditions and the following
-*     disclaimer in the documentation and/or other materials provided
-*     with the distribution.
-*   * Neither the name of the Willow Garage nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************/
+// Copyright 2009, Willow Garage, Inc. All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the Willow Garage nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MESSAGE_FILTERS_TIME_SYNCHRONIZER_H
-#define MESSAGE_FILTERS_TIME_SYNCHRONIZER_H
+#ifndef MESSAGE_FILTERS__TIME_SYNCHRONIZER_H_
+#define MESSAGE_FILTERS__TIME_SYNCHRONIZER_H_
 
 #include <memory>
 
@@ -79,8 +73,9 @@ void callback(const sensor_msgs::msg::CameraInfo::SharedPtr, const sensor_msgs::
  *
  */
 template<class M0, class M1, class M2 = NullType, class M3 = NullType, class M4 = NullType,
-         class M5 = NullType, class M6 = NullType, class M7 = NullType, class M8 = NullType>
-class TimeSynchronizer : public Synchronizer<sync_policies::ExactTime<M0, M1, M2, M3, M4, M5, M6, M7, M8> >
+  class M5 = NullType, class M6 = NullType, class M7 = NullType, class M8 = NullType>
+class TimeSynchronizer : public Synchronizer<sync_policies::ExactTime<
+                          M0, M1, M2, M3, M4, M5, M6, M7, M8> >
 {
 public:
   typedef sync_policies::ExactTime<M0, M1, M2, M3, M4, M5, M6, M7, M8> Policy;
@@ -154,20 +149,22 @@ public:
   }
 
   template<class F0, class F1, class F2, class F3, class F4, class F5, class F6, class F7>
-  TimeSynchronizer(F0& f0, F1& f1, F2& f2, F3& f3, F4& f4, F5& f5, F6& f6, F7& f7, uint32_t queue_size)
+  TimeSynchronizer(F0& f0, F1& f1, F2& f2, F3& f3, F4& f4, F5& f5, F6& f6, F7& f7,
+    uint32_t queue_size)
   : Base(Policy(queue_size))
   {
     connectInput(f0, f1, f2, f3, f4, f5, f6, f7);
   }
 
   template<class F0, class F1, class F2, class F3, class F4, class F5, class F6, class F7, class F8>
-  TimeSynchronizer(F0& f0, F1& f1, F2& f2, F3& f3, F4& f4, F5& f5, F6& f6, F7& f7, F8& f8, uint32_t queue_size)
+  TimeSynchronizer(F0& f0, F1& f1, F2& f2, F3& f3, F4& f4, F5& f5, F6& f6, F7& f7, F8& f8,
+    uint32_t queue_size)
   : Base(Policy(queue_size))
   {
     connectInput(f0, f1, f2, f3, f4, f5, f6, f7, f8);
   }
 
-  TimeSynchronizer(uint32_t queue_size)
+  explicit TimeSynchronizer(uint32_t queue_size)
   : Base(Policy(queue_size))
   {
   }
@@ -223,4 +220,4 @@ public:
 
 }  // namespace message_filters
 
-#endif  // MESSAGE_FILTERS_TIME_SYNCHRONIZER_H
+#endif  // MESSAGE_FILTERS__TIME_SYNCHRONIZER_H_

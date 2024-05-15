@@ -1,36 +1,30 @@
-/*********************************************************************
-* Software License Agreement (BSD License)
-*
-*  Copyright (c) 2008, Willow Garage, Inc.
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*   * Redistributions in binary form must reproduce the above
-*     copyright notice, this list of conditions and the following
-*     disclaimer in the documentation and/or other materials provided
-*     with the distribution.
-*   * Neither the name of the Willow Garage nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************/
+// Copyright 2008, Willow Garage, Inc. All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the Willow Garage nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef MESSAGE_FILTERS__CACHE_H_
 #define MESSAGE_FILTERS__CACHE_H_
@@ -38,6 +32,7 @@
 #include <deque>
 #include <memory>
 #include <functional>
+#include <vector>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -70,10 +65,10 @@ public:
   typedef MessageEvent<M const> EventType;
 
   template<class F>
-  Cache(F& f, unsigned int cache_size = 1)
+  explicit Cache(F& f, unsigned int cache_size = 1)
   {
-    setCacheSize(cache_size) ;
-    connectInput(f) ;
+    setCacheSize(cache_size);
+    connectInput(f);
   }
 
   /**
@@ -81,7 +76,7 @@ public:
    * order to populate the cache, the user then has to call add themselves, or connectInput() is
    * called later
    */
-  Cache(unsigned int cache_size = 1)
+  explicit Cache(unsigned int cache_size = 1)
   {
     setCacheSize(cache_size);
   }
@@ -106,11 +101,11 @@ public:
   {
     if (cache_size == 0)
     {
-      //ROS_ERROR("Cannot set max_size to 0") ;
-      return ;
+      // ROS_ERROR("Cannot set max_size to 0");
+      return;
     }
 
-    cache_size_ = cache_size ;
+    cache_size_ = cache_size;
   }
 
   /**
@@ -130,27 +125,29 @@ public:
   {
     namespace mt = message_filters::message_traits;
 
-    //printf("  Cache Size: %u\n", cache_.size()) ;
+    // printf("  Cache Size: %u\n", cache_.size());
     {
       std::lock_guard<std::mutex> lock(cache_lock_);
 
-      while (cache_.size() >= cache_size_)                       // Keep popping off old data until we have space for a new msg
-        cache_.pop_front() ;                                     // The front of the deque has the oldest elem, so we can get rid of it
+      // Keep popping off old data until we have space for a new msg
+      // The front of the deque has the oldest elem, so we can get rid of it
+      while (cache_.size() >= cache_size_)
+        cache_.pop_front();
 
       // No longer naively pushing msgs to back. Want to make sure they're sorted correctly
-      //cache_.push_back(msg) ;                                    // Add the newest message to the back of the deque
+      // cache_.push_back(msg);
+      // Add the newest message to the back of the deque
 
       typename std::deque<EventType >::reverse_iterator rev_it = cache_.rbegin();
 
       // Keep walking backwards along deque until we hit the beginning,
-      //   or until we find a timestamp that's smaller than (or equal to) msg's timestamp
+      // or until we find a timestamp that's smaller than (or equal to) msg's timestamp
       rclcpp::Time evt_stamp = mt::TimeStamp<M>::value(*evt.getMessage());
       while(rev_it != cache_.rend() && mt::TimeStamp<M>::value(*(*rev_it).getMessage()) > evt_stamp)
         rev_it++;
 
       // Add msg to the cache
       cache_.insert(rev_it.base(), evt);
-
     }
 
     this->signalMessage(evt);
@@ -170,29 +167,29 @@ public:
     std::lock_guard<std::mutex> lock(cache_lock_);
 
     // Find the starting index. (Find the first index after [or at] the start of the interval)
-    size_t start_index = 0 ;
+    size_t start_index = 0;
     while(start_index < cache_.size() &&
           mt::TimeStamp<M>::value(*cache_[start_index].getMessage()) < start)
     {
-      start_index++ ;
+      start_index++;
     }
 
     // Find the ending index. (Find the first index after the end of interval)
-    size_t end_index = start_index ;
+    size_t end_index = start_index;
     while(end_index < cache_.size() &&
           mt::TimeStamp<M>::value(*cache_[end_index].getMessage()) <= end)
     {
-      end_index++ ;
+      end_index++;
     }
 
-    std::vector<MConstPtr> interval_elems ;
-    interval_elems.reserve(end_index - start_index) ;
-    for (size_t i=start_index; i<end_index; i++)
+    std::vector<MConstPtr> interval_elems;
+    interval_elems.reserve(end_index - start_index);
+    for (size_t i = start_index; i < end_index; i++)
     {
-      interval_elems.push_back(cache_[i].getMessage()) ;
+      interval_elems.push_back(cache_[i].getMessage());
     }
 
-    return interval_elems ;
+    return interval_elems;
   }
 
 
@@ -202,7 +199,8 @@ public:
    * If the messages in the cache do not surround (start,end), then this will return the interval
    * that gets closest to surrounding (start,end)
    */
-  std::vector<MConstPtr> getSurroundingInterval(const rclcpp::Time& start, const rclcpp::Time& end) const
+  std::vector<MConstPtr> getSurroundingInterval(
+    const rclcpp::Time& start, const rclcpp::Time& end) const
   {
     namespace mt = message_filters::message_traits;
 
@@ -223,10 +221,10 @@ public:
     }
 
     std::vector<MConstPtr> interval_elems;
-    interval_elems.reserve(end_index - start_index + 1) ;
-    for (int i=start_index; i<=end_index; i++)
+    interval_elems.reserve(end_index - start_index + 1);
+    for (int i = start_index; i <= end_index; i++)
     {
-      interval_elems.push_back(cache_[i].getMessage()) ;
+      interval_elems.push_back(cache_[i].getMessage());
     }
 
     return interval_elems;
@@ -243,21 +241,20 @@ public:
 
     std::lock_guard<std::mutex> lock(cache_lock_);
 
-    MConstPtr out ;
+    MConstPtr out;
 
-    unsigned int i=0 ;
-    int elem_index = -1 ;
-    while (i<cache_.size() &&
-           mt::TimeStamp<M>::value(*cache_[i].getMessage()) < time)
+    unsigned int i = 0;
+    int elem_index = -1;
+    while (i<cache_.size() && mt::TimeStamp<M>::value(*cache_[i].getMessage()) < time)
     {
-      elem_index = i ;
-      i++ ;
+      elem_index = i;
+      i++;
     }
 
     if (elem_index >= 0)
-      out = cache_[elem_index].getMessage() ;
+      out = cache_[elem_index].getMessage();
 
-    return out ;
+    return out;
   }
 
   /**
@@ -271,23 +268,22 @@ public:
 
     std::lock_guard<std::mutex> lock(cache_lock_);
 
-    MConstPtr out ;
+    MConstPtr out;
 
-    int i = static_cast<int>(cache_.size()) - 1 ;
-    int elem_index = -1 ;
-    while (i>=0 &&
-        mt::TimeStamp<M>::value(*cache_[i].getMessage()) > time)
+    int i = static_cast<int>(cache_.size()) - 1;
+    int elem_index = -1;
+    while (i >= 0 && mt::TimeStamp<M>::value(*cache_[i].getMessage()) > time)
     {
-      elem_index = i ;
-      i-- ;
+      elem_index = i;
+      i--;
     }
 
     if (elem_index >= 0)
-      out = cache_[elem_index].getMessage() ;
+      out = cache_[elem_index].getMessage();
     else
-      out.reset() ;
+      out.reset();
 
-    return out ;
+    return out;
   }
 
   /**
@@ -304,7 +300,7 @@ public:
     if (cache_.size() > 0)
       latest_time = mt::TimeStamp<M>::value(*cache_.back().getMessage());
 
-    return latest_time ;
+    return latest_time;
   }
 
   /**
@@ -321,7 +317,7 @@ public:
     if (cache_.size() > 0)
       oldest_time = mt::TimeStamp<M>::value(*cache_.front().getMessage());
 
-    return oldest_time ;
+    return oldest_time;
   }
 
 
@@ -331,12 +327,12 @@ private:
     add(evt);
   }
 
-  mutable std::mutex cache_lock_ ;            //!< Lock for cache_
-  std::deque<EventType> cache_ ;        //!< Cache for the messages
-  unsigned int cache_size_ ;            //!< Maximum number of elements allowed in the cache.
+  mutable std::mutex cache_lock_;      //!< Lock for cache_
+  std::deque<EventType> cache_;        //!< Cache for the messages
+  unsigned int cache_size_;            //!< Maximum number of elements allowed in the cache.
 
   Connection incoming_connection_;
 };
-}  // namespace message_filters;
+}  // namespace message_filters
 
 #endif  // MESSAGE_FILTERS__CACHE_H_

@@ -1,36 +1,30 @@
-/*********************************************************************
-* Software License Agreement (BSD License)
-*
-*  Copyright (c) 2010, Willow Garage, Inc.
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*   * Redistributions in binary form must reproduce the above
-*     copyright notice, this list of conditions and the following
-*     disclaimer in the documentation and/or other materials provided
-*     with the distribution.
-*   * Neither the name of the Willow Garage nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************/
+// Copyright 2010, Willow Garage, Inc. All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the Willow Garage nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef MESSAGE_FILTERS__SIGNAL9_H_
 #define MESSAGE_FILTERS__SIGNAL9_H_
@@ -38,6 +32,8 @@
 
 #include <functional>
 #include <mutex>
+#include <memory>
+#include <vector>
 
 #include "message_filters/connection.h"
 #include "message_filters/null_types.h"
@@ -47,7 +43,8 @@
 namespace message_filters
 {
 
-template<typename M0, typename M1, typename M2, typename M3, typename M4, typename M5, typename M6, typename M7, typename M8>
+template<typename M0, typename M1, typename M2, typename M3, typename M4, typename M5,
+  typename M6, typename M7, typename M8>
 class CallbackHelper9
 {
 public:
@@ -63,13 +60,15 @@ public:
 
   virtual ~CallbackHelper9() {}
 
-  virtual void call(bool nonconst_force_copy, const M0Event& e0, const M1Event& e1, const M2Event& e2, const M3Event& e3,
-                    const M4Event& e4, const M5Event& e5, const M6Event& e6, const M7Event& e7, const M8Event& e8) = 0;
+  virtual void call(bool nonconst_force_copy, const M0Event& e0, const M1Event& e1,
+    const M2Event& e2, const M3Event& e3, const M4Event& e4, const M5Event& e5,
+    const M6Event& e6, const M7Event& e7, const M8Event& e8) = 0;
 
   typedef std::shared_ptr<CallbackHelper9> Ptr;
 };
 
-template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7, typename P8>
+template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5,
+  typename P6, typename P7, typename P8>
 class CallbackHelper9T :
   public CallbackHelper9<typename ParameterAdapter<P0>::Message,
                          typename ParameterAdapter<P1>::Message,
@@ -102,17 +101,19 @@ private:
   typedef typename A8::Event M8Event;
 
 public:
-  typedef std::function<void(typename A0::Parameter, typename A1::Parameter, typename A2::Parameter,
-                               typename A3::Parameter, typename A4::Parameter, typename A5::Parameter,
-                               typename A6::Parameter, typename A7::Parameter, typename A8::Parameter)> Callback;
+  typedef std::function<void(typename A0::Parameter, typename A1::Parameter,
+    typename A2::Parameter, typename A3::Parameter, typename A4::Parameter,
+    typename A5::Parameter, typename A6::Parameter, typename A7::Parameter,
+    typename A8::Parameter)> Callback;
 
-  CallbackHelper9T(const Callback& cb)
+  explicit CallbackHelper9T(const Callback& cb)
   : callback_(cb)
   {
   }
 
-  virtual void call(bool nonconst_force_copy, const M0Event& e0, const M1Event& e1, const M2Event& e2, const M3Event& e3,
-                    const M4Event& e4, const M5Event& e5, const M6Event& e6, const M7Event& e7, const M8Event& e8)
+  virtual void call(bool nonconst_force_copy, const M0Event& e0, const M1Event& e1,
+    const M2Event& e2, const M3Event& e3, const M4Event& e4, const M5Event& e5,
+    const M6Event& e6, const M7Event& e7, const M8Event& e8)
   {
     M0Event my_e0(e0, nonconst_force_copy || e0.nonConstWillCopy());
     M1Event my_e1(e1, nonconst_force_copy || e0.nonConstWillCopy());
@@ -138,10 +139,11 @@ private:
   Callback callback_;
 };
 
-template<typename M0, typename M1, typename M2, typename M3, typename M4, typename M5, typename M6, typename M7, typename M8>
+template<typename M0, typename M1, typename M2, typename M3, typename M4, typename M5,
+  typename M6, typename M7, typename M8>
 class Signal9
 {
-  typedef std::shared_ptr<CallbackHelper9<M0, M1, M2, M3, M4, M5, M6, M7, M8> > CallbackHelper9Ptr;
+  typedef std::shared_ptr<CallbackHelper9<M0, M1, M2, M3, M4, M5, M6, M7, M8>> CallbackHelper9Ptr;
   typedef std::vector<CallbackHelper9Ptr> V_CallbackHelper9;
 
 public:
@@ -166,10 +168,12 @@ public:
   typedef const std::shared_ptr<NullType const>& NullP;
 
 
-  template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7, typename P8>
+  template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5,
+    typename P6, typename P7, typename P8>
   Connection addCallback(const std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, P8)>& callback)
   {
-    CallbackHelper9T<P0, P1, P2, P3, P4, P5, P6, P7, P8>* helper = new CallbackHelper9T<P0, P1, P2, P3, P4, P5, P6, P7, P8>(callback);
+    CallbackHelper9T<P0, P1, P2, P3, P4, P5, P6, P7, P8>* helper =
+      new CallbackHelper9T<P0, P1, P2, P3, P4, P5, P6, P7, P8>(callback);
 
     std::lock_guard<std::mutex> lock(mutex_);
     callbacks_.push_back(CallbackHelper9Ptr(helper));
@@ -179,91 +183,131 @@ public:
   template<typename P0, typename P1>
   Connection addCallback(void(*callback)(P0, P1))
   {
-    return addCallback(std::function<void(P0, P1, NullP, NullP, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2)));
+    return addCallback(std::function<void(P0, P1, NullP, NullP, NullP, NullP, NullP, NullP,
+      NullP)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2)));
   }
 
   template<typename P0, typename P1, typename P2>
   Connection addCallback(void(*callback)(P0, P1, P2))
   {
-    return addCallback(std::function<void(P0, P1, P2, NullP, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+    return addCallback(std::function<void(P0, P1, P2, NullP, NullP, NullP, NullP, NullP,
+      NullP)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2,
+              std::placeholders::_3)));
   }
 
   template<typename P0, typename P1, typename P2, typename P3>
   Connection addCallback(void(*callback)(P0, P1, P2, P3))
   {
-    return addCallback(std::function<void(P0, P1, P2, P3, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+    return addCallback(std::function<void(P0, P1, P2, P3, NullP, NullP, NullP, NullP, NullP)>(
+      std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4)));
   }
 
   template<typename P0, typename P1, typename P2, typename P3, typename P4>
   Connection addCallback(void(*callback)(P0, P1, P2, P3, P4))
   {
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, NullP, NullP, NullP, NullP)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, NullP, NullP, NullP, NullP)>(
+      std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5)));
   }
 
   template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5>
   Connection addCallback(void(*callback)(P0, P1, P2, P3, P4, P5))
   {
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, NullP, NullP, NullP)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, NullP, NullP, NullP)>(
+      std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5, std::placeholders::_6)));
   }
 
-  template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6>
+  template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5,
+    typename P6>
   Connection addCallback(void(*callback)(P0, P1, P2, P3, P4, P5, P6))
   {
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, NullP, NullP)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, NullP, NullP)>(
+      std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5, std::placeholders::_6,
+      std::placeholders::_7)));
   }
 
-  template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7>
+  template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5,
+    typename P6, typename P7>
   Connection addCallback(void(*callback)(P0, P1, P2, P3, P4, P5, P6, P7))
   {
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, NullP)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7, std::placeholders::_8)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, NullP)>(std::bind(
+      callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5, std::placeholders::_6,
+      std::placeholders::_7, std::placeholders::_8)));
   }
 
-  template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7, typename P8>
+  template<typename P0, typename P1, typename P2, typename P3, typename P4, typename P5,
+    typename P6, typename P7, typename P8>
   Connection addCallback(void(*callback)(P0, P1, P2, P3, P4, P5, P6, P7, P8))
   {
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, P8)>(std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7, std::placeholders::_8, std::placeholders::_9)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, P8)>(std::bind(
+      callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5, std::placeholders::_6,
+      std::placeholders::_7, std::placeholders::_8, std::placeholders::_9)));
   }
 
   template<typename T, typename P0, typename P1>
   Connection addCallback(void(T::*callback)(P0, P1), T* t)
   {
-    return addCallback(std::function<void(P0, P1, NullP, NullP, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, t, std::placeholders::_1, std::placeholders::_2)));
+    return addCallback(std::function<void(P0, P1, NullP, NullP, NullP, NullP, NullP, NullP,
+      NullP)>(std::bind(callback, t, std::placeholders::_1, std::placeholders::_2)));
   }
 
   template<typename T, typename P0, typename P1, typename P2>
   Connection addCallback(void(T::*callback)(P0, P1, P2), T* t)
   {
-    return addCallback(std::function<void(P0, P1, P2, NullP, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, t, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+    return addCallback(std::function<void(P0, P1, P2, NullP, NullP, NullP, NullP, NullP,
+      NullP)>(std::bind(callback, t, std::placeholders::_1, std::placeholders::_2,
+              std::placeholders::_3)));
   }
 
   template<typename T, typename P0, typename P1, typename P2, typename P3>
   Connection addCallback(void(T::*callback)(P0, P1, P2, P3), T* t)
   {
-    return addCallback(std::function<void(P0, P1, P2, P3, NullP, NullP, NullP, NullP, NullP)>(std::bind(callback, t, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+    return addCallback(std::function<void(P0, P1, P2, P3, NullP, NullP, NullP, NullP, NullP)>(
+      std::bind(callback, t, std::placeholders::_1, std::placeholders::_2,
+      std::placeholders::_3, std::placeholders::_4)));
   }
 
   template<typename T, typename P0, typename P1, typename P2, typename P3, typename P4>
   Connection addCallback(void(T::*callback)(P0, P1, P2, P3, P4), T* t)
   {
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, NullP, NullP, NullP, NullP)>(std::bind(callback, t, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, NullP, NullP, NullP, NullP)>(
+      std::bind(callback, t, std::placeholders::_1, std::placeholders::_2,
+      std::placeholders::_3, std::placeholders::_4, std::placeholders::_5)));
   }
 
-  template<typename T, typename P0, typename P1, typename P2, typename P3, typename P4, typename P5>
+  template<typename T, typename P0, typename P1, typename P2, typename P3, typename P4,
+    typename P5>
   Connection addCallback(void(T::*callback)(P0, P1, P2, P3, P4, P5), T* t)
   {
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, NullP, NullP, NullP)>(std::bind(callback, t, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, NullP, NullP, NullP)>(
+      std::bind(callback, t, std::placeholders::_1, std::placeholders::_2,
+      std::placeholders::_3, std::placeholders::_4, std::placeholders::_5,
+      std::placeholders::_6)));
   }
 
-  template<typename T, typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6>
+  template<typename T, typename P0, typename P1, typename P2, typename P3, typename P4,
+    typename P5, typename P6>
   Connection addCallback(void(T::*callback)(P0, P1, P2, P3, P4, P5, P6), T* t)
   {
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, NullP, NullP)>(std::bind(callback, t, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, NullP, NullP)>(
+      std::bind(callback, t, std::placeholders::_1, std::placeholders::_2,
+      std::placeholders::_3, std::placeholders::_4, std::placeholders::_5,
+      std::placeholders::_6, std::placeholders::_7)));
   }
 
-  template<typename T, typename P0, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7>
+  template<typename T, typename P0, typename P1, typename P2, typename P3, typename P4,
+    typename P5, typename P6, typename P7>
   Connection addCallback(void(T::*callback)(P0, P1, P2, P3, P4, P5, P6, P7), T* t)
   {
-    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, NullP)>(std::bind(callback, t, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7, std::placeholders::_8)));
+    return addCallback(std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, NullP)>(
+      std::bind(callback, t, std::placeholders::_1, std::placeholders::_2,
+      std::placeholders::_3, std::placeholders::_4, std::placeholders::_5,
+      std::placeholders::_6, std::placeholders::_7, std::placeholders::_8)));
   }
 
   template<typename C>
@@ -277,21 +321,26 @@ public:
                      const M5ConstPtr&,
                      const M6ConstPtr&,
                      const M7ConstPtr&,
-                     const M8ConstPtr&>(std::bind(callback, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5, std::placeholders::_6, std::placeholders::_7, std::placeholders::_8, std::placeholders::_9));
+                     const M8ConstPtr&>(std::bind(callback, std::placeholders::_1,
+                          std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
+                          std::placeholders::_5, std::placeholders::_6, std::placeholders::_7,
+                          std::placeholders::_8, std::placeholders::_9));
   }
 
   void removeCallback(const CallbackHelper9Ptr& helper)
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    typename V_CallbackHelper9::iterator it = std::find(callbacks_.begin(), callbacks_.end(), helper);
+    typename V_CallbackHelper9::iterator it = std::find(
+      callbacks_.begin(), callbacks_.end(), helper);
     if (it != callbacks_.end())
     {
       callbacks_.erase(it);
     }
   }
 
-  void call(const M0Event& e0, const M1Event& e1, const M2Event& e2, const M3Event& e3, const M4Event& e4,
-            const M5Event& e5, const M6Event& e6, const M7Event& e7, const M8Event& e8)
+  void call(const M0Event& e0, const M1Event& e1, const M2Event& e2, const M3Event& e3,
+    const M4Event& e4, const M5Event& e5, const M6Event& e6, const M7Event& e7,
+    const M8Event& e8)
   {
     std::lock_guard<std::mutex> lock(mutex_);
     bool nonconst_force_copy = callbacks_.size() > 1;
@@ -311,4 +360,4 @@ private:
 
 }  // namespace message_filters
 
-#endif // MESSAGE_FILTERS__SIGNAL9_H_
+#endif  // MESSAGE_FILTERS__SIGNAL9_H_

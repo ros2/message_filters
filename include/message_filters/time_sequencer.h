@@ -1,39 +1,37 @@
-/*********************************************************************
-* Software License Agreement (BSD License)
-*
-*  Copyright (c) 2008, Willow Garage, Inc.
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*   * Redistributions in binary form must reproduce the above
-*     copyright notice, this list of conditions and the following
-*     disclaimer in the documentation and/or other materials provided
-*     with the distribution.
-*   * Neither the name of the Willow Garage nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************/
+// Copyright 2008, Willow Garage, Inc. All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the Willow Garage nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef MESSAGE_FILTERS__TIME_SEQUENCER_H_
 #define MESSAGE_FILTERS__TIME_SEQUENCER_H_
+
+#include <memory>
+#include <set>
+#include <vector>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -88,7 +86,8 @@ public:
    * \param node The Node to use to create the rclcpp::SteadyTimer that runs at update_rate
    */
   template<class F>
-  TimeSequencer(F& f, rclcpp::Duration delay, rclcpp::Duration update_rate, uint32_t queue_size, rclcpp::Node::SharedPtr node)
+  TimeSequencer(F& f, rclcpp::Duration delay, rclcpp::Duration update_rate,
+    uint32_t queue_size, rclcpp::Node::SharedPtr node)
   : delay_(delay)
   , update_rate_(update_rate)
   , queue_size_(queue_size)
@@ -108,7 +107,8 @@ public:
    * \param queue_size The number of messages to store
    * \param node The Node to use to create the rclcpp::SteadyTimer that runs at update_rate
    */
-  TimeSequencer(rclcpp::Duration delay, rclcpp::Duration update_rate, uint32_t queue_size, rclcpp::Node::SharedPtr node)
+  TimeSequencer(rclcpp::Duration delay, rclcpp::Duration update_rate,
+    uint32_t queue_size, rclcpp::Node::SharedPtr node)
   : delay_(delay)
   , update_rate_(update_rate)
   , queue_size_(queue_size)
@@ -124,7 +124,8 @@ public:
   void connectInput(F& f)
   {
     incoming_connection_.disconnect();
-    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(std::bind(&TimeSequencer::cb, this, std::placeholders::_1)));
+    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(
+      std::bind(&TimeSequencer::cb, this, std::placeholders::_1)));
   }
 
   ~TimeSequencer()
@@ -167,7 +168,8 @@ private:
     bool operator()(const EventType& lhs, const EventType& rhs) const
     {
       namespace mt = message_filters::message_traits;
-      return mt::TimeStamp<M>::value(*lhs.getMessage()) < mt::TimeStamp<M>::value(*rhs.getMessage());
+      return mt::TimeStamp<M>::value(*lhs.getMessage()) < mt::TimeStamp<M>::value(
+        *rhs.getMessage());
     }
   };
   typedef std::multiset<EventType, MessageSort> S_Message;
@@ -196,9 +198,7 @@ private:
           last_time_ = stamp;
           to_call.push_back(e);
           messages_.erase(messages_.begin());
-        }
-        else
-        {
+        }  else {
           break;
         }
       }
@@ -216,8 +216,9 @@ private:
 
   void init()
   {
-    update_timer_ = node_->create_wall_timer(std::chrono::nanoseconds(update_rate_.nanoseconds()), [this]() {
-      dispatch();
+    update_timer_ = node_->create_wall_timer(
+      std::chrono::nanoseconds(update_rate_.nanoseconds()), [this]() {
+        dispatch();
       });
   }
 

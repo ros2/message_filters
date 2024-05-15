@@ -1,41 +1,36 @@
-/*********************************************************************
-* Software License Agreement (BSD License)
-*
-*  Copyright (c) 2009, Willow Garage, Inc.
-*  All rights reserved.
-*
-*  Redistribution and use in source and binary forms, with or without
-*  modification, are permitted provided that the following conditions
-*  are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*   * Redistributions in binary form must reproduce the above
-*     copyright notice, this list of conditions and the following
-*     disclaimer in the documentation and/or other materials provided
-*     with the distribution.
-*   * Neither the name of the Willow Garage nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************/
+// Copyright 2009, Willow Garage, Inc. All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the Willow Garage nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef MESSAGE_FILTERS__SYNC_POLICIES__EXACT_TIME_H_
 #define MESSAGE_FILTERS__SYNC_POLICIES__EXACT_TIME_H_
 
 #include <deque>
+#include <map>
 #include <string>
 #include <tuple>
 
@@ -52,8 +47,9 @@ namespace message_filters
 namespace sync_policies
 {
 
-template<typename M0, typename M1, typename M2 = NullType, typename M3 = NullType, typename M4 = NullType,
-         typename M5 = NullType, typename M6 = NullType, typename M7 = NullType, typename M8 = NullType>
+template<typename M0, typename M1, typename M2 = NullType, typename M3 = NullType,
+  typename M4 = NullType, typename M5 = NullType, typename M6 = NullType,
+  typename M7 = NullType, typename M8 = NullType>
 struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 {
   typedef Synchronizer<ExactTime> Sync;
@@ -108,7 +104,8 @@ struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 
     std::lock_guard<std::mutex> lock(mutex_);
 
-    Tuple& t = tuples_[mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(*evt.getMessage())];
+    Tuple& t = tuples_[mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(
+      *evt.getMessage())];
     std::get<i>(t) = evt;
 
     checkTuple(t);
@@ -144,7 +141,6 @@ struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   }
 
 private:
-
   // assumes mutex_ is already locked
   void checkTuple(Tuple& t)
   {
@@ -204,9 +200,7 @@ private:
                           std::get<3>(t), std::get<4>(t), std::get<5>(t),
                           std::get<6>(t), std::get<7>(t), std::get<8>(t));
         tuples_.erase(old);
-      }
-      else
-      {
+      } else {
         // the map is sorted by time, so we can ignore anything after this if this one's time is ok
         break;
       }
