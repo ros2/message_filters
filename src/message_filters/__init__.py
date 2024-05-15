@@ -31,7 +31,6 @@
 from functools import reduce
 import itertools
 import threading
-# import builtin_interfaces
 
 import rclpy
 from rclpy.clock import ROSClock
