@@ -6,7 +6,7 @@ either from a ROS 2 subscription or another filter,
 and may or may not output the message
 at some time in the future, depending on a policy defined for that filter.
 
-message_filters also defines a common interface for these filters, allowing you to chain them together.
+``message_filters`` also defines a common interface for these filters, allowing you to chain them together.
 
 The filters currently implemented in this package are:
 
@@ -48,8 +48,8 @@ The Subscriber filter is simply a wrapper around a ROS 2 subscription that provi
 Input:
   No input connections
 Output:
-  * C++: void callback(const std::shared_ptr<M const>&)
-  * Python: callback(msg)
+  * C++: ``void callback(const std::shared_ptr<M const>&)``
+  * Python: ``callback(msg)``
 
 2.2 Example (C++)
 ~~~~~~~~~~~~~~~~~
@@ -79,12 +79,12 @@ The TimeSynchronizer filter synchronizes incoming channels by the timestamps con
 3.1 Connections
 ~~~~~~~~~~~~~~~
 Input:
-  * C++: Up to 9 separate filters, each of which is of the form void callback(const std::shared_ptr<M const>&). The number of filters supported is determined by the number of template arguments the class was created with.
-  * Python: N separate filters, each of which has signature callback(msg).
+  * C++: Up to 9 separate filters, each of which is of the form ``void callback(const std::shared_ptr<M const>&)``. The number of filters supported is determined by the number of template arguments the class was created with.
+  * Python: N separate filters, each of which has signature ``callback(msg)``.
 
 Output:
-  * C++: For message types M0..M8, void callback(const std::shared_ptr<M0 const>&, ..., const std::shared_ptr<M8 const>&). The number of parameters is determined by the number of template arguments the class was created with.
-  * Python: callback(msg0.. msgN). The number of parameters is determined by the number of template arguments the class was created with.
+  * C++: For message types M0..M8, ``void callback(const std::shared_ptr<M0 const>&, ..., const std::shared_ptr<M8 const>&)``. The number of parameters is determined by the number of template arguments the class was created with.
+  * Python: ``callback(msg0.. msgN)``. The number of parameters is determined by the number of template arguments the class was created with.
 
 4. Time Sequencer
 -----------------
@@ -95,9 +95,9 @@ The TimeSequencer filter guarantees that messages will be called in temporal ord
 4.1 Connections
 ~~~~~~~~~~~~~~~
 Input:
-  * C++: void callback(const std::shared_ptr<M const>&)
+  * C++: ``void callback(const std::shared_ptr<M const>&)``
 Output:
-  * C++: void callback(const std::shared_ptr<M const>&)
+  * C++: ``void callback(const std::shared_ptr<M const>&)``
 
 4.2 Example (C++)
 ~~~~~~~~~~~~~~~~~
@@ -121,11 +121,11 @@ The Cache immediately passes messages through to its output connections.
 5.1 Connections
 ~~~~~~~~~~~~~~~
 Input:
-  * C++: void callback(const std::shared_ptr<M const>&)
-  * Python: callback(msg)
+  * C++: ``void callback(const std::shared_ptr<M const>&)``
+  * Python: ``callback(msg)``
 Output:
-  * C++: void callback(const std::shared_ptr<M const>&)
-  * Python: callback(msg)
+  * C++: ``void callback(const std::shared_ptr<M const>&)``
+  * Python: ``callback(msg)``
 
 5.2 Example (C++)
 ~~~~~~~~~~~~~~~~~
@@ -142,33 +142,37 @@ Output:
     sub = message_filters.Subscriber('my_topic', sensor_msgs.msg.Image)
     cache = message_filters.Cache(sub, 100)
 
-In this example, the Cache stores the last 100 messages received on my_topic, and myCallback is called on the addition of every new message. The user can then make calls like cache.getInterval(start, end) to extract part of the cache.
-If the message type does not contain a header field that is normally used to determine its timestamp, and the Cache is contructed with allow_headerless=True, the current ROS 2 time is used as the timestamp of the message. This is currently only available in Python.
+In this example, the Cache stores the last 100 messages received on ``my_topic``, and ``myCallback`` is called on the addition of every new message. The user can then make calls like ``cache.getInterval(start, end)`` to extract part of the cache.
+If the message type does not contain a header field that is normally used to determine its timestamp, and the Cache is contructed with ``allow_headerless=True``, the current ROS 2 time is used as the timestamp of the message. This is currently only available in Python.
 
 6. PolicyBased Synchronizers
 ----------------------------
 The Synchronizer filter synchronizes incoming channels by the timestamps contained in their headers, and outputs them in the form of a single callback that takes the same number of channels. The C++ implementation can synchronize up to 9 channels.
 
-The Synchronizer filter is templated on a policy that determines how to synchronize the channels. There are currently two policies: ExactTime and ApproximateTime.
+The Synchronizer filter is templated on a policy that determines how to synchronize the channels. There are currently three policies: ExactTime, ApproximateEpsilonTime and ApproximateTime.
 
 6.1 Connections
 ~~~~~~~~~~~~~~~
 Input:
-  * C++: Up to 9 separate filters, each of which is of the form void callback(const std::shared_ptr<M const>&). The number of filters supported is determined by the number of template arguments the class was created with.
-  * Python: N separate filters, each of which has signature callback(msg).
+  * C++: Up to 9 separate filters, each of which is of the form ``void callback(const std::shared_ptr<M const>&)``. The number of filters supported is determined by the number of template arguments the class was created with.
+  * Python: N separate filters, each of which has signature ``callback(msg)``.
 Output:
-  * C++: For message types M0..M8, void callback(const std::shared_ptr<M0 const>&, ..., const std::shared_ptr<M8 const>&). The number of parameters is determined by the number of template arguments the class was created with.
-  * Python: callback(msg0.. msgN). The number of parameters is determined by the number of template arguments the class was created with.
+  * C++: For message types M0..M8, ``void callback(const std::shared_ptr<M0 const>&, ..., const std::shared_ptr<M8 const>&)``. The number of parameters is determined by the number of template arguments the class was created with.
+  * Python: ``callback(msg0.. msgN)``. The number of parameters is determined by the number of template arguments the class was created with.
 
 6.2 ExactTime Policy
 ~~~~~~~~~~~~~~~~~~~~
-The message_filters::sync_policies::ExactTime policy requires messages to have exactly the same timestamp in order to match. Your callback is only called if a message has been received on all specified channels with the same exact timestamp. The timestamp is read from the header field of all messages (which is required for this policy).
+The ``message_filters::sync_policies::ExactTime`` policy requires messages to have exactly the same timestamp in order to match. Your callback is only called if a message has been received on all specified channels with the same exact timestamp. The timestamp is read from the header field of all messages (which is required for this policy).
 
-6.3 ApproximateTime Policy
+6.3 ApproximateEpsilonTime Policy
+~~~~~~~~~~~~~~~~~~~~
+The ``message_filters::sync_policies::ApproximateEpsilonTime`` policy requires messages to have exactly the same timestamp within an "epsilon" tolerance in order to match. Your callback is only called if a message has been received on all specified channels with that same exact timestamp within the tolerance. The timestamp is read from the header field of all messages (which is required for this policy).
+
+6.4 ApproximateTime Policy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-The message_filters::sync_policies::ApproximateTime policy uses an adaptive algorithm to match messages based on their timestamp.
+The ``message_filters::sync_policies::ApproximateTime`` policy uses an adaptive algorithm to match messages based on their timestamp.
 
-If not all messages have a header field from which the timestamp could be determined, see below for a workaround. If some messages are of a type that doesn't contain the header field, ApproximateTimeSynchronizer refuses by default adding such messages. However, its Python version can be constructed with allow_headerless=True, which uses current ROS 2 time in place of any missing header.stamp field:
+If not all messages have a header field from which the timestamp could be determined, see below for a workaround. If some messages are of a type that doesn't contain the header field, ``ApproximateTimeSynchronizer`` refuses by default adding such messages. However, its Python version can be constructed with ``allow_headerless=True``, which uses current ROS 2 time in place of any missing header.stamp field:
 
 7. Chain
 --------
@@ -180,9 +184,9 @@ Chain is most useful for cases where you want to determine which filters to appl
 7.1 Connections
 ~~~~~~~~~~~~~~~
 Input:
-  * C++: void callback(const std::shared_ptr<M const>&)
+  * C++: ``void callback(const std::shared_ptr<M const>&)``
 Output:
-  * C++: void callback(const std::shared_ptr<M const>&)
+  * C++: ``void callback(const std::shared_ptr<M const>&)``
 
 7.2 Examples (C++)
 ~~~~~~~~~~~~~~~~~~
@@ -238,7 +242,6 @@ message handler as a callback.
 
 Output connections are registered through the ``registerCallback()`` function.
 
-
 Here's a simple example of using a Subscriber with a Cache::
 
     def myCallback(posemsg):
@@ -248,8 +251,8 @@ Here's a simple example of using a Subscriber with a Cache::
     cache = message_filters.Cache(sub, 10)
     cache.registerCallback(myCallback)
 
-The Subscriber here acts as the source of messages.  Each message is passed to the cache, which then passes it through to the
-user's callback ``myCallback``.
+The Subscriber here acts as the source of messages. Each message is passed to the cache,
+which then passes it through to the user's callback ``myCallback``.
 
 **Note**: It is **VERY IMPORTANT** that each subscriber has the same ``qos_profile`` as the one specified in the corresponding publisher code for each topic you want to subscribe to.
 If they don't match, the callback won't be executed (without any warning) and you will be very frustrated.

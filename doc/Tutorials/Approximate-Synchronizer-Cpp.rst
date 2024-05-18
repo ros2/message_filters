@@ -178,7 +178,6 @@ Finally, add the ``install(TARGETS…)`` section so ``ros2 run`` can find your e
 ~~~~~~~~
 From the root of your package, build and source.
 
-
 .. code-block:: bash
 
     colcon build && . install/setup.zsh
