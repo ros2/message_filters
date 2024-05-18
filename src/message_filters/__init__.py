@@ -185,7 +185,6 @@ class Cache(SimpleFilter):
             return None
         return self.cache_times[0]
 
-
     def getLast(self):
         if self.getLastestTime() is None:
             return None

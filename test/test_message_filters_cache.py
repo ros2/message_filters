@@ -37,7 +37,7 @@ from std_msgs.msg import String
 import time
 import unittest
 
-PKG = "message_filters"
+PKG = 'message_filters'
 
 class AnonymMsg:
     class AnonymHeader:
@@ -56,7 +56,7 @@ class TestCache(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         rclpy.init()
-        cls.node = rclpy.create_node("my_node", namespace='/my_ns')
+        cls.node = rclpy.create_node('my_node', namespace='/my_ns')
 
     @classmethod
     def tearDownClass(cls):
@@ -147,6 +147,7 @@ class TestCache(unittest.TestCase):
         s = cache.getElemAfterTime(currentRosTime)
         self.assertIsNone(s, "invalid msg returned in headerless scenario")
 
+
         cache.add(msg)
 
         s = cache.getInterval(Time(clock_type=ClockType.ROS_TIME),
@@ -160,8 +161,8 @@ class TestCache(unittest.TestCase):
                          "invalid msg returned in headerless scenario")
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(TestCache("test_all_funcs"))
-    suite.addTest(TestCache("test_headerless"))
+    suite.addTest(TestCache('test_all_funcs'))
+    suite.addTest(TestCache('test_headerless'))
     unittest.TextTestRunner(verbosity=2).run(suite)
