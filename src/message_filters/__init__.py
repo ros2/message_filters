@@ -25,6 +25,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+
 """
 Message Filter Objects
 ======================
@@ -183,6 +184,7 @@ class Cache(SimpleFilter):
         if not self.cache_times:
             return None
         return self.cache_times[0]
+
 
     def getLast(self):
         if self.getLastestTime() is None:

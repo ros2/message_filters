@@ -26,22 +26,19 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import random
-
-import unittest
-
 import message_filters
 from message_filters import ApproximateTimeSynchronizer
 
-# import rclpy
+import random
+import rclpy
 from rclpy.clock import ROSClock
 from rclpy.duration import Duration
 from rclpy.time import Time
+import unittest
 
 
 class MockHeader:
     pass
-
 
 class MockMessage:
     def __init__(self, stamp, data):
@@ -49,15 +46,12 @@ class MockMessage:
         self.header.stamp = stamp
         self.data = data
 
-
 class MockHeaderlessMessage:
     def __init__(self, data):
         self.data = data
 
-
 class MockFilter(message_filters.SimpleFilter):
     pass
-
 
 class TestApproxSync(unittest.TestCase):
 
@@ -87,9 +81,9 @@ class TestApproxSync(unittest.TestCase):
         for N in range(1, 10):
             m0 = MockFilter()
             m1 = MockFilter()
-            seq0 = [MockMessage(Time(seconds=t), random.random())
+            seq0 = [MockMessage(Time(seconds=t), random.random())\
                     for t in range(N)]
-            seq1 = [MockMessage(Time(seconds=t), random.random())
+            seq1 = [MockMessage(Time(seconds=t), random.random())\
                     for t in range(N)]
             # random.shuffle(seq0)
             ts = ApproximateTimeSynchronizer([m0, m1], N, 0.1)
@@ -124,7 +118,6 @@ class TestApproxSync(unittest.TestCase):
                 msg = seq1[i]
                 m1.signalMessage(msg)
             self.assertEqual(set(self.collector), set(zip(seq0, seq1)))
-
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
