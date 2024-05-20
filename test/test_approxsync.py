@@ -36,7 +36,6 @@ from rclpy.duration import Duration
 from rclpy.time import Time
 import unittest
 
-
 class MockHeader:
     pass
 
