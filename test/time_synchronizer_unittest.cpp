@@ -61,7 +61,7 @@ namespace message_traits
 template<>
 struct TimeStamp<Msg>
 {
-  static rclcpp::Time value(const Msg& m)
+  static rclcpp::Time value(const Msg & m)
   {
     return m.header.stamp;
   }
@@ -74,7 +74,7 @@ class Helper
 public:
   Helper()
   : count_(0)
-  , drop_count_(0)
+    , drop_count_(0)
   {}
 
   void cb()
@@ -124,29 +124,45 @@ TEST(TimeSynchronizer, compile6)
 TEST(TimeSynchronizer, compile7)
 {
   message_filters::NullFilter<Msg> f0, f1, f2, f3, f4, f5, f6;
-  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4, f5, f6, 1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4, f5,
+    f6, 1);
 }
 
 TEST(TimeSynchronizer, compile8)
 {
   message_filters::NullFilter<Msg> f0, f1, f2, f3, f4, f5, f6, f7;
-  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4, f5, f6, f7, 1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4,
+    f5, f6, f7, 1);
 }
 
 TEST(TimeSynchronizer, compile9)
 {
   message_filters::NullFilter<Msg> f0, f1, f2, f3, f4, f5, f6, f7, f8;
-  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1, f2, f3, f4, f5, f6, f7, f8, 1);
+  message_filters::TimeSynchronizer<Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg, Msg> sync(f0, f1,
+    f2, f3, f4, f5, f6, f7, f8, 1);
 }
 
-void function2(const MsgConstPtr&, const MsgConstPtr&) {}
-void function3(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function4(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function5(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function6(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function7(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function8(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-void function9(const MsgConstPtr&, MsgConstPtr, const MsgPtr&, MsgPtr, const Msg&, Msg, const message_filters::MessageEvent<Msg const>&, const message_filters::MessageEvent<Msg>&, const MsgConstPtr&) {}
+void function2(const MsgConstPtr &, const MsgConstPtr &) {}
+void function3(const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &) {}
+void function4(const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &)
+{
+}
+void function5(
+  const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &,
+  const MsgConstPtr &) {}
+void function6(
+  const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &,
+  const MsgConstPtr &, const MsgConstPtr &) {}
+void function7(
+  const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &,
+  const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &) {}
+void function8(
+  const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &,
+  const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &) {}
+void function9(
+  const MsgConstPtr &, MsgConstPtr, const MsgPtr &, MsgPtr, const Msg &, Msg,
+  const message_filters::MessageEvent<Msg const> &,
+  const message_filters::MessageEvent<Msg> &, const MsgConstPtr &) {}
 
 TEST(TimeSynchronizer, compileFunction2)
 {
@@ -198,13 +214,24 @@ TEST(TimeSynchronizer, compileFunction9)
 
 struct MethodHelper
 {
-  void method2(const MsgConstPtr&, const MsgConstPtr&) {}
-  void method3(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-  void method4(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-  void method5(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-  void method6(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-  void method7(const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&, const MsgConstPtr&) {}
-  void method8(const MsgConstPtr&, MsgConstPtr, const MsgPtr&, MsgPtr, const Msg&, Msg, const message_filters::MessageEvent<Msg const>&, const message_filters::MessageEvent<Msg>&) {}
+  void method2(const MsgConstPtr &, const MsgConstPtr &) {}
+  void method3(const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &) {}
+  void method4(const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &)
+  {
+  }
+  void method5(
+    const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &,
+    const MsgConstPtr &) {}
+  void method6(
+    const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &,
+    const MsgConstPtr &, const MsgConstPtr &) {}
+  void method7(
+    const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &,
+    const MsgConstPtr &, const MsgConstPtr &, const MsgConstPtr &) {}
+  void method8(
+    const MsgConstPtr &, MsgConstPtr, const MsgPtr &, MsgPtr, const Msg &, Msg,
+    const message_filters::MessageEvent<Msg const> &,
+    const message_filters::MessageEvent<Msg> &) {}
   // Can only do 8 here because the object instance counts as a parameter and bind only supports 9
 };
 
@@ -495,7 +522,9 @@ TEST(TimeSynchronizer, dropCallback)
 
 struct EventHelper
 {
-  void callback(const message_filters::MessageEvent<Msg const> & e1, const message_filters::MessageEvent<Msg const> & e2)
+  void callback(
+    const message_filters::MessageEvent<Msg const> & e1,
+    const message_filters::MessageEvent<Msg const> & e2)
   {
     e1_ = e1;
     e2_ = e2;
@@ -536,12 +565,9 @@ TEST(TimeSynchronizer, connectConstructor)
   ASSERT_EQ(h.count_, 1);
 }
 
-int main(int argc, char **argv)
+int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
   rclcpp::init(argc, argv);
   return RUN_ALL_TESTS();
 }
-
-
-

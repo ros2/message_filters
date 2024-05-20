@@ -48,8 +48,8 @@ class noncopyable
 protected:
   noncopyable() {}
   ~noncopyable() {}
-  noncopyable( const noncopyable& ) = delete;
-  noncopyable& operator=( const noncopyable& ) = delete;
+  noncopyable(const noncopyable &) = delete;
+  noncopyable & operator=(const noncopyable &) = delete;
 };
 
 /**
@@ -58,10 +58,10 @@ protected:
 class Connection
 {
 public:
-  using VoidDisconnectFunction = std::function<void(void)>;
-  using WithConnectionDisconnectFunction = std::function<void(const Connection&)>;
+  using VoidDisconnectFunction = std::function<void (void)>;
+  using WithConnectionDisconnectFunction = std::function<void (const Connection &)>;
   MESSAGE_FILTERS_PUBLIC Connection() {}
-  MESSAGE_FILTERS_PUBLIC Connection(const VoidDisconnectFunction& func);
+  MESSAGE_FILTERS_PUBLIC Connection(const VoidDisconnectFunction & func);
 
   /**
    * \brief disconnects this connection

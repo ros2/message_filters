@@ -59,12 +59,12 @@ public:
   : count_(0)
   {}
 
-  void cb(const MsgConstPtr&)
+  void cb(const MsgConstPtr &)
   {
     ++count_;
   }
 
-  void cb2(const MsgConstPtr&, const MsgConstPtr&)
+  void cb2(const MsgConstPtr &, const MsgConstPtr &)
   {
     ++count_;
   }
@@ -84,7 +84,9 @@ static void fuzz_msg(MsgPtr msg)
 TEST(TimeSequencer, fuzz_sequencer)
 {
   rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("test_node");
-  message_filters::TimeSequencer<Msg> seq(rclcpp::Duration(0, 10000000), rclcpp::Duration(0, 1000000), 10, node);
+  message_filters::TimeSequencer<Msg> seq(rclcpp::Duration(0, 10000000), rclcpp::Duration(
+      0, 1000000),
+    10, node);
   Helper h;
   seq.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   rclcpp::Clock ros_clock;
@@ -151,7 +153,7 @@ TEST(Subscriber, fuzz_subscriber)
   rclcpp::spin_some(node);
 }
 
-int main(int argc, char **argv)
+int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
 

@@ -54,13 +54,13 @@ template<class M>
 struct NullFilter
 {
   template<typename C>
-  Connection registerCallback(const C&)
+  Connection registerCallback(const C &)
   {
     return Connection();
   }
 
   template<typename P>
-  Connection registerCallback(const std::function<void(P)>&)
+  Connection registerCallback(const std::function<void(P)> &)
   {
     return Connection();
   }
@@ -71,7 +71,7 @@ namespace message_traits
 template<>
 struct TimeStamp<message_filters::NullType>
 {
-  static rclcpp::Time value(const message_filters::NullType&)
+  static rclcpp::Time value(const message_filters::NullType &)
   {
     return rclcpp::Time();
   }

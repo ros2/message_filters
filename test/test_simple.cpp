@@ -71,7 +71,7 @@ public:
     ++counts_[0];
   }
 
-  void cb1(const Msg&)
+  void cb1(const Msg &)
   {
     ++counts_[1];
   }
@@ -114,13 +114,19 @@ TEST(SimpleFilter, callbackTypes)
   Helper h;
   Filter f;
   f.registerCallback(std::bind(&Helper::cb0, &h, std::placeholders::_1));
-  f.registerCallback<const Msg&>(std::bind(&Helper::cb1, &h, std::placeholders::_1));
+  f.registerCallback<const Msg &>(std::bind(&Helper::cb1, &h, std::placeholders::_1));
   f.registerCallback<MsgConstPtr>(std::bind(&Helper::cb2, &h, std::placeholders::_1));
-  f.registerCallback<const message_filters::MessageEvent<Msg const>&>(std::bind(&Helper::cb3, &h, std::placeholders::_1));
+  f.registerCallback<const message_filters::MessageEvent<Msg const> &>(
+    std::bind(
+      &Helper::cb3, &h,
+      std::placeholders::_1));
   f.registerCallback<Msg>(std::bind(&Helper::cb4, &h, std::placeholders::_1));
-  f.registerCallback<const MsgPtr&>(std::bind(&Helper::cb5, &h, std::placeholders::_1));
+  f.registerCallback<const MsgPtr &>(std::bind(&Helper::cb5, &h, std::placeholders::_1));
   f.registerCallback<MsgPtr>(std::bind(&Helper::cb6, &h, std::placeholders::_1));
-  f.registerCallback<const message_filters::MessageEvent<Msg>&>(std::bind(&Helper::cb7, &h, std::placeholders::_1));
+  f.registerCallback<const message_filters::MessageEvent<Msg> &>(
+    std::bind(
+      &Helper::cb7, &h,
+      std::placeholders::_1));
 
   f.add(Filter::EventType(std::make_shared<Msg>()));
   EXPECT_EQ(h.counts_[0], 1);
@@ -135,7 +141,7 @@ TEST(SimpleFilter, callbackTypes)
 
 struct OldFilter
 {
-  message_filters::Connection registerCallback(const std::function<void(const MsgConstPtr&)>&)
+  message_filters::Connection registerCallback(const std::function<void(const MsgConstPtr &)> &)
   {
     return message_filters::Connection();
   }
@@ -148,11 +154,9 @@ TEST(SimpleFilter, oldRegisterWithNewFilter)
   f.registerCallback(std::bind(&Helper::cb3, &h, std::placeholders::_1));
 }
 
-int main(int argc, char **argv){
+int main(int argc, char ** argv)
+{
   testing::InitGoogleTest(&argc, argv);
   rclcpp::init(argc, argv);
   return RUN_ALL_TESTS();
 }
-
-
-
