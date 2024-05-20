@@ -65,6 +65,7 @@ class SimpleFilter(object):
             cb(*(msg + args))
 
 class Subscriber(SimpleFilter):
+
     """
     ROS 2 subscription filter, takes identical arguments as :class:`rclpy.Subscriber`.
 
@@ -183,6 +184,7 @@ class Cache(SimpleFilter):
         if not self.cache_times:
             return None
         return self.cache_times[0]
+
     def getLast(self):
         if self.getLastestTime() is None:
             return None
