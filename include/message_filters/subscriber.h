@@ -33,6 +33,8 @@
 #include <type_traits>
 
 #include <rclcpp/rclcpp.hpp>
+#include <rclcpp/node_interfaces/node_interfaces.hpp>
+#include <rclcpp/create_subscription.hpp>
 
 #include "message_filters/connection.h"
 #include "message_filters/simple_filter.h"
@@ -40,67 +42,65 @@
 namespace message_filters
 {
 
-template<class NodeType = rclcpp::Node>
+/// Utility struct for highlighting deprecated template parameters
+struct DeprecatedTemplateParameter {};
+
+template<class NodeType = DeprecatedTemplateParameter>
 class SubscriberBase
 {
 public:
-  typedef std::shared_ptr<NodeType> NodePtr;
+  [[deprecated]] typedef std::shared_ptr<NodeType> NodePtr;
+
+  using NodeParametersInterface = rclcpp::node_interfaces::NodeParametersInterface;
+  using NodeTopicsInterface = rclcpp::node_interfaces::NodeTopicsInterface;
+
+  using RequiredInterfaces = rclcpp::node_interfaces::NodeInterfaces<NodeParametersInterface, NodeTopicsInterface>;
+
+  template<typename U = NodeType, std::enable_if_t<std::is_same<U, DeprecatedTemplateParameter>{}, int> = 0>
+  SubscriberBase() {}
+
+  template<typename U = NodeType, std::enable_if_t<!std::is_same<U, DeprecatedTemplateParameter>{}, int> = 0>
+  [[deprecated("Template parameter of SubscriberBase class has been deprecated and will be removed in future releases")]]
+  SubscriberBase() {}
 
   virtual ~SubscriberBase() = default;
+
+  /**
+   * \brief Subscribe to a topic (deprecated in favor of NodeInterfaces interface).
+   */
+  [[deprecated]] virtual void subscribe(NodePtr /*node*/, const std::string& /*topic*/,
+                                        const rmw_qos_profile_t /*qos*/ = rmw_qos_profile_default) {};
+
+  /**
+   * \brief Subscribe to a topic (deprecated in favor of NodeInterfaces interface).
+   */
+  [[deprecated]] virtual void subscribe(NodeType * /*node*/, const std::string& /*topic*/,
+                                        const rmw_qos_profile_t /*qos*/ = rmw_qos_profile_default) {};
+
   /**
    * \brief Subscribe to a topic.
    *
    * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
    *
-   * \param node The rclcpp::Node::SharedPtr to use to subscribe.
+   * \param node The NodeInterfaces to use to subscribe.
    * \param topic The topic to subscribe to.
    * \param qos (optional) The rmw qos profile to use to subscribe
    */
-  virtual void subscribe(NodePtr node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default) = 0;
+  virtual void subscribe(RequiredInterfaces node_interfaces, const std::string& topic,
+                         const rmw_qos_profile_t qos = rmw_qos_profile_default) = 0;
 
   /**
    * \brief Subscribe to a topic.
    *
    * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
    *
-   * \param node The rclcpp::Node to use to subscribe.
-   * \param topic The topic to subscribe to.
-   * \param qos (optional) The rmw qos profile to use to subscribe
-   */
-  virtual void subscribe(NodeType * node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default) = 0;
-
-  /**
-   * \brief Subscribe to a topic.
-   *
-   * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
-   * This override allows SubscriptionOptions to be passed into the class without changing API.
-   *
-   * \param node The rclcpp::Node::SharedPtr to use to subscribe.
-   * \param topic The topic to subscribe to.
-   * \param qos (optional) The rmw qos profile to use to subscribe.
-   * \param options The subscription options to use to subscribe.
-   */
-  virtual void subscribe(
-    NodePtr node,
-    const std::string& topic,
-    const rmw_qos_profile_t qos,
-    rclcpp::SubscriptionOptions options)
-  {
-    this->subscribe(node.get(), topic, qos, options);
-  };
-
-  /**
-   * \brief Subscribe to a topic.
-   *
-   * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
-   *
-   * \param node The rclcpp::Node to use to subscribe.
+   * \param node The NodeInterfaces to use to subscribe.
    * \param topic The topic to subscribe to.
    * \param qos The rmw qos profile to use to subscribe.
    * \param options The subscription options to use to subscribe.
    */
   virtual void subscribe(
-    NodeType * node,
+    RequiredInterfaces node_interfaces,
     const std::string& topic,
     const rmw_qos_profile_t qos,
     rclcpp::SubscriptionOptions options) = 0;
@@ -114,6 +114,7 @@ public:
    */
   virtual void unsubscribe() = 0;
 };
+
 template <typename T>
 using SubscriberBasePtr = std::shared_ptr<SubscriberBase<T>>;
 
@@ -155,62 +156,124 @@ struct message_type <M, false>
 template <typename M>
 using message_type_t = typename message_type<M>::type;
 
-template<class M, class NodeType = rclcpp::Node>
-class Subscriber 
+template<class M, class NodeType = DeprecatedTemplateParameter>
+class Subscriber
 : public SubscriberBase<NodeType>
 , public SimpleFilter<message_type_t<M>>
 {
 public:
-  typedef std::shared_ptr<NodeType> NodePtr;
   typedef message_type_t<M> MessageType;
   typedef MessageEvent<MessageType const> EventType;
 
+  // Note: can be removed once the deprecated template parameter NodeType is removed
+  using RequiredInterfaces = typename SubscriberBase<NodeType>::RequiredInterfaces;
+  using NodeParametersInterface = typename SubscriberBase<NodeType>::NodeParametersInterface;
+  using NodeTopicsInterface = typename SubscriberBase<NodeType>::NodeTopicsInterface;
+
   /**
-   * \brief Constructor
+   * \brief Solely for highlighting deprecated template parameters with a compiler warning
+   */
+  template<typename U = NodeType, std::enable_if_t<!std::is_same<U, DeprecatedTemplateParameter>{}, int> = 0>
+  [[deprecated("Second template parameter of Subscriber class is deprecated and will be removed in a future release")]]
+  Subscriber(RequiredInterfaces node_interfaces,
+             const std::string& topic,
+             const rmw_qos_profile_t qos,
+             rclcpp::SubscriptionOptions options)
+  {
+      subscribe(node_interfaces, topic, qos, options);
+  }
+
+  /**
+   * \brief Solely for highlighting deprecated template parameters with a compiler warning
+   */
+  template<typename U = NodeType, std::enable_if_t<!std::is_same<U, DeprecatedTemplateParameter>{}, int> = 0>
+  [[deprecated("Second template parameter of Subscriber class is deprecated and will be removed in a future release")]]
+  Subscriber(RequiredInterfaces node_interfaces, const std::string& topic,
+             const rmw_qos_profile_t qos = rmw_qos_profile_default)
+  {
+      subscribe(node_interfaces, topic, qos);
+  }
+
+  /**
+   * \brief Constructor for rclcpp::Node / rclcpp_lifecycle::LifecycleNode.
    *
-   * See the rclcpp::Node::subscribe() variants for more information on the parameters
-   *
-   * \param node The rclcpp::Node::SharedPtr to use to subscribe.
+   * \param node The NodeInterfaces to use to subscribe.
    * \param topic The topic to subscribe to.
    * \param qos (optional) The rmw qos profile to use to subscribe
    */
-  Subscriber(NodePtr node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
+  template<typename U = NodeType, std::enable_if_t<std::is_same<U, DeprecatedTemplateParameter>{}, int> = 0>
+  Subscriber(RequiredInterfaces node_interfaces, const std::string& topic,
+             const rmw_qos_profile_t qos = rmw_qos_profile_default)
   {
-    subscribe(node, topic, qos);
-  }
-
-  Subscriber(NodeType * node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
-  {
-    subscribe(node, topic, qos);
+    subscribe(node_interfaces, topic, qos);
   }
 
   /**
-   * \brief Constructor
+   * \brief Constructor for rclcpp::Node::SharedPtr / rclcpp_lifecycle::LifecycleNode::SharedPtr.
    *
-   * See the rclcpp::Node::subscribe() variants for more information on the parameters
+   * \param node The NodeT::SharedPtr to use to subscribe.
+   * \param topic The topic to subscribe to.
+   * \param qos (optional) The rmw qos profile to use to subscribe
+   */
+  template<typename NodeT>
+  Subscriber(std::shared_ptr<NodeT> node, const std::string& topic,
+             const rmw_qos_profile_t qos = rmw_qos_profile_default) : Subscriber(node.get(), topic, qos) {}
+
+  /**
+   * \brief Constructor for raw pointer to rclcpp::Node / rclcpp_lifecycle::LifecycleNode.
    *
-   * \param node The rclcpp::Node::SharedPtr to use to subscribe.
+   * \param node The NodeT raw pointer to use to subscribe.
+   * \param topic The topic to subscribe to.
+   * \param qos (optional) The rmw qos profile to use to subscribe
+   */
+  template<typename NodeT>
+  Subscriber(NodeT * node, const std::string& topic,
+             const rmw_qos_profile_t qos = rmw_qos_profile_default) : Subscriber(*node, topic, qos) {}
+
+  /**
+   * \brief Constructor for rclcpp::Node / rclcpp_lifecycle::LifecycleNode.
+   *
+   * \param node_interfaces The NodeInterfaces to use to subscribe.
    * \param topic The topic to subscribe to.
    * \param qos The rmw qos profile to use to subscribe.
    * \param options The subscription options to use to subscribe.
    */
-  Subscriber(
-    NodePtr node,
-    const std::string& topic,
-    const rmw_qos_profile_t qos,
-    rclcpp::SubscriptionOptions options)
+  template<typename U = NodeType, std::enable_if_t<std::is_same<U, DeprecatedTemplateParameter>{}, int> = 0>
+  Subscriber(RequiredInterfaces node_interfaces,
+             const std::string& topic,
+             const rmw_qos_profile_t qos,
+             rclcpp::SubscriptionOptions options)
   {
-      subscribe(node.get(), topic, qos, options);
+    subscribe(node_interfaces, topic, qos, options);
   }
 
-  Subscriber(
-    NodeType * node,
-    const std::string& topic,
-    const rmw_qos_profile_t qos,
-    rclcpp::SubscriptionOptions options)
-  {
-    subscribe(node, topic, qos, options);
-  }
+  /**
+   * \brief Constructor for rclcpp::Node::SharedPtr / rclcpp_lifecycle::LifecycleNode::SharedPtr.
+   *
+   * \param node The NodeT::SharedPtr to use to subscribe.
+   * \param topic The topic to subscribe to.
+   * \param qos The rmw qos profile to use to subscribe.
+   * \param options The subscription options to use to subscribe.
+   */
+  template<typename NodeT>
+  Subscriber(std::shared_ptr<NodeT> node,
+             const std::string& topic,
+             const rmw_qos_profile_t qos,
+             rclcpp::SubscriptionOptions options) : Subscriber(node.get(), topic, qos, options) {}
+
+  /**
+   * \brief Constructor for raw pointer to rclcpp::Node / rclcpp_lifecycle::LifecycleNode.
+   *
+   * \param node The NodeT raw pointer to use to subscribe.
+   * \param topic The topic to subscribe to.
+   * \param qos The rmw qos profile to use to subscribe.
+   * \param options The subscription options to use to subscribe.
+   */
+  template<typename NodeT>
+  Subscriber(NodeT * node,
+             const std::string& topic,
+             const rmw_qos_profile_t qos,
+             rclcpp::SubscriptionOptions options) : Subscriber(*node, topic, qos, options) {}
 
   /**
    * \brief Empty constructor, use subscribe() to subscribe to a topic
@@ -227,11 +290,28 @@ public:
    *
    * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
    *
-   * \param node The rclcpp::Node::SharedPtr to use to subscribe.
+   * \param node_interfaces The NodeInterfaces to use to subscribe.
    * \param topic The topic to subscribe to.
    * \param qos (optional) The rmw qos profile to use to subscribe
    */
-  void subscribe(NodePtr node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default) override
+  // TODO(wjwwood): deprecate in favor of API's that use `rclcpp::QoS` instead.
+  void subscribe(RequiredInterfaces node_interfaces, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default) override
+  {
+    subscribe(node_interfaces, topic, qos, rclcpp::SubscriptionOptions());
+  }
+
+  /**
+   * \brief Subscribe to a topic.
+   *
+   * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
+   *
+   * \param node The NodeT::SharedPtr to use to subscribe.
+   * \param topic The topic to subscribe to.
+   * \param qos (optional) The rmw qos profile to use to subscribe
+   */
+  // TODO(wjwwood): deprecate in favor of API's that use `rclcpp::QoS` instead.
+  template<typename NodeT>
+  void subscribe(std::shared_ptr<NodeT> node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
   {
     subscribe(node.get(), topic, qos, rclcpp::SubscriptionOptions());
   }
@@ -241,14 +321,15 @@ public:
    *
    * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
    *
-   * \param node The rclcpp::Node to use to subscribe.
+   * \param node The NodeT raw pointer to use to subscribe.
    * \param topic The topic to subscribe to.
    * \param qos (optional) The rmw qos profile to use to subscribe
    */
   // TODO(wjwwood): deprecate in favor of API's that use `rclcpp::QoS` instead.
-  void subscribe(NodeType * node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default) override
+  template<typename NodeT>
+  void subscribe(NodeT * node, const std::string& topic, const rmw_qos_profile_t qos = rmw_qos_profile_default)
   {
-    subscribe(node, topic, qos, rclcpp::SubscriptionOptions());
+    subscribe(*node, topic, qos, rclcpp::SubscriptionOptions());
   }
 
   /**
@@ -256,35 +337,14 @@ public:
    *
    * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
    *
-   * \param node The rclcpp::Node::SharedPtr to use to subscribe.
-   * \param topic The topic to subscribe to.
-   * \param qos The rmw qos profile to use to subscribe.
-   * \param options The subscription options to use to subscribe.
-   */
-  void subscribe(
-    NodePtr node,
-    const std::string& topic,
-    const rmw_qos_profile_t qos,
-    rclcpp::SubscriptionOptions options) override
-  {
-    subscribe(node.get(), topic, qos, options);
-    node_raw_ = nullptr;
-    node_shared_ = node;
-  }
-
-  /**
-   * \brief Subscribe to a topic.
-   *
-   * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
-   *
-   * \param node The rclcpp::Node to use to subscribe.
+   * \param node The NodeInterfaces to use to subscribe.
    * \param topic The topic to subscribe to.
    * \param qos The rmw qos profile to use to subscribe
    * \param options The subscription options to use to subscribe.
    */
   // TODO(wjwwood): deprecate in favor of API's that use `rclcpp::QoS` instead.
   void subscribe(
-    NodeType * node,
+    RequiredInterfaces node_interfaces,
     const std::string& topic,
     const rmw_qos_profile_t qos,
     rclcpp::SubscriptionOptions options) override
@@ -298,12 +358,21 @@ public:
       rclcpp_qos.get_rmw_qos_profile() = qos;
       qos_ = qos;
       options_ = options;
-      sub_ = node->template create_subscription<M>(topic, rclcpp_qos,
-          [this](const std::shared_ptr<MessageType const> msg) {
-            this->cb(EventType(msg));
-          }, options);
 
-      node_raw_ = node;
+      // Note: temporary variables are solely needed because the involved submodules are inconsistent about the passing
+      //       of shared_ptr. While the node_interfaces return by value, the create_subscription function expects the
+      //       shared_ptr to be passed via reference...
+      auto parameters_interface = node_interfaces.template get<NodeParametersInterface>();
+      auto topics_interface = node_interfaces.template get<NodeTopicsInterface>();
+
+      sub_ = rclcpp::create_subscription<MessageType>(parameters_interface,
+                                                      topics_interface,
+                                                      topic, rclcpp_qos,
+                                                      [this](const std::shared_ptr<MessageType const> msg) {
+                                                        this->cb(EventType(msg));
+                                                      }, options);
+
+      node_interfaces_ = node_interfaces;
     }
   }
 
@@ -314,11 +383,7 @@ public:
   {
     if (!topic_.empty())
     {
-      if (node_raw_ != nullptr) {
-        subscribe(node_raw_, topic_, qos_, options_);
-      } else if (node_shared_ != nullptr) {
-        subscribe(node_shared_, topic_, qos_, options_);
-      }
+      subscribe(node_interfaces_, topic_, qos_, options_);
     }
   }
 
@@ -366,8 +431,7 @@ private:
 
   typename rclcpp::Subscription<M>::SharedPtr sub_;
 
-  NodePtr node_shared_;
-  NodeType * node_raw_ {nullptr};
+  RequiredInterfaces node_interfaces_;
 
   std::string topic_;
   rmw_qos_profile_t qos_;
