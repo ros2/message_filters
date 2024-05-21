@@ -29,9 +29,14 @@
 #ifndef MESSAGE_FILTERS__SYNC_POLICIES__APPROXIMATE_EPSILON_TIME_H_
 #define MESSAGE_FILTERS__SYNC_POLICIES__APPROXIMATE_EPSILON_TIME_H_
 
+#include <cstdint>
+#include <cstddef>
 #include <deque>
+#include <limits>
 #include <string>
 #include <tuple>
+#include <utility>
+#include <vector>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -46,8 +51,9 @@ namespace message_filters
 namespace sync_policies
 {
 
-template<typename M0, typename M1, typename M2 = NullType, typename M3 = NullType, typename M4 = NullType,
-         typename M5 = NullType, typename M6 = NullType, typename M7 = NullType, typename M8 = NullType>
+template<typename M0, typename M1, typename M2 = NullType, typename M3 = NullType,
+  typename M4 = NullType, typename M5 = NullType, typename M6 = NullType,
+  typename M7 = NullType, typename M8 = NullType>
 class ApproximateEpsilonTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 {
 public:
@@ -70,18 +76,18 @@ public:
 
   ApproximateEpsilonTime(uint32_t queue_size, rclcpp::Duration epsilon)
   : parent_(nullptr)
-  , queue_size_(queue_size)
-  , epsilon_{epsilon}
+    , queue_size_(queue_size)
+    , epsilon_{epsilon}
   {
   }
 
-  ApproximateEpsilonTime(const ApproximateEpsilonTime& e)
+  ApproximateEpsilonTime(const ApproximateEpsilonTime & e)
   : epsilon_{e.epsilon_}
   {
     *this = e;
   }
 
-  ApproximateEpsilonTime& operator=(const ApproximateEpsilonTime& rhs)
+  ApproximateEpsilonTime & operator=(const ApproximateEpsilonTime & rhs)
   {
     parent_ = rhs.parent_;
     queue_size_ = rhs.queue_size_;
@@ -91,13 +97,13 @@ public:
     return *this;
   }
 
-  void initParent(Sync* parent)
+  void initParent(Sync * parent)
   {
     parent_ = parent;
   }
 
   template<size_t i>
-  void add(const typename std::tuple_element<i, Events>::type& evt)
+  void add(const typename std::tuple_element<i, Events>::type & evt)
   {
     RCUTILS_ASSERT(parent_);
 
@@ -118,7 +124,7 @@ public:
 private:
   using TimeIndexPair = std::pair<rclcpp::Time, size_t>;
 
-  template <size_t Is>
+  template<size_t Is>
   TimeIndexPair
   get_older_timestamp_between(const TimeIndexPair & current)
   {
@@ -132,19 +138,21 @@ private:
       // this condition should not happen
       return current;
     }
-    auto candidate = mt::TimeStamp<typename ThisEventType::Message>::value(*events_of_this_type.at(0).getMessage());
+    auto candidate = mt::TimeStamp<typename ThisEventType::Message>::value(
+      *events_of_this_type.at(0).getMessage());
     if (current.first > candidate) {
       return std::make_pair(candidate, Is);
     }
     return current;
   }
 
-  template <size_t ... Is>
+  template<size_t ... Is>
   TimeIndexPair
   get_older_timestamp_helper(std::index_sequence<Is...> const &)
   {
     TimeIndexPair older{
-      rclcpp::Time(std::numeric_limits<int64_t>::max(), RCL_ROS_TIME), std::numeric_limits<size_t>::max()};
+      rclcpp::Time(std::numeric_limits<int64_t>::max(), RCL_ROS_TIME),
+      std::numeric_limits<size_t>::max()};
     ((older = get_older_timestamp_between<Is>(older)), ...);
     return older;
   }
@@ -155,7 +163,7 @@ private:
     return get_older_timestamp_helper(std::make_index_sequence<9u>());
   }
 
-  template <size_t Is>
+  template<size_t Is>
   bool
   check_timestamp_within_epsilon(const TimeIndexPair & older)
   {
@@ -172,14 +180,15 @@ private:
       // this condition should not happen
       return false;
     }
-    auto ts = mt::TimeStamp<typename ThisEventType::Message>::value(*events_of_this_type.at(0).getMessage());
+    auto ts = mt::TimeStamp<typename ThisEventType::Message>::value(
+      *events_of_this_type.at(0).getMessage());
     if (older.first + epsilon_ >= ts) {
       return true;
     }
     return false;
   }
 
-  template <size_t ... Is>
+  template<size_t ... Is>
   bool
   check_all_timestamp_within_epsilon_helper(
     const TimeIndexPair & older, std::index_sequence<Is...> const &)
@@ -212,7 +221,7 @@ private:
     }
   }
 
-  template <size_t ... Is>
+  template<size_t ... Is>
   void
   erase_beginning_of_vectors_helper(std::index_sequence<Is...> const &)
   {
@@ -248,9 +257,10 @@ private:
     }
   }
 
-  template <size_t ... Is>
+  template<size_t ... Is>
   void
-  erase_old_events_if_on_sync_with_ts_helper(rclcpp::Time timestamp, std::index_sequence<Is...> const &)
+  erase_old_events_if_on_sync_with_ts_helper(
+    rclcpp::Time timestamp, std::index_sequence<Is...> const &)
   {
     ((erase_beginning_of_vector_if_on_sync_with_ts<Is>(timestamp)), ...);
   }
@@ -321,7 +331,7 @@ private:
     }
   }
 
-  Sync* parent_;
+  Sync * parent_;
 
   uint32_t queue_size_;
   rclcpp::Duration epsilon_;
@@ -339,4 +349,3 @@ private:
 }  // namespace message_filters
 
 #endif  // MESSAGE_FILTERS__SYNC_POLICIES__APPROXIMATE_EPSILON_TIME_H_
-

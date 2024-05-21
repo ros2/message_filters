@@ -29,6 +29,10 @@
 #ifndef MESSAGE_FILTERS__TIME_SEQUENCER_H_
 #define MESSAGE_FILTERS__TIME_SEQUENCER_H_
 
+#include <chrono>
+#include <cstdint>
+#include <functional>
+
 #include <rclcpp/rclcpp.hpp>
 
 #include "message_filters/connection.h"
@@ -82,11 +86,13 @@ public:
    * \param node The Node to use to create the rclcpp::SteadyTimer that runs at update_rate
    */
   template<class F>
-  TimeSequencer(F& f, rclcpp::Duration delay, rclcpp::Duration update_rate, uint32_t queue_size, rclcpp::Node::SharedPtr node)
+  TimeSequencer(
+    F & f, rclcpp::Duration delay, rclcpp::Duration update_rate, uint32_t queue_size,
+    rclcpp::Node::SharedPtr node)
   : delay_(delay)
-  , update_rate_(update_rate)
-  , queue_size_(queue_size)
-  , node_(node)
+    , update_rate_(update_rate)
+    , queue_size_(queue_size)
+    , node_(node)
   {
     init();
     connectInput(f);
@@ -102,11 +108,13 @@ public:
    * \param queue_size The number of messages to store
    * \param node The Node to use to create the rclcpp::SteadyTimer that runs at update_rate
    */
-  TimeSequencer(rclcpp::Duration delay, rclcpp::Duration update_rate, uint32_t queue_size, rclcpp::Node::SharedPtr node)
+  TimeSequencer(
+    rclcpp::Duration delay, rclcpp::Duration update_rate, uint32_t queue_size,
+    rclcpp::Node::SharedPtr node)
   : delay_(delay)
-  , update_rate_(update_rate)
-  , queue_size_(queue_size)
-  , node_(node)
+    , update_rate_(update_rate)
+    , queue_size_(queue_size)
+    , node_(node)
   {
     init();
   }
@@ -115,10 +123,15 @@ public:
    * \brief Connect this filter's input to another filter's output.
    */
   template<class F>
-  void connectInput(F& f)
+  void connectInput(F & f)
   {
     incoming_connection_.disconnect();
-    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(std::bind(&TimeSequencer::cb, this, std::placeholders::_1)));
+    incoming_connection_ =
+      f.registerCallback(
+      typename SimpleFilter<M>::EventCallback(
+        std::bind(
+          &TimeSequencer::cb, this,
+          std::placeholders::_1)));
   }
 
   ~TimeSequencer()
@@ -127,20 +140,18 @@ public:
     incoming_connection_.disconnect();
   }
 
-  void add(const EventType& evt)
+  void add(const EventType & evt)
   {
     namespace mt = message_filters::message_traits;
 
     std::lock_guard<std::mutex> lock(messages_mutex_);
-    if (mt::TimeStamp<M>::value(*evt.getMessage()) < last_time_)
-    {
+    if (mt::TimeStamp<M>::value(*evt.getMessage()) < last_time_) {
       return;
     }
 
     messages_.insert(evt);
 
-    if (queue_size_ != 0 && messages_.size() > queue_size_)
-    {
+    if (queue_size_ != 0 && messages_.size() > queue_size_) {
       messages_.erase(*messages_.begin());
     }
   }
@@ -148,7 +159,7 @@ public:
   /**
    * \brief Manually add a message to the cache.
    */
-  void add(const MConstPtr& msg)
+  void add(const MConstPtr & msg)
   {
     EventType evt(msg);
     add(evt);
@@ -157,17 +168,18 @@ public:
 private:
   class MessageSort
   {
-  public:
-    bool operator()(const EventType& lhs, const EventType& rhs) const
+public:
+    bool operator()(const EventType & lhs, const EventType & rhs) const
     {
       namespace mt = message_filters::message_traits;
-      return mt::TimeStamp<M>::value(*lhs.getMessage()) < mt::TimeStamp<M>::value(*rhs.getMessage());
+      return mt::TimeStamp<M>::value(*lhs.getMessage()) <
+             mt::TimeStamp<M>::value(*rhs.getMessage());
     }
   };
   typedef std::multiset<EventType, MessageSort> S_Message;
   typedef std::vector<EventType> V_Message;
 
-  void cb(const EventType& evt)
+  void cb(const EventType & evt)
   {
     add(evt);
   }
@@ -181,18 +193,14 @@ private:
     {
       std::lock_guard<std::mutex> lock(messages_mutex_);
 
-      while (!messages_.empty())
-      {
-        const EventType& e = *messages_.begin();
+      while (!messages_.empty()) {
+        const EventType & e = *messages_.begin();
         rclcpp::Time stamp = mt::TimeStamp<M>::value(*e.getMessage());
-        if ((stamp + delay_) <= rclcpp::Clock().now())
-        {
+        if ((stamp + delay_) <= rclcpp::Clock().now()) {
           last_time_ = stamp;
           to_call.push_back(e);
           messages_.erase(messages_.begin());
-        }
-        else
-        {
+        } else {
           break;
         }
       }
@@ -201,8 +209,7 @@ private:
     {
       typename V_Message::iterator it = to_call.begin();
       typename V_Message::iterator end = to_call.end();
-      for (; it != end; ++it)
-      {
+      for (; it != end; ++it) {
         this->signalMessage(*it);
       }
     }
@@ -210,8 +217,9 @@ private:
 
   void init()
   {
-    update_timer_ = node_->create_wall_timer(std::chrono::nanoseconds(update_rate_.nanoseconds()), [this]() {
-      dispatch();
+    update_timer_ = node_->create_wall_timer(
+      std::chrono::nanoseconds(update_rate_.nanoseconds()), [this]() {
+        dispatch();
       });
   }
 

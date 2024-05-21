@@ -29,9 +29,11 @@
 #ifndef MESSAGE_FILTERS__CACHE_H_
 #define MESSAGE_FILTERS__CACHE_H_
 
+#include <cstddef>
 #include <deque>
 #include <memory>
 #include <functional>
+#include <vector>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -53,7 +55,7 @@ namespace message_filters
  *
  * Cache's input and output connections are both of the same signature as rclcpp subscription callbacks, ie.
 \verbatim
-void callback(const std::shared_ptr<M const>&);
+void callback(const std::shared_ptr<M const> &);
 \endverbatim
  */
 template<class M>
@@ -64,10 +66,10 @@ public:
   typedef MessageEvent<M const> EventType;
 
   template<class F>
-  Cache(F& f, unsigned int cache_size = 1)
+  explicit Cache(F & f, unsigned int cache_size = 1)
   {
-    setCacheSize(cache_size) ;
-    connectInput(f) ;
+    setCacheSize(cache_size);
+    connectInput(f);
   }
 
   /**
@@ -75,16 +77,17 @@ public:
    * order to populate the cache, the user then has to call add themselves, or connectInput() is
    * called later
    */
-  Cache(unsigned int cache_size = 1)
+  explicit Cache(unsigned int cache_size = 1)
   {
     setCacheSize(cache_size);
   }
 
   template<class F>
-  void connectInput(F& f)
+  void connectInput(F & f)
   {
-    incoming_connection_ = f.registerCallback(typename SimpleFilter<M>::EventCallback(
-      std::bind(&Cache::callback, this, std::placeholders::_1)));
+    incoming_connection_ = f.registerCallback(
+      typename SimpleFilter<M>::EventCallback(
+        std::bind(&Cache::callback, this, std::placeholders::_1)));
   }
 
   ~Cache()
@@ -98,20 +101,19 @@ public:
    */
   void setCacheSize(unsigned int cache_size)
   {
-    if (cache_size == 0)
-    {
-      //ROS_ERROR("Cannot set max_size to 0") ;
-      return ;
+    if (cache_size == 0) {
+      // ROS_ERROR("Cannot set max_size to 0");
+      return;
     }
 
-    cache_size_ = cache_size ;
+    cache_size_ = cache_size;
   }
 
   /**
    * \brief Add a message to the cache, and pop off any elements that are too old.
    * This method is registered with a data provider when connectTo is called.
    */
-  void add(const MConstPtr& msg)
+  void add(const MConstPtr & msg)
   {
     add(EventType(msg));
   }
@@ -120,31 +122,37 @@ public:
    * \brief Add a message to the cache, and pop off any elements that are too old.
    * This method is registered with a data provider when connectTo is called.
    */
-  void add(const EventType& evt)
+  void add(const EventType & evt)
   {
     namespace mt = message_filters::message_traits;
 
-    //printf("  Cache Size: %u\n", cache_.size()) ;
+    // printf("  Cache Size: %u\n", cache_.size());
     {
       std::lock_guard<std::mutex> lock(cache_lock_);
 
-      while (cache_.size() >= cache_size_)                       // Keep popping off old data until we have space for a new msg
-        cache_.pop_front() ;                                     // The front of the deque has the oldest elem, so we can get rid of it
+      // Keep popping off old data until we have space for a new msg
+      // The front of the deque has the oldest elem, so we can get rid of it
+      while (cache_.size() >= cache_size_) {
+        cache_.pop_front();
+      }
 
       // No longer naively pushing msgs to back. Want to make sure they're sorted correctly
-      //cache_.push_back(msg) ;                                    // Add the newest message to the back of the deque
+      // cache_.push_back(msg);
+      // Add the newest message to the back of the deque
 
-      typename std::deque<EventType >::reverse_iterator rev_it = cache_.rbegin();
+      typename std::deque<EventType>::reverse_iterator rev_it = cache_.rbegin();
 
       // Keep walking backwards along deque until we hit the beginning,
-      //   or until we find a timestamp that's smaller than (or equal to) msg's timestamp
+      // or until we find a timestamp that's smaller than (or equal to) msg's timestamp
       rclcpp::Time evt_stamp = mt::TimeStamp<M>::value(*evt.getMessage());
-      while(rev_it != cache_.rend() && mt::TimeStamp<M>::value(*(*rev_it).getMessage()) > evt_stamp)
+      while (rev_it != cache_.rend() &&
+        mt::TimeStamp<M>::value(*(*rev_it).getMessage()) > evt_stamp)
+      {
         rev_it++;
+      }
 
       // Add msg to the cache
       cache_.insert(rev_it.base(), evt);
-
     }
 
     this->signalMessage(evt);
@@ -158,35 +166,34 @@ public:
    * \param start The start of the requested interval
    * \param end The end of the requested interval
    */
-  std::vector<MConstPtr> getInterval(const rclcpp::Time& start, const rclcpp::Time& end) const
+  std::vector<MConstPtr> getInterval(const rclcpp::Time & start, const rclcpp::Time & end) const
   {
     namespace mt = message_filters::message_traits;
     std::lock_guard<std::mutex> lock(cache_lock_);
 
     // Find the starting index. (Find the first index after [or at] the start of the interval)
-    size_t start_index = 0 ;
-    while(start_index < cache_.size() &&
-          mt::TimeStamp<M>::value(*cache_[start_index].getMessage()) < start)
+    size_t start_index = 0;
+    while (start_index < cache_.size() &&
+      mt::TimeStamp<M>::value(*cache_[start_index].getMessage()) < start)
     {
-      start_index++ ;
+      start_index++;
     }
 
     // Find the ending index. (Find the first index after the end of interval)
-    size_t end_index = start_index ;
-    while(end_index < cache_.size() &&
-          mt::TimeStamp<M>::value(*cache_[end_index].getMessage()) <= end)
+    size_t end_index = start_index;
+    while (end_index < cache_.size() &&
+      mt::TimeStamp<M>::value(*cache_[end_index].getMessage()) <= end)
     {
-      end_index++ ;
+      end_index++;
     }
 
-    std::vector<MConstPtr> interval_elems ;
-    interval_elems.reserve(end_index - start_index) ;
-    for (size_t i=start_index; i<end_index; i++)
-    {
-      interval_elems.push_back(cache_[i].getMessage()) ;
+    std::vector<MConstPtr> interval_elems;
+    interval_elems.reserve(end_index - start_index);
+    for (size_t i = start_index; i < end_index; i++) {
+      interval_elems.push_back(cache_[i].getMessage());
     }
 
-    return interval_elems ;
+    return interval_elems;
   }
 
 
@@ -196,31 +203,31 @@ public:
    * If the messages in the cache do not surround (start,end), then this will return the interval
    * that gets closest to surrounding (start,end)
    */
-  std::vector<MConstPtr> getSurroundingInterval(const rclcpp::Time& start, const rclcpp::Time& end) const
+  std::vector<MConstPtr> getSurroundingInterval(
+    const rclcpp::Time & start, const rclcpp::Time & end) const
   {
     namespace mt = message_filters::message_traits;
 
     std::lock_guard<std::mutex> lock(cache_lock_);
     // Find the starting index. (Find the first index after [or at] the start of the interval)
     int start_index = static_cast<int>(cache_.size()) - 1;
-    while(start_index > 0 &&
-          mt::TimeStamp<M>::value(*cache_[start_index].getMessage()) > start)
+    while (start_index > 0 &&
+      mt::TimeStamp<M>::value(*cache_[start_index].getMessage()) > start)
     {
       start_index--;
     }
 
     int end_index = start_index;
-    while(end_index < static_cast<int>(cache_.size()) - 1 &&
-          mt::TimeStamp<M>::value(*cache_[end_index].getMessage()) < end)
+    while (end_index < static_cast<int>(cache_.size()) - 1 &&
+      mt::TimeStamp<M>::value(*cache_[end_index].getMessage()) < end)
     {
       end_index++;
     }
 
     std::vector<MConstPtr> interval_elems;
-    interval_elems.reserve(end_index - start_index + 1) ;
-    for (int i=start_index; i<=end_index; i++)
-    {
-      interval_elems.push_back(cache_[i].getMessage()) ;
+    interval_elems.reserve(end_index - start_index + 1);
+    for (int i = start_index; i <= end_index; i++) {
+      interval_elems.push_back(cache_[i].getMessage());
     }
 
     return interval_elems;
@@ -231,27 +238,26 @@ public:
    * \param time Time that must occur right after the returned elem
    * \returns shared_ptr to the newest elem that occurs before 'time'. NULL if doesn't exist
    */
-  MConstPtr getElemBeforeTime(const rclcpp::Time& time) const
+  MConstPtr getElemBeforeTime(const rclcpp::Time & time) const
   {
     namespace mt = message_filters::message_traits;
 
     std::lock_guard<std::mutex> lock(cache_lock_);
 
-    MConstPtr out ;
+    MConstPtr out;
 
-    unsigned int i=0 ;
-    int elem_index = -1 ;
-    while (i<cache_.size() &&
-           mt::TimeStamp<M>::value(*cache_[i].getMessage()) < time)
-    {
-      elem_index = i ;
-      i++ ;
+    unsigned int i = 0;
+    int elem_index = -1;
+    while (i < cache_.size() && mt::TimeStamp<M>::value(*cache_[i].getMessage()) < time) {
+      elem_index = i;
+      i++;
     }
 
-    if (elem_index >= 0)
-      out = cache_[elem_index].getMessage() ;
+    if (elem_index >= 0) {
+      out = cache_[elem_index].getMessage();
+    }
 
-    return out ;
+    return out;
   }
 
   /**
@@ -259,29 +265,28 @@ public:
    * \param time Time that must occur right before the returned elem
    * \returns shared_ptr to the oldest elem that occurs after 'time'. NULL if doesn't exist
    */
-  MConstPtr getElemAfterTime(const rclcpp::Time& time) const
+  MConstPtr getElemAfterTime(const rclcpp::Time & time) const
   {
     namespace mt = message_filters::message_traits;
 
     std::lock_guard<std::mutex> lock(cache_lock_);
 
-    MConstPtr out ;
+    MConstPtr out;
 
-    int i = static_cast<int>(cache_.size()) - 1 ;
-    int elem_index = -1 ;
-    while (i>=0 &&
-        mt::TimeStamp<M>::value(*cache_[i].getMessage()) > time)
-    {
-      elem_index = i ;
-      i-- ;
+    int i = static_cast<int>(cache_.size()) - 1;
+    int elem_index = -1;
+    while (i >= 0 && mt::TimeStamp<M>::value(*cache_[i].getMessage()) > time) {
+      elem_index = i;
+      i--;
     }
 
-    if (elem_index >= 0)
-      out = cache_[elem_index].getMessage() ;
-    else
-      out.reset() ;
+    if (elem_index >= 0) {
+      out = cache_[elem_index].getMessage();
+    } else {
+      out.reset();
+    }
 
-    return out ;
+    return out;
   }
 
   /**
@@ -295,10 +300,11 @@ public:
 
     rclcpp::Time latest_time;
 
-    if (cache_.size() > 0)
+    if (cache_.size() > 0) {
       latest_time = mt::TimeStamp<M>::value(*cache_.back().getMessage());
+    }
 
-    return latest_time ;
+    return latest_time;
   }
 
   /**
@@ -312,25 +318,25 @@ public:
 
     rclcpp::Time oldest_time;
 
-    if (cache_.size() > 0)
+    if (cache_.size() > 0) {
       oldest_time = mt::TimeStamp<M>::value(*cache_.front().getMessage());
+    }
 
-    return oldest_time ;
+    return oldest_time;
   }
 
-
 private:
-  void callback(const EventType& evt)
+  void callback(const EventType & evt)
   {
     add(evt);
   }
 
-  mutable std::mutex cache_lock_ ;            //!< Lock for cache_
-  std::deque<EventType> cache_ ;        //!< Cache for the messages
-  unsigned int cache_size_ ;            //!< Maximum number of elements allowed in the cache.
+  mutable std::mutex cache_lock_;      //!< Lock for cache_
+  std::deque<EventType> cache_;        //!< Cache for the messages
+  unsigned int cache_size_;            //!< Maximum number of elements allowed in the cache.
 
   Connection incoming_connection_;
 };
-}  // namespace message_filters;
+}  // namespace message_filters
 
 #endif  // MESSAGE_FILTERS__CACHE_H_

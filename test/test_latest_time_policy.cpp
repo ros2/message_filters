@@ -29,6 +29,7 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
+#include <cstddef>
 #include <functional>
 #include <memory>
 #include <thread>
@@ -100,13 +101,15 @@ protected:
     param_client = std::make_shared<rclcpp::SyncParametersClient>(node);
     ASSERT_TRUE(param_client->wait_for_service(5s));
 
-    sync.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1,
-                                                     std::placeholders::_2,
-                                                     std::placeholders::_3));
+    sync.registerCallback(
+      std::bind(
+        &Helper::cb, &h, std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3));
     p.reserve(12U);
     q.reserve(6U);
     r.reserve(3U);
-    for(std::size_t idx = 0U; idx < 12U; ++idx) {
+    for (std::size_t idx = 0U; idx < 12U; ++idx) {
       MsgPtr p_idx(std::make_shared<Msg>()); p_idx->data = idx; p.push_back(p_idx);
       if (idx % 2U == 0U) {
         MsgPtr q_idx(std::make_shared<Msg>()); q_idx->data = idx; q.push_back(q_idx);
@@ -194,11 +197,11 @@ TEST_F(LatestTimePolicy, ChangeRateLeading)
 
   for (std::size_t idx = 0U; idx < 12U; ++idx) {
     if (idx % 2U == 0U) {
-      sync.add<1>(q[idx/2U]);
+      sync.add<1>(q[idx / 2U]);
     }
 
     if (idx % 4U == 0U) {
-      sync.add<2>(r[idx/4U]);
+      sync.add<2>(r[idx / 4U]);
     }
 
     if (idx < 4U) {
@@ -267,7 +270,7 @@ TEST_F(LatestTimePolicy, ChangeRateTrailing)
   executor.add_node(node);
 
   for (std::size_t idx = 0U; idx < 12U; ++idx) {
-    if(idx % 2U == 1U) {
+    if (idx % 2U == 1U) {
       sync.add<1>(q[(idx - 1U) / 2U]);
     }
 
@@ -331,7 +334,7 @@ TEST_F(LatestTimePolicy, ChangeRateTrailing)
   }
 }
 
-int main(int argc, char **argv)
+int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
   rclcpp::init(argc, argv);

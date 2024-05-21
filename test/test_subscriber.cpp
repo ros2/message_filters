@@ -98,7 +98,7 @@ TEST(Subscriber, subUnsubSub)
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
   message_filters::Subscriber<Msg> sub(node, "test_topic");
-  sub.registerCallback(std::bind(&Helper::cb, &h,  std::placeholders::_1));
+  sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
 
   sub.unsubscribe();
@@ -120,7 +120,7 @@ TEST(Subscriber, subUnsubSub_raw)
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
   message_filters::Subscriber<Msg> sub(node.get(), "test_topic");
-  sub.registerCallback(std::bind(&Helper::cb, &h,  std::placeholders::_1));
+  sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
 
   sub.unsubscribe();
@@ -142,7 +142,7 @@ TEST(Subscriber, switchRawAndShared)
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
   message_filters::Subscriber<Msg> sub(node, "test_topic");
-  sub.registerCallback(std::bind(&Helper::cb, &h,  std::placeholders::_1));
+  sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic2", 10);
 
   sub.unsubscribe();
@@ -164,8 +164,8 @@ TEST(Subscriber, subInChain)
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
   message_filters::Chain<Msg> c;
-  c.addFilter(std::make_shared<message_filters::Subscriber<Msg> >(node, "test_topic"));
-  c.registerCallback(std::bind(&Helper::cb, &h,  std::placeholders::_1));
+  c.addFilter(std::make_shared<message_filters::Subscriber<Msg>>(node, "test_topic"));
+  c.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
 
   rclcpp::Clock ros_clock;
@@ -282,7 +282,7 @@ TEST(Subscriber, lifecycle)
 }
 
 
-int main(int argc, char **argv)
+int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
 

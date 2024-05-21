@@ -66,8 +66,9 @@ namespace message_filters
 namespace sync_policies
 {
 
-template<typename M0, typename M1, typename M2 = NullType, typename M3 = NullType, typename M4 = NullType,
-         typename M5 = NullType, typename M6 = NullType, typename M7 = NullType, typename M8 = NullType>
+template<typename M0, typename M1, typename M2 = NullType, typename M3 = NullType,
+  typename M4 = NullType,
+  typename M5 = NullType, typename M6 = NullType, typename M7 = NullType, typename M8 = NullType>
 struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 {
   typedef Synchronizer<ApproximateTime> Sync;
@@ -104,30 +105,32 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   typedef std::vector<M7Event> M7Vector;
   typedef std::vector<M8Event> M8Vector;
   typedef Events Tuple;
-  typedef std::tuple<M0Deque, M1Deque, M2Deque, M3Deque, M4Deque, M5Deque, M6Deque, M7Deque, M8Deque> DequeTuple;
-  typedef std::tuple<M0Vector, M1Vector, M2Vector, M3Vector, M4Vector, M5Vector, M6Vector, M7Vector, M8Vector> VectorTuple;
+  typedef std::tuple<M0Deque, M1Deque, M2Deque, M3Deque, M4Deque, M5Deque, M6Deque, M7Deque,
+      M8Deque> DequeTuple;
+  typedef std::tuple<M0Vector, M1Vector, M2Vector, M3Vector, M4Vector, M5Vector, M6Vector, M7Vector,
+      M8Vector> VectorTuple;
 
   ApproximateTime(uint32_t queue_size)
   : parent_(0)
-  , queue_size_(queue_size)
-  , num_non_empty_deques_(0)
-  , pivot_(NO_PIVOT)
-  , max_interval_duration_(rclcpp::Duration(std::numeric_limits<int32_t>::max(),999999999))
-  , age_penalty_(0.1)
-  , has_dropped_messages_(9, false)
-  , inter_message_lower_bounds_(9, rclcpp::Duration(0, 0))
-  , warned_about_incorrect_bound_(9, false)
+    , queue_size_(queue_size)
+    , num_non_empty_deques_(0)
+    , pivot_(NO_PIVOT)
+    , max_interval_duration_(rclcpp::Duration(std::numeric_limits<int32_t>::max(), 999999999))
+    , age_penalty_(0.1)
+    , has_dropped_messages_(9, false)
+    , inter_message_lower_bounds_(9, rclcpp::Duration(0, 0))
+    , warned_about_incorrect_bound_(9, false)
   {
     RCUTILS_ASSERT(queue_size_ > 0);  // The synchronizer will tend to drop many messages with a queue size of 1. At least 2 is recommended.
   }
 
-  ApproximateTime(const ApproximateTime& e)
-  : max_interval_duration_(rclcpp::Duration(std::numeric_limits<int32_t>::max(),999999999))
+  ApproximateTime(const ApproximateTime & e)
+  : max_interval_duration_(rclcpp::Duration(std::numeric_limits<int32_t>::max(), 999999999))
   {
     *this = e;
   }
 
-  ApproximateTime& operator=(const ApproximateTime& rhs)
+  ApproximateTime & operator=(const ApproximateTime & rhs)
   {
     parent_ = rhs.parent_;
     queue_size_ = rhs.queue_size_;
@@ -147,7 +150,7 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
     return *this;
   }
 
-  void initParent(Sync* parent)
+  void initParent(Sync * parent)
   {
     parent_ = parent;
   }
@@ -156,40 +159,38 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   void checkInterMessageBound()
   {
     namespace mt = message_filters::message_traits;
-    if (warned_about_incorrect_bound_[i])
-    {
+    if (warned_about_incorrect_bound_[i]) {
       return;
     }
-    std::deque<typename std::tuple_element<i, Events>::type>& deque = std::get<i>(deques_);
-    std::vector<typename std::tuple_element<i, Events>::type>& v = std::get<i>(past_);
+    std::deque<typename std::tuple_element<i, Events>::type> & deque = std::get<i>(deques_);
+    std::vector<typename std::tuple_element<i, Events>::type> & v = std::get<i>(past_);
     RCUTILS_ASSERT(!deque.empty());
-    const typename std::tuple_element<i, Messages>::type &msg = *(deque.back()).getMessage();
-    rclcpp::Time msg_time = mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(msg);
+    const typename std::tuple_element<i, Messages>::type & msg = *(deque.back()).getMessage();
+    rclcpp::Time msg_time =
+      mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(msg);
     rclcpp::Time previous_msg_time;
-    if (deque.size() == (size_t) 1)
-    {
-      if (v.empty())
-      {
-	// We have already published (or have never received) the previous message, we cannot check the bound
-	return;
+    if (deque.size() == (size_t) 1) {
+      if (v.empty()) {
+        // We have already published (or have never received) the previous message, we cannot check the bound
+        return;
       }
-      const typename std::tuple_element<i, Messages>::type &previous_msg = *(v.back()).getMessage();
-      previous_msg_time = mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(previous_msg);
-    }
-    else
-    {
+      const typename std::tuple_element<i,
+        Messages>::type & previous_msg = *(v.back()).getMessage();
+      previous_msg_time = mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(
+        previous_msg);
+    } else {
       // There are at least 2 elements in the deque. Check that the gap respects the bound if it was provided.
-      const typename std::tuple_element<i, Messages>::type &previous_msg = *(deque[deque.size()-2]).getMessage();
-      previous_msg_time = mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(previous_msg);
+      const typename std::tuple_element<i,
+        Messages>::type & previous_msg = *(deque[deque.size() - 2]).getMessage();
+      previous_msg_time = mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(
+        previous_msg);
     }
-    if (msg_time < previous_msg_time)
-    {
+    if (msg_time < previous_msg_time) {
       RCUTILS_LOG_WARN_ONCE("Messages of type %d arrived out of order (will print only once)", i);
       warned_about_incorrect_bound_[i] = true;
-    }
-    else if ((msg_time - previous_msg_time) < inter_message_lower_bounds_[i])
-    {
-      RCUTILS_LOG_WARN_ONCE("Messages of type %d arrived closer ("
+    } else if ((msg_time - previous_msg_time) < inter_message_lower_bounds_[i]) {
+      RCUTILS_LOG_WARN_ONCE(
+        "Messages of type %d arrived closer ("
         "%" PRId64 ") than the lower bound you provided ("
         "%" PRId64 ") (will print only once)",
         i,
@@ -201,30 +202,26 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
 
 
   template<int i>
-  void add(const typename std::tuple_element<i, Events>::type& evt)
+  void add(const typename std::tuple_element<i, Events>::type & evt)
   {
     std::lock_guard<std::mutex> lock(data_mutex_);
 
-    std::deque<typename std::tuple_element<i, Events>::type>& deque = std::get<i>(deques_);
+    std::deque<typename std::tuple_element<i, Events>::type> & deque = std::get<i>(deques_);
     deque.push_back(evt);
     if (deque.size() == (size_t)1) {
       // We have just added the first message, so it was empty before
       ++num_non_empty_deques_;
-      if (num_non_empty_deques_ == (uint32_t)RealTypeCount::value)
-      {
+      if (num_non_empty_deques_ == (uint32_t)RealTypeCount::value) {
         // All deques have messages
         process();
       }
-    }
-    else
-    {
+    } else {
       checkInterMessageBound<i>();
     }
     // Check whether we have more messages than allowed in the queue.
     // Note that during the above call to process(), queue i may contain queue_size_+1 messages.
-    std::vector<typename std::tuple_element<i, Events>::type>& past = std::get<i>(past_);
-    if (deque.size() + past.size() > queue_size_)
-    {
+    std::vector<typename std::tuple_element<i, Events>::type> & past = std::get<i>(past_);
+    if (deque.size() + past.size() > queue_size_) {
       // Cancel ongoing candidate search, if any:
       num_non_empty_deques_ = 0; // We will recompute it from scratch
       recover<0>();
@@ -240,13 +237,12 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
       RCUTILS_ASSERT(!deque.empty());
       deque.pop_front();
       has_dropped_messages_[i] = true;
-      if (pivot_ != NO_PIVOT)
-      {
-	// The candidate is no longer valid. Destroy it.
-	candidate_ = Tuple();
-	pivot_ = NO_PIVOT;
-	// There might still be enough messages to create a new candidate:
-	process();
+      if (pivot_ != NO_PIVOT) {
+        // The candidate is no longer valid. Destroy it.
+        candidate_ = Tuple();
+        pivot_ = NO_PIVOT;
+        // There might still be enough messages to create a new candidate:
+        process();
       }
     }
   }
@@ -258,15 +254,17 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
     age_penalty_ = age_penalty;
   }
 
-  void setInterMessageLowerBound(int i, rclcpp::Duration lower_bound) {
+  void setInterMessageLowerBound(int i, rclcpp::Duration lower_bound)
+  {
     // For correctness we only need age_penalty > -1.0, but most likely a negative age_penalty is a mistake.
-    RCUTILS_ASSERT(lower_bound >= rclcpp::Duration(0,0));
+    RCUTILS_ASSERT(lower_bound >= rclcpp::Duration(0, 0));
     inter_message_lower_bounds_[i] = lower_bound;
   }
 
-  void setMaxIntervalDuration(rclcpp::Duration max_interval_duration) {
+  void setMaxIntervalDuration(rclcpp::Duration max_interval_duration)
+  {
     // For correctness we only need age_penalty > -1.0, but most likely a negative age_penalty is a mistake.
-    RCUTILS_ASSERT(max_interval_duration >= rclcpp::Duration(0,0));
+    RCUTILS_ASSERT(max_interval_duration >= rclcpp::Duration(0, 0));
     max_interval_duration_ = max_interval_duration;
   }
 
@@ -275,11 +273,10 @@ private:
   template<int i>
   void dequeDeleteFront()
   {
-    std::deque<typename std::tuple_element<i, Events>::type>& deque = std::get<i>(deques_);
+    std::deque<typename std::tuple_element<i, Events>::type> & deque = std::get<i>(deques_);
     RCUTILS_ASSERT(!deque.empty());
     deque.pop_front();
-    if (deque.empty())
-    {
+    if (deque.empty()) {
       --num_non_empty_deques_;
     }
   }
@@ -287,37 +284,36 @@ private:
   // Assumes that deque number <index> is non empty
   void dequeDeleteFront(uint32_t index)
   {
-    switch (index)
-    {
-    case 0:
-      dequeDeleteFront<0>();
-      break;
-    case 1:
-      dequeDeleteFront<1>();
-      break;
-    case 2:
-      dequeDeleteFront<2>();
-      break;
-    case 3:
-      dequeDeleteFront<3>();
-      break;
-    case 4:
-      dequeDeleteFront<4>();
-      break;
-    case 5:
-      dequeDeleteFront<5>();
-      break;
-    case 6:
-      dequeDeleteFront<6>();
-      break;
-    case 7:
-      dequeDeleteFront<7>();
-      break;
-    case 8:
-      dequeDeleteFront<8>();
-      break;
-    default:
-      RCUTILS_BREAK();
+    switch (index) {
+      case 0:
+        dequeDeleteFront<0>();
+        break;
+      case 1:
+        dequeDeleteFront<1>();
+        break;
+      case 2:
+        dequeDeleteFront<2>();
+        break;
+      case 3:
+        dequeDeleteFront<3>();
+        break;
+      case 4:
+        dequeDeleteFront<4>();
+        break;
+      case 5:
+        dequeDeleteFront<5>();
+        break;
+      case 6:
+        dequeDeleteFront<6>();
+        break;
+      case 7:
+        dequeDeleteFront<7>();
+        break;
+      case 8:
+        dequeDeleteFront<8>();
+        break;
+      default:
+        RCUTILS_BREAK();
     }
   }
 
@@ -325,50 +321,48 @@ private:
   template<int i>
   void dequeMoveFrontToPast()
   {
-    std::deque<typename std::tuple_element<i, Events>::type>& deque = std::get<i>(deques_);
-    std::vector<typename std::tuple_element<i, Events>::type>& vector = std::get<i>(past_);
+    std::deque<typename std::tuple_element<i, Events>::type> & deque = std::get<i>(deques_);
+    std::vector<typename std::tuple_element<i, Events>::type> & vector = std::get<i>(past_);
     RCUTILS_ASSERT(!deque.empty());
     vector.push_back(deque.front());
     deque.pop_front();
-    if (deque.empty())
-    {
+    if (deque.empty()) {
       --num_non_empty_deques_;
     }
   }
   // Assumes that deque number <index> is non empty
   void dequeMoveFrontToPast(uint32_t index)
   {
-    switch (index)
-    {
-    case 0:
-      dequeMoveFrontToPast<0>();
-      break;
-    case 1:
-      dequeMoveFrontToPast<1>();
-      break;
-    case 2:
-      dequeMoveFrontToPast<2>();
-      break;
-    case 3:
-      dequeMoveFrontToPast<3>();
-      break;
-    case 4:
-      dequeMoveFrontToPast<4>();
-      break;
-    case 5:
-      dequeMoveFrontToPast<5>();
-      break;
-    case 6:
-      dequeMoveFrontToPast<6>();
-      break;
-    case 7:
-      dequeMoveFrontToPast<7>();
-      break;
-    case 8:
-      dequeMoveFrontToPast<8>();
-      break;
-    default:
-      RCUTILS_BREAK();
+    switch (index) {
+      case 0:
+        dequeMoveFrontToPast<0>();
+        break;
+      case 1:
+        dequeMoveFrontToPast<1>();
+        break;
+      case 2:
+        dequeMoveFrontToPast<2>();
+        break;
+      case 3:
+        dequeMoveFrontToPast<3>();
+        break;
+      case 4:
+        dequeMoveFrontToPast<4>();
+        break;
+      case 5:
+        dequeMoveFrontToPast<5>();
+        break;
+      case 6:
+        dequeMoveFrontToPast<6>();
+        break;
+      case 7:
+        dequeMoveFrontToPast<7>();
+        break;
+      case 8:
+        dequeMoveFrontToPast<8>();
+        break;
+      default:
+        RCUTILS_BREAK();
     }
   }
 
@@ -379,32 +373,25 @@ private:
     candidate_ = Tuple(); // Discards old one if any
     std::get<0>(candidate_) = std::get<0>(deques_).front();
     std::get<1>(candidate_) = std::get<1>(deques_).front();
-    if (RealTypeCount::value > 2)
-    {
+    if (RealTypeCount::value > 2) {
       std::get<2>(candidate_) = std::get<2>(deques_).front();
-      if (RealTypeCount::value > 3)
-      {
-	std::get<3>(candidate_) = std::get<3>(deques_).front();
-	if (RealTypeCount::value > 4)
-	{
-	  std::get<4>(candidate_) = std::get<4>(deques_).front();
-	  if (RealTypeCount::value > 5)
-	  {
-	    std::get<5>(candidate_) = std::get<5>(deques_).front();
-	    if (RealTypeCount::value > 6)
-	    {
-	      std::get<6>(candidate_) = std::get<6>(deques_).front();
-	      if (RealTypeCount::value > 7)
-	      {
-		std::get<7>(candidate_) = std::get<7>(deques_).front();
-		if (RealTypeCount::value > 8)
-		{
-		  std::get<8>(candidate_) = std::get<8>(deques_).front();
-		}
-	      }
-	    }
-	  }
-	}
+      if (RealTypeCount::value > 3) {
+        std::get<3>(candidate_) = std::get<3>(deques_).front();
+        if (RealTypeCount::value > 4) {
+          std::get<4>(candidate_) = std::get<4>(deques_).front();
+          if (RealTypeCount::value > 5) {
+            std::get<5>(candidate_) = std::get<5>(deques_).front();
+            if (RealTypeCount::value > 6) {
+              std::get<6>(candidate_) = std::get<6>(deques_).front();
+              if (RealTypeCount::value > 7) {
+                std::get<7>(candidate_) = std::get<7>(deques_).front();
+                if (RealTypeCount::value > 8) {
+                  std::get<8>(candidate_) = std::get<8>(deques_).front();
+                }
+              }
+            }
+          }
+        }
       }
     }
     // Delete all past messages, since we have found a better candidate
@@ -425,23 +412,20 @@ private:
   template<int i>
   void recover(size_t num_messages)
   {
-    if (i >= RealTypeCount::value)
-    {
+    if (i >= RealTypeCount::value) {
       return;
     }
 
-    std::vector<typename std::tuple_element<i, Events>::type>& v = std::get<i>(past_);
-    std::deque<typename std::tuple_element<i, Events>::type>& q = std::get<i>(deques_);
+    std::vector<typename std::tuple_element<i, Events>::type> & v = std::get<i>(past_);
+    std::deque<typename std::tuple_element<i, Events>::type> & q = std::get<i>(deques_);
     RCUTILS_ASSERT(num_messages <= v.size());
-    while (num_messages > 0)
-    {
+    while (num_messages > 0) {
       q.push_front(v.back());
       v.pop_back();
       num_messages--;
     }
 
-    if (!q.empty())
-    {
+    if (!q.empty()) {
       ++num_non_empty_deques_;
     }
   }
@@ -450,21 +434,18 @@ private:
   template<int i>
   void recover()
   {
-    if (i >= RealTypeCount::value)
-    {
+    if (i >= RealTypeCount::value) {
       return;
     }
 
-    std::vector<typename std::tuple_element<i, Events>::type>& v = std::get<i>(past_);
-    std::deque<typename std::tuple_element<i, Events>::type>& q = std::get<i>(deques_);
-    while (!v.empty())
-    {
+    std::vector<typename std::tuple_element<i, Events>::type> & v = std::get<i>(past_);
+    std::deque<typename std::tuple_element<i, Events>::type> & q = std::get<i>(deques_);
+    while (!v.empty()) {
       q.push_front(v.back());
       v.pop_back();
     }
 
-    if (!q.empty())
-    {
+    if (!q.empty()) {
       ++num_non_empty_deques_;
     }
   }
@@ -473,15 +454,13 @@ private:
   template<int i>
   void recoverAndDelete()
   {
-    if (i >= RealTypeCount::value)
-    {
+    if (i >= RealTypeCount::value) {
       return;
     }
 
-    std::vector<typename std::tuple_element<i, Events>::type>& v = std::get<i>(past_);
-    std::deque<typename std::tuple_element<i, Events>::type>& q = std::get<i>(deques_);
-    while (!v.empty())
-    {
+    std::vector<typename std::tuple_element<i, Events>::type> & v = std::get<i>(past_);
+    std::deque<typename std::tuple_element<i, Events>::type> & q = std::get<i>(deques_);
+    while (!v.empty()) {
       q.push_front(v.back());
       v.pop_back();
     }
@@ -489,8 +468,7 @@ private:
     RCUTILS_ASSERT(!q.empty());
 
     q.pop_front();
-    if (!q.empty())
-    {
+    if (!q.empty()) {
       ++num_non_empty_deques_;
     }
   }
@@ -500,9 +478,12 @@ private:
   {
     //printf("Publishing candidate\n");
     // Publish
-    parent_->signal(std::get<0>(candidate_), std::get<1>(candidate_), std::get<2>(candidate_), std::get<3>(candidate_),
-                    std::get<4>(candidate_), std::get<5>(candidate_), std::get<6>(candidate_), std::get<7>(candidate_),
-                    std::get<8>(candidate_));
+    parent_->signal(
+      std::get<0>(candidate_), std::get<1>(candidate_), std::get<2>(candidate_),
+      std::get<3>(candidate_),
+      std::get<4>(candidate_), std::get<5>(candidate_), std::get<6>(candidate_),
+      std::get<7>(candidate_),
+      std::get<8>(candidate_));
     // Delete this candidate
     candidate_ = Tuple();
     pivot_ = NO_PIVOT;
@@ -522,7 +503,7 @@ private:
 
   // Assumes: all deques are non empty, i.e. num_non_empty_deques_ == RealTypeCount::value
   // Returns: the oldest message on the deques
-  void getCandidateStart(uint32_t &start_index, rclcpp::Time &start_time)
+  void getCandidateStart(uint32_t & start_index, rclcpp::Time & start_time)
   {
     return getCandidateBoundary(start_index, start_time, false);
   }
@@ -530,7 +511,7 @@ private:
   // Assumes: all deques are non empty, i.e. num_non_empty_deques_ == RealTypeCount::value
   // Returns: the latest message among the heads of the deques, i.e. the minimum
   //          time to end an interval started at getCandidateStart_index()
-  void getCandidateEnd(uint32_t &end_index, rclcpp::Time &end_time)
+  void getCandidateEnd(uint32_t & end_index, rclcpp::Time & end_time)
   {
     return getCandidateBoundary(end_index, end_time, true);
   }
@@ -538,81 +519,65 @@ private:
   // ASSUMES: all deques are non-empty
   // end = true: look for the latest head of deque
   //       false: look for the earliest head of deque
-  void getCandidateBoundary(uint32_t &index, rclcpp::Time &time, bool end)
+  void getCandidateBoundary(uint32_t & index, rclcpp::Time & time, bool end)
   {
     namespace mt = message_filters::message_traits;
 
-    M0Event& m0 = std::get<0>(deques_).front();
+    M0Event & m0 = std::get<0>(deques_).front();
     time = mt::TimeStamp<M0>::value(*m0.getMessage());
     index = 0;
-    if (RealTypeCount::value > 1)
-    {
-      M1Event& m1 = std::get<1>(deques_).front();
-      if ((mt::TimeStamp<M1>::value(*m1.getMessage()) < time) ^ end)
-      {
+    if (RealTypeCount::value > 1) {
+      M1Event & m1 = std::get<1>(deques_).front();
+      if ((mt::TimeStamp<M1>::value(*m1.getMessage()) < time) ^ end) {
         time = mt::TimeStamp<M1>::value(*m1.getMessage());
         index = 1;
       }
     }
-    if (RealTypeCount::value > 2)
-    {
-      M2Event& m2 = std::get<2>(deques_).front();
-      if ((mt::TimeStamp<M2>::value(*m2.getMessage()) < time) ^ end)
-      {
+    if (RealTypeCount::value > 2) {
+      M2Event & m2 = std::get<2>(deques_).front();
+      if ((mt::TimeStamp<M2>::value(*m2.getMessage()) < time) ^ end) {
         time = mt::TimeStamp<M2>::value(*m2.getMessage());
         index = 2;
       }
     }
-    if (RealTypeCount::value > 3)
-    {
-      M3Event& m3 = std::get<3>(deques_).front();
-      if ((mt::TimeStamp<M3>::value(*m3.getMessage()) < time) ^ end)
-      {
+    if (RealTypeCount::value > 3) {
+      M3Event & m3 = std::get<3>(deques_).front();
+      if ((mt::TimeStamp<M3>::value(*m3.getMessage()) < time) ^ end) {
         time = mt::TimeStamp<M3>::value(*m3.getMessage());
         index = 3;
       }
     }
-    if (RealTypeCount::value > 4)
-    {
-      M4Event& m4 = std::get<4>(deques_).front();
-      if ((mt::TimeStamp<M4>::value(*m4.getMessage()) < time) ^ end)
-      {
+    if (RealTypeCount::value > 4) {
+      M4Event & m4 = std::get<4>(deques_).front();
+      if ((mt::TimeStamp<M4>::value(*m4.getMessage()) < time) ^ end) {
         time = mt::TimeStamp<M4>::value(*m4.getMessage());
         index = 4;
       }
     }
-    if (RealTypeCount::value > 5)
-    {
-      M5Event& m5 = std::get<5>(deques_).front();
-      if ((mt::TimeStamp<M5>::value(*m5.getMessage()) < time) ^ end)
-      {
+    if (RealTypeCount::value > 5) {
+      M5Event & m5 = std::get<5>(deques_).front();
+      if ((mt::TimeStamp<M5>::value(*m5.getMessage()) < time) ^ end) {
         time = mt::TimeStamp<M5>::value(*m5.getMessage());
         index = 5;
       }
     }
-    if (RealTypeCount::value > 6)
-    {
-      M6Event& m6 = std::get<6>(deques_).front();
-      if ((mt::TimeStamp<M6>::value(*m6.getMessage()) < time) ^ end)
-      {
+    if (RealTypeCount::value > 6) {
+      M6Event & m6 = std::get<6>(deques_).front();
+      if ((mt::TimeStamp<M6>::value(*m6.getMessage()) < time) ^ end) {
         time = mt::TimeStamp<M6>::value(*m6.getMessage());
         index = 6;
       }
     }
-    if (RealTypeCount::value > 7)
-    {
-      M7Event& m7 = std::get<7>(deques_).front();
-      if ((mt::TimeStamp<M7>::value(*m7.getMessage()) < time) ^ end)
-      {
+    if (RealTypeCount::value > 7) {
+      M7Event & m7 = std::get<7>(deques_).front();
+      if ((mt::TimeStamp<M7>::value(*m7.getMessage()) < time) ^ end) {
         time = mt::TimeStamp<M7>::value(*m7.getMessage());
         index = 7;
       }
     }
-    if (RealTypeCount::value > 8)
-    {
-      M8Event& m8 = std::get<8>(deques_).front();
-      if ((mt::TimeStamp<M8>::value(*m8.getMessage()) < time) ^ end)
-      {
+    if (RealTypeCount::value > 8) {
+      M8Event & m8 = std::get<8>(deques_).front();
+      if ((mt::TimeStamp<M8>::value(*m8.getMessage()) < time) ^ end) {
         time = mt::TimeStamp<M8>::value(*m8.getMessage());
         index = 8;
       }
@@ -626,38 +591,39 @@ private:
   {
     namespace mt = message_filters::message_traits;
 
-    if (i >= RealTypeCount::value)
-    {
-      return rclcpp::Time(0,0);  // Dummy return value
+    if (i >= RealTypeCount::value) {
+      return rclcpp::Time(0, 0);  // Dummy return value
     }
     RCUTILS_ASSERT(pivot_ != NO_PIVOT);
 
-    std::vector<typename std::tuple_element<i, Events>::type>& v = std::get<i>(past_);
-    std::deque<typename std::tuple_element<i, Events>::type>& q = std::get<i>(deques_);
-    if (q.empty())
-    {
+    std::vector<typename std::tuple_element<i, Events>::type> & v = std::get<i>(past_);
+    std::deque<typename std::tuple_element<i, Events>::type> & q = std::get<i>(deques_);
+    if (q.empty()) {
       RCUTILS_ASSERT(!v.empty());  // Because we have a candidate
-      rclcpp::Time last_msg_time = mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(*(v.back()).getMessage());
+      rclcpp::Time last_msg_time =
+        mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(
+        *(v.back()).getMessage());
       rclcpp::Time msg_time_lower_bound = last_msg_time + inter_message_lower_bounds_[i];
-      if (msg_time_lower_bound > pivot_time_)  // Take the max
-      {
+      if (msg_time_lower_bound > pivot_time_) { // Take the max
         return msg_time_lower_bound;
       }
       return pivot_time_;
     }
-    rclcpp::Time current_msg_time = mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(*(q.front()).getMessage());
+    rclcpp::Time current_msg_time =
+      mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(
+      *(q.front()).getMessage());
     return current_msg_time;
   }
 
 
   // ASSUMES: we have a pivot and candidate
-  void getVirtualCandidateStart(uint32_t &start_index, rclcpp::Time &start_time)
+  void getVirtualCandidateStart(uint32_t & start_index, rclcpp::Time & start_time)
   {
     return getVirtualCandidateBoundary(start_index, start_time, false);
   }
 
   // ASSUMES: we have a pivot and candidate
-  void getVirtualCandidateEnd(uint32_t &end_index, rclcpp::Time &end_time)
+  void getVirtualCandidateEnd(uint32_t & end_index, rclcpp::Time & end_time)
   {
     return getVirtualCandidateBoundary(end_index, end_time, true);
   }
@@ -665,7 +631,7 @@ private:
   // ASSUMES: we have a pivot and candidate
   // end = true: look for the latest head of deque
   //       false: look for the earliest head of deque
-  void getVirtualCandidateBoundary(uint32_t &index, rclcpp::Time &time, bool end)
+  void getVirtualCandidateBoundary(uint32_t & index, rclcpp::Time & time, bool end)
   {
     std::vector<rclcpp::Time> virtual_times(9);
     virtual_times[0] = getVirtualTime<0>();
@@ -680,12 +646,10 @@ private:
 
     time = virtual_times[0];
     index = 0;
-    for (int i = 0; i < RealTypeCount::value; i++)
-    {
-      if ((virtual_times[i] < time) ^ end)
-      {
-	time = virtual_times[i];
-	index = i;
+    for (int i = 0; i < RealTypeCount::value; i++) {
+      if ((virtual_times[i] < time) ^ end) {
+        time = virtual_times[i];
+        index = i;
       }
     }
   }
@@ -695,8 +659,7 @@ private:
   void process()
   {
     // While no deque is empty
-    while (num_non_empty_deques_ == (uint32_t)RealTypeCount::value)
-    {
+    while (num_non_empty_deques_ == (uint32_t)RealTypeCount::value) {
       // Find the start and end of the current interval
       //printf("Entering while loop in this state [\n");
       //show_internal_state();
@@ -705,52 +668,42 @@ private:
       uint32_t end_index, start_index;
       getCandidateEnd(end_index, end_time);
       getCandidateStart(start_index, start_time);
-      for (uint32_t i = 0; i < (uint32_t)RealTypeCount::value; i++)
-      {
-	if (i != end_index)
-	{
-	  // No dropped message could have been better to use than the ones we have,
-	  // so it becomes ok to use this topic as pivot in the future
-	  has_dropped_messages_[i] = false;
-	}
+      for (uint32_t i = 0; i < (uint32_t)RealTypeCount::value; i++) {
+        if (i != end_index) {
+          // No dropped message could have been better to use than the ones we have,
+          // so it becomes ok to use this topic as pivot in the future
+          has_dropped_messages_[i] = false;
+        }
       }
-      if (pivot_ == NO_PIVOT)
-      {
+      if (pivot_ == NO_PIVOT) {
         // We do not have a candidate
         // INVARIANT: the past_ vectors are empty
         // INVARIANT: (candidate_ has no filled members)
-        if (end_time - start_time > max_interval_duration_)
-        {
+        if (end_time - start_time > max_interval_duration_) {
           // This interval is too big to be a valid candidate, move to the next
           dequeDeleteFront(start_index);
           continue;
         }
-	if (has_dropped_messages_[end_index])
-	{
-	  // The topic that would become pivot has dropped messages, so it is not a good pivot
-	  dequeDeleteFront(start_index);
-	  continue;
-	}
-	// This is a valid candidate, and we don't have any, so take it
-	makeCandidate();
-	candidate_start_ = start_time;
-	candidate_end_ = end_time;
-	pivot_ = end_index;
-	pivot_time_ = end_time;
-	dequeMoveFrontToPast(start_index);
-      }
-      else
-      {
+        if (has_dropped_messages_[end_index]) {
+          // The topic that would become pivot has dropped messages, so it is not a good pivot
+          dequeDeleteFront(start_index);
+          continue;
+        }
+        // This is a valid candidate, and we don't have any, so take it
+        makeCandidate();
+        candidate_start_ = start_time;
+        candidate_end_ = end_time;
+        pivot_ = end_index;
+        pivot_time_ = end_time;
+        dequeMoveFrontToPast(start_index);
+      } else {
         // We already have a candidate
         // Is this one better than the current candidate?
         // INVARIANT: has_dropped_messages_ is all false
-        if ((end_time - candidate_end_) * (1 + age_penalty_) >= (start_time - candidate_start_))
-        {
+        if ((end_time - candidate_end_) * (1 + age_penalty_) >= (start_time - candidate_start_)) {
           // This is not a better candidate, move to the next
           dequeMoveFrontToPast(start_index);
-        }
-        else
-        {
+        } else {
           // This is a better candidate
           makeCandidate();
           candidate_start_ = start_time;
@@ -762,12 +715,11 @@ private:
       // INVARIANT: we have a candidate and pivot
       RCUTILS_ASSERT(pivot_ != NO_PIVOT);
       //printf("start_index == %d, pivot_ == %d\n", start_index, pivot_);
-      if (start_index == pivot_)  // TODO: replace with start_time == pivot_time_
-      {
+      if (start_index == pivot_) {  // TODO: replace with start_time == pivot_time_
         // We have exhausted all possible candidates for this pivot, we now can output the best one
         publishCandidate();
-      }
-      else if ((end_time - candidate_end_) * (1 + age_penalty_) >= (pivot_time_ - candidate_start_))
+      } else if ((end_time - candidate_end_) * (1 + age_penalty_) >=
+        (pivot_time_ - candidate_start_))
       {
         // We have not exhausted all candidates, but this candidate is already provably optimal
         // Indeed, any future candidate must contain the interval [pivot_time_ end_time], which
@@ -775,20 +727,18 @@ private:
         // Note: this case is subsumed by the next, but it may save some unnecessary work and
         //       it makes things (a little) easier to understand
         publishCandidate();
-      }
-      else if (num_non_empty_deques_ < (uint32_t)RealTypeCount::value)
-      {
+      } else if (num_non_empty_deques_ < (uint32_t)RealTypeCount::value) {
         uint32_t num_non_empty_deques_before_virtual_search = num_non_empty_deques_;
 
         // Before giving up, use the rate bounds, if provided, to further try to prove optimality
-        std::vector<int> num_virtual_moves(9,0);
-        while (1)
-        {
+        std::vector<int> num_virtual_moves(9, 0);
+        while (1) {
           rclcpp::Time end_time, start_time;
           uint32_t end_index, start_index;
           getVirtualCandidateEnd(end_index, end_time);
           getVirtualCandidateStart(start_index, start_time);
-          if ((end_time - candidate_end_) * (1 + age_penalty_) >= (pivot_time_ - candidate_start_))
+          if ((end_time - candidate_end_) * (1 + age_penalty_) >=
+            (pivot_time_ - candidate_start_))
           {
             // We have proved optimality
             // As above, any future candidate must contain the interval [pivot_time_ end_time], which
@@ -796,22 +746,23 @@ private:
             publishCandidate();  // This cleans up the virtual moves as a byproduct
             break;  // From the while(1) loop only
           }
-          if ((end_time - candidate_end_) * (1 + age_penalty_) < (start_time - candidate_start_))
+          if ((end_time - candidate_end_) * (1 + age_penalty_) <
+            (start_time - candidate_start_))
           {
             // We cannot prove optimality
             // Indeed, we have a virtual (i.e. optimistic) candidate that is better than the current
             // candidate
             // Cleanup the virtual search:
             num_non_empty_deques_ = 0; // We will recompute it from scratch
-	    recover<0>(num_virtual_moves[0]);
-	    recover<1>(num_virtual_moves[1]);
-	    recover<2>(num_virtual_moves[2]);
-	    recover<3>(num_virtual_moves[3]);
-	    recover<4>(num_virtual_moves[4]);
-	    recover<5>(num_virtual_moves[5]);
-	    recover<6>(num_virtual_moves[6]);
-	    recover<7>(num_virtual_moves[7]);
-	    recover<8>(num_virtual_moves[8]);
+            recover<0>(num_virtual_moves[0]);
+            recover<1>(num_virtual_moves[1]);
+            recover<2>(num_virtual_moves[2]);
+            recover<3>(num_virtual_moves[3]);
+            recover<4>(num_virtual_moves[4]);
+            recover<5>(num_virtual_moves[5]);
+            recover<6>(num_virtual_moves[6]);
+            recover<7>(num_virtual_moves[7]);
+            recover<8>(num_virtual_moves[8]);
             (void)num_non_empty_deques_before_virtual_search; // unused variable warning stopper
             RCUTILS_ASSERT(num_non_empty_deques_before_virtual_search == num_non_empty_deques_);
             break;
@@ -819,8 +770,8 @@ private:
           // Note: we cannot reach this point with start_index == pivot_ since in that case we would
           //       have start_time == pivot_time, in which case the two tests above are the negation
           //       of each other, so that one must be true. Therefore the while loop always terminates.
-	  RCUTILS_ASSERT(start_index != pivot_);
-	  RCUTILS_ASSERT(start_time < pivot_time_);
+          RCUTILS_ASSERT(start_index != pivot_);
+          RCUTILS_ASSERT(start_time < pivot_time_);
           dequeMoveFrontToPast(start_index);
           num_virtual_moves[start_index]++;
         } // while(1)
@@ -828,7 +779,7 @@ private:
     } // while(num_non_empty_deques_ == (uint32_t)RealTypeCount::value)
   }
 
-  Sync* parent_;
+  Sync * parent_;
   uint32_t queue_size_;
 
   static const uint32_t NO_PIVOT = 9;  // Special value for the pivot indicating that no pivot has been selected
