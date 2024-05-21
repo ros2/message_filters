@@ -29,6 +29,7 @@
 #ifndef MESSAGE_FILTERS__CACHE_H_
 #define MESSAGE_FILTERS__CACHE_H_
 
+#include <cstddef>
 #include <deque>
 #include <memory>
 #include <functional>

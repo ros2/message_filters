@@ -30,6 +30,7 @@
 #define MESSAGE_FILTERS__SYNCHRONIZER_H_
 
 #include <deque>
+#include <functional>
 #include <memory>
 #include <string>
 #include <tuple>

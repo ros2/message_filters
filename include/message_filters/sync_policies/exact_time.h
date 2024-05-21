@@ -29,6 +29,7 @@
 #ifndef MESSAGE_FILTERS__SYNC_POLICIES__EXACT_TIME_H_
 #define MESSAGE_FILTERS__SYNC_POLICIES__EXACT_TIME_H_
 
+#include <cstdint>
 #include <deque>
 #include <map>
 #include <string>

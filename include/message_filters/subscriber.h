@@ -29,7 +29,9 @@
 #ifndef MESSAGE_FILTERS__SUBSCRIBER_H_
 #define MESSAGE_FILTERS__SUBSCRIBER_H_
 
+#include <memory>
 #include <stdexcept>
+#include <string>
 #include <type_traits>
 
 #include <rclcpp/rclcpp.hpp>

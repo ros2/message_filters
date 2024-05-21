@@ -29,6 +29,7 @@
 #ifndef MESSAGE_FILTERS__SIGNAL1_H_
 #define MESSAGE_FILTERS__SIGNAL1_H_
 
+#include <algorithm>
 #include <memory>
 #include <mutex>
 

@@ -29,6 +29,10 @@
 #ifndef MESSAGE_FILTERS__TIME_SEQUENCER_H_
 #define MESSAGE_FILTERS__TIME_SEQUENCER_H_
 
+#include <chrono>
+#include <cstdint>
+#include <functional>
+
 #include <rclcpp/rclcpp.hpp>
 
 #include "message_filters/connection.h"
