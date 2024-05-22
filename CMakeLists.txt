@@ -57,11 +57,13 @@ ament_export_targets(${PROJECT_NAME})
 ament_export_dependencies(rclcpp rcutils std_msgs)
 
 if(BUILD_TESTING)
-  find_package(ament_cmake_copyright)
+  find_package(ament_cmake_copyright REQUIRED)
+  find_package(ament_cmake_cpplint REQUIRED)
   find_package(ament_cmake_uncrustify REQUIRED)
   find_package(rclcpp_lifecycle REQUIRED)
   find_package(sensor_msgs REQUIRED)
 
+  ament_cpplint()
   ament_copyright()
   ament_uncrustify(LANGUAGE "c++")
 

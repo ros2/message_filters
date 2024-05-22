@@ -26,13 +26,14 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <gtest/gtest.h>
+
 #include <cstdint>
 #include <functional>
 #include <memory>
 #include <utility>
 #include <vector>
 
-#include <gtest/gtest.h>
 #include <rclcpp/rclcpp.hpp>
 
 #include "message_filters/synchronizer.h"
@@ -64,8 +65,8 @@ struct TimeStamp<Msg>
     return m.header.stamp;
   }
 };
-}
-}
+}  // namespace message_traits
+}  // namespace message_filters
 
 typedef std::pair<rclcpp::Time, rclcpp::Time> TimePair;
 typedef std::pair<rclcpp::Time, unsigned int> TimeAndTopic;
@@ -110,7 +111,7 @@ public:
 
   void run()
   {
-    for (const auto & time_topic: input_) {
+    for (const auto & time_topic : input_) {
       const rclcpp::Time & time = time_topic.first;
       const unsigned int & topic = time_topic.second;
       if (topic == 0) {
@@ -177,10 +178,10 @@ TEST(ApproxTimeSync, PerfectMatch) {
 
   input.push_back(TimeAndTopic(t, 0));     // a
   input.push_back(TimeAndTopic(t + s, 1));   // A
-  input.push_back(TimeAndTopic(t + s * 3, 0)); // b
-  input.push_back(TimeAndTopic(t + s * 4, 1)); // B
-  input.push_back(TimeAndTopic(t + s * 6, 0)); // c
-  input.push_back(TimeAndTopic(t + s * 7, 1)); // C
+  input.push_back(TimeAndTopic(t + s * 3, 0));  // b
+  input.push_back(TimeAndTopic(t + s * 4, 1));  // B
+  input.push_back(TimeAndTopic(t + s * 6, 0));  // c
+  input.push_back(TimeAndTopic(t + s * 7, 1));  // C
   output.push_back(TimePair(t, t + s));
   output.push_back(TimePair(t + s * 3, t + s * 4));
   output.push_back(TimePair(t + s * 6, t + s * 7));
@@ -204,11 +205,11 @@ TEST(ApproxTimeSync, ImperfectMatch) {
 
   input.push_back(TimeAndTopic(t, 0));     // a
   input.push_back(TimeAndTopic(t + s, 1));   // A
-  input.push_back(TimeAndTopic(t + s * 2, 0)); // x
-  input.push_back(TimeAndTopic(t + s * 3, 0)); // b
-  input.push_back(TimeAndTopic(t + s * 4, 1)); // B
-  input.push_back(TimeAndTopic(t + s * 6, 0)); // c
-  input.push_back(TimeAndTopic(t + s * 7, 1)); // C
+  input.push_back(TimeAndTopic(t + s * 2, 0));  // x
+  input.push_back(TimeAndTopic(t + s * 3, 0));  // b
+  input.push_back(TimeAndTopic(t + s * 4, 1));  // B
+  input.push_back(TimeAndTopic(t + s * 6, 0));  // c
+  input.push_back(TimeAndTopic(t + s * 7, 1));  // C
   output.push_back(TimePair(t, t + s));
   output.push_back(TimePair(t + s * 3, t + s * 4));
   output.push_back(TimePair(t + s * 6, t + s * 7));

@@ -79,7 +79,7 @@ struct ParameterAdapter
     return *event.getMessage();
   }
 };
-//struct message_filters::ParameterAdapter<const std::shared_ptr<const Msg> &>
+// struct message_filters::ParameterAdapter<const std::shared_ptr<const Msg> &>
 template<typename M>
 struct ParameterAdapter<const std::shared_ptr<M const> &>
 {
@@ -180,4 +180,4 @@ struct ParameterAdapter<const MessageEvent<M> &>
 
 }  // namespace message_filters
 
-#endif // MESSAGE_FILTERS__PARAMETER_ADAPTER_H_
+#endif  // MESSAGE_FILTERS__PARAMETER_ADAPTER_H_

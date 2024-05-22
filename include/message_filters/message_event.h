@@ -33,7 +33,9 @@
 #define MESSAGE_FILTERS__MESSAGE_EVENT_H_
 
 #include <type_traits>
+#include <map>
 #include <memory>
+#include <string>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -43,7 +45,7 @@
 #define RCUTILS_ASSERT assert
 #endif
 // Uncomment below intead
-//#include <rcutils/assert.h>
+// #include <rcutils/assert.h>
 
 namespace message_filters
 {
@@ -240,7 +242,8 @@ private:
   }
 
   ConstMessagePtr message_;
-  // Kind of ugly to make this mutable, but it means we can pass a const MessageEvent to a callback and not worry about other things being modified
+  // Kind of ugly to make this mutable, but it means we can pass a const MessageEvent
+  // to a callback and not worry about other things being modified
   mutable MessagePtr message_copy_;
   rclcpp::Time receipt_time_;
   bool nonconst_need_copy_;

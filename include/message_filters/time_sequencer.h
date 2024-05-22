@@ -32,6 +32,9 @@
 #include <chrono>
 #include <cstdint>
 #include <functional>
+#include <memory>
+#include <set>
+#include <vector>
 
 #include <rclcpp/rclcpp.hpp>
 

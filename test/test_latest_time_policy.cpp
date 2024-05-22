@@ -42,8 +42,6 @@
 
 #include "rosgraph_msgs/msg/clock.hpp"
 
-using namespace std::chrono;
-
 struct Header
 {
   rclcpp::Time stamp;
@@ -99,7 +97,7 @@ protected:
     rclcpp::init(0, nullptr);
     node = std::make_shared<rclcpp::Node>("clock_sleep_node");
     param_client = std::make_shared<rclcpp::SyncParametersClient>(node);
-    ASSERT_TRUE(param_client->wait_for_service(5s));
+    ASSERT_TRUE(param_client->wait_for_service(std::chrono::seconds(5)));
 
     sync.registerCallback(
       std::bind(
@@ -206,7 +204,7 @@ TEST_F(LatestTimePolicy, ChangeRateLeading)
 
     if (idx < 4U) {
       sync.add<0>(p[idx]);
-    } else { // Change rate of p
+    } else {  // Change rate of p
       if (idx % 3U == 0U) {
         static std::size_t p_idx = 3U;
         sync.add<0>(p[++p_idx]);
@@ -219,22 +217,20 @@ TEST_F(LatestTimePolicy, ChangeRateLeading)
       EXPECT_EQ(h.p_->data, p[idx]->data);
       EXPECT_EQ(h.q_->data, q[idx / 2U]->data);
       EXPECT_EQ(h.r_->data, r[idx / 4U]->data);
-    }
-    // p rate is changed but isn't detected as late until idx==6,
-    // since q is 500Hz and p isn't late yet when q checks at idx==4.
-    // Will not publish again until idx==6 when q is found as new pivot.
-    // Same behavior as initialization dropping faster messages until rates of all are known
-    // or found to be late.
-    else if (idx >= 4U && idx < 6U) {
+    } else if (idx >= 4U && idx < 6U) {
+      // p rate is changed but isn't detected as late until idx==6,
+      // since q is 500Hz and p isn't late yet when q checks at idx==4.
+      // Will not publish again until idx==6 when q is found as new pivot.
+      // Same behavior as initialization dropping faster messages until rates of all are known
+      // or found to be late.
       EXPECT_EQ(h.count_, (idx + 2U) / 2U);
       EXPECT_EQ(h.p_->data, p[3]->data);
       EXPECT_EQ(h.q_->data, q[1]->data);
       EXPECT_EQ(h.r_->data, r[0]->data);
-    }
-    // New actual rate of p computed when is received after q when idx==6
-    // for idx >= 6, follows normal "Leading" pattern again
-    // with pivot on q
-    else if (idx >= 6U) {
+    } else if (idx >= 6U) {
+      // New actual rate of p computed when is received after q when idx==6
+      // for idx >= 6, follows normal "Leading" pattern again
+      // with pivot on q
       EXPECT_EQ(h.count_, (idx + 2U) / 2U);
       EXPECT_EQ(h.p_->data, p[idx / 2U]->data);
       EXPECT_EQ(h.q_->data, q[idx / 2U]->data);
@@ -251,7 +247,7 @@ TEST_F(LatestTimePolicy, ChangeRateLeading)
     msg.clock = rclcpp::Time(new_time);
     clock_publisher->publish(msg);
     while (rclcpp::ok() && clock->now() < new_time) {
-      executor.spin_once(10ms);
+      executor.spin_once(std::chrono::milliseconds(10));
     }
   }
 }
@@ -293,26 +289,24 @@ TEST_F(LatestTimePolicy, ChangeRateTrailing)
       EXPECT_EQ(h.p_->data, p[idx]->data);
       EXPECT_EQ(h.q_->data, q[(idx - 1U) / 2U]->data);
       EXPECT_EQ(h.r_->data, r[(idx - 3U) / 4U]->data);
-    }
-    // Rate of p still 1kHz @ idx==4.
-    // Then, change rate of p lower than q when idx==5.
-    // At idx==5, policy still doesn't know that p is late when q is received.
-    // Same behavior as initialization dropping faster messages until rates of all are known
-    // or found to be late.
-    else if (idx > 4U && idx < 7U) {
+    } else if (idx > 4U && idx < 7U) {
+      // Rate of p still 1kHz @ idx==4.
+      // Then, change rate of p lower than q when idx==5.
+      // At idx==5, policy still doesn't know that p is late when q is received.
+      // Same behavior as initialization dropping faster messages until rates of all are known
+      // or found to be late.
       EXPECT_EQ(h.count_, 2U);
       EXPECT_EQ(h.p_->data, p[4U]->data);
       EXPECT_EQ(h.q_->data, q[1U]->data);
       EXPECT_EQ(h.r_->data, r[0U]->data);
-    }
-    // Will not publish again until idx==7, since rate of q is 500Hz
-    // and p is calculated as late when q recieved when idx==7 -- this makes q new pivot.
-    // Since q is new pivot and publishes when idx==7,
-    // and r comes in after q, r is now trailing.
-    // New actual rate of p computed when is received after q when idx==7
-    // for idx >= 7, follows normal "Trailing" pattern again
-    // with pivot on q
-    else if (idx >= 7U) {
+    } else if (idx >= 7U) {
+      // Will not publish again until idx==7, since rate of q is 500Hz
+      // and p is calculated as late when q recieved when idx==7 -- this makes q new pivot.
+      // Since q is new pivot and publishes when idx==7,
+      // and r comes in after q, r is now trailing.
+      // New actual rate of p computed when is received after q when idx==7
+      // for idx >= 7, follows normal "Trailing" pattern again
+      // with pivot on q
       EXPECT_EQ(h.count_, (idx - 1U) / 2U);
       EXPECT_EQ(h.p_->data, p[(idx + 1U) / 2U]->data);
       EXPECT_EQ(h.q_->data, q[(idx - 1U) / 2U]->data);
@@ -329,7 +323,7 @@ TEST_F(LatestTimePolicy, ChangeRateTrailing)
     msg.clock = rclcpp::Time(new_time);
     clock_publisher->publish(msg);
     while (rclcpp::ok() && clock->now() < new_time) {
-      executor.spin_once(10ms);
+      executor.spin_once(std::chrono::milliseconds(10));
     }
   }
 }

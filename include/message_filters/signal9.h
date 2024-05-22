@@ -107,7 +107,7 @@ public:
       typename A5::Parameter, typename A6::Parameter, typename A7::Parameter,
       typename A8::Parameter)> Callback;
 
-  explicit CallbackHelper9T(const Callback & cb)
+  CallbackHelper9T(const Callback & cb)
   : callback_(cb)
   {
   }
@@ -175,7 +175,7 @@ public:
     typename P6, typename P7, typename P8>
   Connection addCallback(const std::function<void(P0, P1, P2, P3, P4, P5, P6, P7, P8)> & callback)
   {
-    CallbackHelper9T<P0, P1, P2, P3, P4, P5, P6, P7, P8> * helper =
+    explicit CallbackHelper9T<P0, P1, P2, P3, P4, P5, P6, P7, P8> * helper =
       new CallbackHelper9T<P0, P1, P2, P3, P4, P5, P6, P7, P8>(callback);
 
     std::lock_guard<std::mutex> lock(mutex_);

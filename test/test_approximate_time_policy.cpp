@@ -26,12 +26,13 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <gtest/gtest.h>
+
 #include <cstdint>
 #include <functional>
 #include <memory>
 #include <vector>
 
-#include <gtest/gtest.h>
 #include <rclcpp/rclcpp.hpp>
 #include "message_filters/synchronizer.h"
 #include "message_filters/sync_policies/approximate_time.h"
@@ -62,8 +63,8 @@ struct TimeStamp<Msg>
     return m.header.stamp;
   }
 };
-}
-}
+}  // namespace message_traits
+}  // namespace message_filters
 
 typedef std::pair<rclcpp::Time, rclcpp::Time> TimePair;
 typedef std::pair<rclcpp::Time, unsigned int> TimeAndTopic;
@@ -221,10 +222,10 @@ TEST(ApproxTimeSync, ExactMatch) {
 
   input.push_back(TimeAndTopic(t, 0));     // a
   input.push_back(TimeAndTopic(t, 1));   // A
-  input.push_back(TimeAndTopic(t + s * 3, 0)); // b
-  input.push_back(TimeAndTopic(t + s * 3, 1)); // B
-  input.push_back(TimeAndTopic(t + s * 6, 0)); // c
-  input.push_back(TimeAndTopic(t + s * 6, 1)); // C
+  input.push_back(TimeAndTopic(t + s * 3, 0));  // b
+  input.push_back(TimeAndTopic(t + s * 3, 1));  // B
+  input.push_back(TimeAndTopic(t + s * 6, 0));  // c
+  input.push_back(TimeAndTopic(t + s * 6, 1));  // C
   output.push_back(TimePair(t, t));
   output.push_back(TimePair(t + s * 3, t + s * 3));
   output.push_back(TimePair(t + s * 6, t + s * 6));
@@ -247,10 +248,10 @@ TEST(ApproxTimeSync, PerfectMatch) {
 
   input.push_back(TimeAndTopic(t, 0));     // a
   input.push_back(TimeAndTopic(t + s, 1));   // A
-  input.push_back(TimeAndTopic(t + s * 3, 0)); // b
-  input.push_back(TimeAndTopic(t + s * 4, 1)); // B
-  input.push_back(TimeAndTopic(t + s * 6, 0)); // c
-  input.push_back(TimeAndTopic(t + s * 7, 1)); // C
+  input.push_back(TimeAndTopic(t + s * 3, 0));  // b
+  input.push_back(TimeAndTopic(t + s * 4, 1));  // B
+  input.push_back(TimeAndTopic(t + s * 6, 0));  // c
+  input.push_back(TimeAndTopic(t + s * 7, 1));  // C
   output.push_back(TimePair(t, t + s));
   output.push_back(TimePair(t + s * 3, t + s * 4));
 
@@ -272,11 +273,11 @@ TEST(ApproxTimeSync, ImperfectMatch) {
 
   input.push_back(TimeAndTopic(t, 0));     // a
   input.push_back(TimeAndTopic(t + s, 1));   // A
-  input.push_back(TimeAndTopic(t + s * 2, 0)); // x
-  input.push_back(TimeAndTopic(t + s * 3, 0)); // b
-  input.push_back(TimeAndTopic(t + s * 5, 1)); // B
-  input.push_back(TimeAndTopic(t + s * 6, 0)); // c
-  input.push_back(TimeAndTopic(t + s * 7, 1)); // C
+  input.push_back(TimeAndTopic(t + s * 2, 0));  // x
+  input.push_back(TimeAndTopic(t + s * 3, 0));  // b
+  input.push_back(TimeAndTopic(t + s * 5, 1));  // B
+  input.push_back(TimeAndTopic(t + s * 6, 0));  // c
+  input.push_back(TimeAndTopic(t + s * 7, 1));  // C
   output.push_back(TimePair(t, t + s));
   output.push_back(TimePair(t + s * 6, t + s * 5));
 
@@ -298,11 +299,11 @@ TEST(ApproxTimeSync, Acceleration) {
   rclcpp::Duration s(1, 0);
 
   input.push_back(TimeAndTopic(t, 0));      // a
-  input.push_back(TimeAndTopic(t + s * 7, 1));  // A
-  input.push_back(TimeAndTopic(t + s * 12, 0)); // b
-  input.push_back(TimeAndTopic(t + s * 15, 1)); // B
-  input.push_back(TimeAndTopic(t + s * 17, 0)); // c
-  input.push_back(TimeAndTopic(t + s * 18, 1)); // C
+  input.push_back(TimeAndTopic(t + s * 7, 1));   // A
+  input.push_back(TimeAndTopic(t + s * 12, 0));  // b
+  input.push_back(TimeAndTopic(t + s * 15, 1));  // B
+  input.push_back(TimeAndTopic(t + s * 17, 0));  // c
+  input.push_back(TimeAndTopic(t + s * 18, 1));  // C
   output.push_back(TimePair(t + s * 12, t + s * 7));
   output.push_back(TimePair(t + s * 17, t + s * 18));
 
@@ -326,14 +327,14 @@ TEST(ApproxTimeSync, DroppedMessages) {
 
   input.push_back(TimeAndTopic(t, 0));     // a
   input.push_back(TimeAndTopic(t + s, 1));   // A
-  input.push_back(TimeAndTopic(t + s * 3, 1)); // B
-  input.push_back(TimeAndTopic(t + s * 4, 0)); // b
-  input.push_back(TimeAndTopic(t + s * 7, 1)); // C
-  input.push_back(TimeAndTopic(t + s * 8, 0)); // c
-  input.push_back(TimeAndTopic(t + s * 10, 0)); // d
-  input.push_back(TimeAndTopic(t + s * 11, 1)); // D
-  input.push_back(TimeAndTopic(t + s * 13, 0)); // e
-  input.push_back(TimeAndTopic(t + s * 14, 1)); // E
+  input.push_back(TimeAndTopic(t + s * 3, 1));  // B
+  input.push_back(TimeAndTopic(t + s * 4, 0));  // b
+  input.push_back(TimeAndTopic(t + s * 7, 1));  // C
+  input.push_back(TimeAndTopic(t + s * 8, 0));  // c
+  input.push_back(TimeAndTopic(t + s * 10, 0));  // d
+  input.push_back(TimeAndTopic(t + s * 11, 1));  // D
+  input.push_back(TimeAndTopic(t + s * 13, 0));  // e
+  input.push_back(TimeAndTopic(t + s * 14, 1));  // E
   output.push_back(TimePair(t + s * 4, t + s * 3));
   output.push_back(TimePair(t + s * 10, t + s * 11));
 
@@ -409,8 +410,8 @@ TEST(ApproxTimeSync, DoublePublish) {
 
   input.push_back(TimeAndTopic(t, 0));     // a
   input.push_back(TimeAndTopic(t + s, 1));   // A
-  input.push_back(TimeAndTopic(t + rclcpp::Duration(3, 0), 1)); // B
-  input.push_back(TimeAndTopic(t + rclcpp::Duration(3, 0), 0)); // b
+  input.push_back(TimeAndTopic(t + rclcpp::Duration(3, 0), 1));  // B
+  input.push_back(TimeAndTopic(t + rclcpp::Duration(3, 0), 0));  // b
   output.push_back(TimePair(t, t + s));
   output.push_back(TimePair(t + rclcpp::Duration(3, 0), t + rclcpp::Duration(3, 0)));
 
@@ -507,10 +508,10 @@ TEST(ApproxTimeSync, RateBound) {
 
   input.push_back(TimeAndTopic(t, 0));     // a
   input.push_back(TimeAndTopic(t + s, 1));   // A
-  input.push_back(TimeAndTopic(t + s * 3, 0)); // b
-  input.push_back(TimeAndTopic(t + s * 4, 1)); // B
-  input.push_back(TimeAndTopic(t + s * 6, 0)); // c
-  input.push_back(TimeAndTopic(t + s * 7, 1)); // C
+  input.push_back(TimeAndTopic(t + s * 3, 0));  // b
+  input.push_back(TimeAndTopic(t + s * 4, 1));  // B
+  input.push_back(TimeAndTopic(t + s * 6, 0));  // c
+  input.push_back(TimeAndTopic(t + s * 7, 1));  // C
   output.push_back(TimePair(t, t + s));
   output.push_back(TimePair(t + s * 3, t + s * 4));
 
@@ -529,7 +530,6 @@ TEST(ApproxTimeSync, RateBound) {
   ApproximateTimeSynchronizerTest sync_test2(input, output, 10);
   sync_test2.sync_.setInterMessageLowerBound(0, s * 2);
   sync_test2.run();
-
 }
 
 
