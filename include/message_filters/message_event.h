@@ -44,8 +44,6 @@
 // https://github.com/ros2/rcutils/pull/112
 #define RCUTILS_ASSERT assert
 #endif
-// Uncomment below intead
-// #include <rcutils/assert.h>
 
 namespace message_filters
 {

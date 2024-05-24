@@ -59,8 +59,6 @@
 // https://github.com/ros2/rcutils/pull/112
 #define RCUTILS_BREAK std::abort
 #endif
-// Uncomment below intead
-// #include <rcutils/assert.h>
 
 namespace message_filters
 {
@@ -376,7 +374,6 @@ private:
 
   void makeCandidate()
   {
-    // printf("Creating candidate\n");
     // Create candidate tuple
     candidate_ = Tuple();  // Discards old one if any
     std::get<0>(candidate_) = std::get<0>(deques_).front();
@@ -412,7 +409,6 @@ private:
     std::get<6>(past_).clear();
     std::get<7>(past_).clear();
     std::get<8>(past_).clear();
-    // printf("Candidate created\n");
   }
 
 
@@ -484,7 +480,6 @@ private:
   // Assumes: all deques are non empty, i.e. num_non_empty_deques_ == RealTypeCount::value
   void publishCandidate()
   {
-    // printf("Publishing candidate\n");
     // Publish
     parent_->signal(
       std::get<0>(candidate_), std::get<1>(candidate_), std::get<2>(candidate_),
@@ -669,9 +664,6 @@ private:
     // While no deque is empty
     while (num_non_empty_deques_ == (uint32_t)RealTypeCount::value) {
       // Find the start and end of the current interval
-      // printf("Entering while loop in this state [\n");
-      // show_internal_state();
-      // printf("]\n");
       rclcpp::Time end_time, start_time;
       uint32_t end_index, start_index;
       getCandidateEnd(end_index, end_time);
@@ -722,7 +714,6 @@ private:
       }
       // INVARIANT: we have a candidate and pivot
       RCUTILS_ASSERT(pivot_ != NO_PIVOT);
-      // printf("start_index == %d, pivot_ == %d\n", start_index, pivot_);
       if (start_index == pivot_) {  // TODO(anyone): replace with start_time == pivot_time_
         // We have exhausted all possible candidates for this pivot, we now can output the best one
         publishCandidate();

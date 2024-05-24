@@ -204,7 +204,7 @@ public:
     init();
   }
 
-  Synchronizer(const Policy & policy)
+  explicit Synchronizer(const Policy & policy)
   : Policy(policy)
   {
     init();
