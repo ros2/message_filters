@@ -1,7 +1,3 @@
-.. redirect-from::
-
-   Tutorials/Approximate-Synchronizer-Cpp
-
 Approximate Time Synchronizer (C++):
 ---------------------------------------
 

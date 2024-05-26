@@ -1,7 +1,3 @@
-.. redirect-from::
-
-   Tutorials/Writing-A-Time_Synchronizer-Python
-
 Time Synchronizer (Python):
 ---------------------------
 

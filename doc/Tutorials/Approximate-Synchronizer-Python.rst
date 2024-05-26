@@ -1,7 +1,3 @@
-.. redirect-from::
-
-   Tutorials/Approximate-Synchronizer-Python
-
 Approximate Time Synchronizer (Python):
 ---------------------------------------
 
