@@ -146,8 +146,8 @@ struct message_type <M, true>
   using type = typename M::custom_type;
 };
 
-template <typename M>
-struct message_type <M, false>
+template <typename M> 
+struct message_type <M, false> 
 {
   using type = M;
 };
@@ -156,7 +156,7 @@ template <typename M>
 using message_type_t = typename message_type<M>::type;
 
 template<class M, class NodeType = rclcpp::Node>
-class Subscriber
+class Subscriber 
 : public SubscriberBase<NodeType>
 , public SimpleFilter<message_type_t<M>>
 {
