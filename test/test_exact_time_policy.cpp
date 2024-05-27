@@ -55,7 +55,7 @@ namespace message_traits
 template<>
 struct TimeStamp<Msg>
 {
-  static rclcpp::Time value(const Msg& m)
+  static rclcpp::Time value(const Msg & m)
   {
     return m.header.stamp;
   }
@@ -68,7 +68,7 @@ class Helper
 public:
   Helper()
   : count_(0)
-  , drop_count_(0)
+    , drop_count_(0)
   {}
 
   void cb()
@@ -160,7 +160,9 @@ TEST(ExactTime, dropCallback)
 
 struct EventHelper
 {
-  void callback(const message_filters::MessageEvent<Msg const> & e1, const message_filters::MessageEvent<Msg const> & e2)
+  void callback(
+    const message_filters::MessageEvent<Msg const> & e1,
+    const message_filters::MessageEvent<Msg const> & e2)
   {
     e1_ = e1;
     e2_ = e2;
@@ -186,11 +188,9 @@ TEST(ExactTime, eventInEventOut)
   ASSERT_EQ(h.e2_.getReceiptTime(), evt.getReceiptTime());
 }
 
-int main(int argc, char **argv)
+int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
   rclcpp::init(argc, argv);
   return RUN_ALL_TESTS();
 }
-
-

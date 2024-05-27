@@ -26,6 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <utility>
@@ -58,7 +59,7 @@ namespace message_traits
 template<>
 struct TimeStamp<Msg>
 {
-  static rclcpp::Time value(const Msg& m)
+  static rclcpp::Time value(const Msg & m)
   {
     return m.header.stamp;
   }
@@ -84,17 +85,20 @@ struct TimeQuad
 class ApproximateEpsilonTimeSynchronizerTest
 {
 public:
-
-  ApproximateEpsilonTimeSynchronizerTest(const std::vector<TimeAndTopic> &input,
-				  const std::vector<TimePair> &output,
-				  uint32_t queue_size, rclcpp::Duration epsilon) :
-    input_(input), output_(output), output_position_(0), sync_(
+  ApproximateEpsilonTimeSynchronizerTest(
+    const std::vector<TimeAndTopic> & input,
+    const std::vector<TimePair> & output,
+    uint32_t queue_size, rclcpp::Duration epsilon)
+  : input_(input), output_(output), output_position_(0), sync_(
       message_filters::sync_policies::ApproximateEpsilonTime<Msg, Msg>{queue_size, epsilon})
   {
-    sync_.registerCallback(std::bind(&ApproximateEpsilonTimeSynchronizerTest::callback, this, std::placeholders::_1, std::placeholders::_2));
+    sync_.registerCallback(
+      std::bind(
+        &ApproximateEpsilonTimeSynchronizerTest::callback, this,
+        std::placeholders::_1, std::placeholders::_2));
   }
 
-  void callback(const MsgConstPtr& p, const MsgConstPtr& q)
+  void callback(const MsgConstPtr & p, const MsgConstPtr & q)
   {
     ASSERT_TRUE(p);
     ASSERT_TRUE(q);
@@ -106,18 +110,14 @@ public:
 
   void run()
   {
-    for (const auto & time_topic: input_)
-    {
+    for (const auto & time_topic: input_) {
       const rclcpp::Time & time = time_topic.first;
       const unsigned int & topic = time_topic.second;
-      if (topic == 0)
-      {
+      if (topic == 0) {
         MsgPtr p(std::make_shared<Msg>());
         p->header.stamp = time;
         sync_.add<0>(p);
-      }
-      else
-      {
+      } else {
         MsgPtr q(std::make_shared<Msg>());
         q->header.stamp = time;
         sync_.add<1>(q);
@@ -130,7 +130,9 @@ private:
   const std::vector<TimeAndTopic> & input_;
   const std::vector<TimePair> & output_;
   unsigned int output_position_;
-  typedef message_filters::Synchronizer<message_filters::sync_policies::ApproximateEpsilonTime<Msg, Msg>> Sync2;
+  typedef message_filters::Synchronizer<message_filters::sync_policies::ApproximateEpsilonTime<Msg,
+      Msg>> Sync2;
+
 public:
   Sync2 sync_;
 };
@@ -146,15 +148,15 @@ TEST(ApproxTimeSync, ExactMatch) {
   rclcpp::Time t(0, 0, RCL_ROS_TIME);
   rclcpp::Duration s(1, 0);
 
-  input.push_back(TimeAndTopic(t,0));     // a
-  input.push_back(TimeAndTopic(t,1));   // A
-  input.push_back(TimeAndTopic(t+s*3,0));  // b
-  input.push_back(TimeAndTopic(t+s*3,1));  // B
-  input.push_back(TimeAndTopic(t+s*6,0));  // c
-  input.push_back(TimeAndTopic(t+s*6,1));  // C
+  input.push_back(TimeAndTopic(t, 0));     // a
+  input.push_back(TimeAndTopic(t, 1));   // A
+  input.push_back(TimeAndTopic(t + s * 3, 0));  // b
+  input.push_back(TimeAndTopic(t + s * 3, 1));  // B
+  input.push_back(TimeAndTopic(t + s * 6, 0));  // c
+  input.push_back(TimeAndTopic(t + s * 6, 1));  // C
   output.push_back(TimePair(t, t));
-  output.push_back(TimePair(t+s*3, t+s*3));
-  output.push_back(TimePair(t+s*6, t+s*6));
+  output.push_back(TimePair(t + s * 3, t + s * 3));
+  output.push_back(TimePair(t + s * 6, t + s * 6));
 
   ApproximateEpsilonTimeSynchronizerTest sync_test(
     input, output, 10, rclcpp::Duration::from_seconds(0.5));
@@ -173,15 +175,15 @@ TEST(ApproxTimeSync, PerfectMatch) {
   rclcpp::Time t(0, 0, RCL_ROS_TIME);
   rclcpp::Duration s(1, 0);
 
-  input.push_back(TimeAndTopic(t,0));     // a
-  input.push_back(TimeAndTopic(t+s,1));   // A
-  input.push_back(TimeAndTopic(t+s*3,0)); // b
-  input.push_back(TimeAndTopic(t+s*4,1)); // B
-  input.push_back(TimeAndTopic(t+s*6,0)); // c
-  input.push_back(TimeAndTopic(t+s*7,1)); // C
-  output.push_back(TimePair(t, t+s));
-  output.push_back(TimePair(t+s*3, t+s*4));
-  output.push_back(TimePair(t+s*6, t+s*7));
+  input.push_back(TimeAndTopic(t, 0));     // a
+  input.push_back(TimeAndTopic(t + s, 1));   // A
+  input.push_back(TimeAndTopic(t + s * 3, 0)); // b
+  input.push_back(TimeAndTopic(t + s * 4, 1)); // B
+  input.push_back(TimeAndTopic(t + s * 6, 0)); // c
+  input.push_back(TimeAndTopic(t + s * 7, 1)); // C
+  output.push_back(TimePair(t, t + s));
+  output.push_back(TimePair(t + s * 3, t + s * 4));
+  output.push_back(TimePair(t + s * 6, t + s * 7));
 
   ApproximateEpsilonTimeSynchronizerTest sync_test(
     input, output, 10, rclcpp::Duration::from_seconds(1.5));
@@ -200,23 +202,23 @@ TEST(ApproxTimeSync, ImperfectMatch) {
   rclcpp::Time t(0, 0, RCL_ROS_TIME);
   rclcpp::Duration s(1, 0);
 
-  input.push_back(TimeAndTopic(t,0));     // a
-  input.push_back(TimeAndTopic(t+s,1));   // A
-  input.push_back(TimeAndTopic(t+s*2,0)); // x
-  input.push_back(TimeAndTopic(t+s*3,0)); // b
-  input.push_back(TimeAndTopic(t+s*4,1)); // B
-  input.push_back(TimeAndTopic(t+s*6,0)); // c
-  input.push_back(TimeAndTopic(t+s*7,1)); // C
-  output.push_back(TimePair(t, t+s));
-  output.push_back(TimePair(t+s*3, t+s*4));
-  output.push_back(TimePair(t+s*6, t+s*7));
+  input.push_back(TimeAndTopic(t, 0));     // a
+  input.push_back(TimeAndTopic(t + s, 1));   // A
+  input.push_back(TimeAndTopic(t + s * 2, 0)); // x
+  input.push_back(TimeAndTopic(t + s * 3, 0)); // b
+  input.push_back(TimeAndTopic(t + s * 4, 1)); // B
+  input.push_back(TimeAndTopic(t + s * 6, 0)); // c
+  input.push_back(TimeAndTopic(t + s * 7, 1)); // C
+  output.push_back(TimePair(t, t + s));
+  output.push_back(TimePair(t + s * 3, t + s * 4));
+  output.push_back(TimePair(t + s * 6, t + s * 7));
 
   ApproximateEpsilonTimeSynchronizerTest sync_test(
     input, output, 10, rclcpp::Duration::from_seconds(1.5));
   sync_test.run();
 }
 
-int main(int argc, char **argv)
+int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
   rclcpp::init(argc, argv);

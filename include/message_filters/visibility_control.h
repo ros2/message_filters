@@ -54,4 +54,3 @@ extern "C"
 #endif
 
 #endif  // MESSAGE_FILTERS__VISIBILITY_CONTROL_H_
-
