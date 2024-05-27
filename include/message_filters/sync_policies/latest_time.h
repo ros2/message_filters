@@ -43,7 +43,7 @@ Synchronizer<latest_policy> sync_policies(latest_policy(), caminfo_sub, limage_s
 sync_policies.registerCallback(callback);
 \endverbatim
 
- * May also take an instance of a `rclcpp::Clock::SharedPtr` from `rclpp::Node::get_clock()`
+ * May also take an instance of a `rclcpp::Clock::SharedPtr` from `rclpp::Node::get_clock()` 
  * to use the node's time source (e.g. sim time) as in:
 \verbatim
 typedef LatestTime<sensor_msgs::CameraInfo, sensor_msgs::Image, sensor_msgs::Image> latest_policy;
