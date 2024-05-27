@@ -28,7 +28,7 @@
 
 # -*- coding: utf-8 -*-
 #
-# tf documentation build configuration file, created by
+# message_filters documentation build configuration file, created by
 # sphinx-quickstart on Mon Jun  1 14:21:53 2009.
 #
 # This file is execfile()d with the current directory set to its containing dir.
