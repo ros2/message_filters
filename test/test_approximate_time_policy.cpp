@@ -91,7 +91,7 @@ public:
     const std::vector<TimeAndTopic> & input,
     const std::vector<TimePair> & output,
     uint32_t queue_size)
-  : input_(input), output_(output), output_position_(0), sync_(Policy2(queue_size))
+  : input_(input), output_(output), output_position_(0), policy_(queue_size), sync_(policy_)
   {
     sync_.registerCallback(
       std::bind(
@@ -133,6 +133,7 @@ private:
   typedef message_filters::Synchronizer<Policy2> Sync2;
 
 public:
+  Policy2 policy_;
   Sync2 sync_;
 };
 

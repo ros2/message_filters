@@ -668,7 +668,6 @@ private:
       uint32_t end_index, start_index;
       getCandidateEnd(end_index, end_time);
       getCandidateStart(start_index, start_time);
-      rclcpp::Duration age_check = (end_time - candidate_end_) * (1 + age_penalty_);
       for (uint32_t i = 0; i < (uint32_t)RealTypeCount::value; i++) {
         if (i != end_index) {
           // No dropped message could have been better to use than the ones we have,
@@ -701,8 +700,10 @@ private:
         // We already have a candidate
         // Is this one better than the current candidate?
         // INVARIANT: has_dropped_messages_ is all false
-        if (age_check  >= (start_time - candidate_start_)) {
-          // This is not a better candidate, move to the nextappro
+        if ((end_time - candidate_end_) * (1 + age_penalty_) >=
+          (start_time - candidate_start_))
+        {
+          // This is not a better candidate, move to the next
           dequeMoveFrontToPast(start_index);
         } else {
           // This is a better candidate
@@ -715,10 +716,11 @@ private:
       }
       // INVARIANT: we have a candidate and pivot
       RCUTILS_ASSERT(pivot_ != NO_PIVOT);
+      rclcpp::Duration age_check = (end_time - candidate_end_) * (1 + age_penalty_);
       if (start_index == pivot_) {  // TODO(anyone): replace with start_time == pivot_time_
         // We have exhausted all possible candidates for this pivot, we now can output the best one
         publishCandidate();
-      } else if (age_check  >= (pivot_time_ - candidate_start_)) {
+      } else if (age_check >= (pivot_time_ - candidate_start_)) {
         // We have not exhausted all candidates, but this candidate is already provably optimal
         // Indeed, any future candidate must contain the interval [pivot_time_ end_time], which
         // is already too big.
@@ -735,7 +737,8 @@ private:
           uint32_t end_index, start_index;
           getVirtualCandidateEnd(end_index, end_time);
           getVirtualCandidateStart(start_index, start_time);
-          if (age_check >= (pivot_time_ - candidate_start_))
+          if ((end_time - candidate_end_) * (1 + age_penalty_) >=
+            (pivot_time_ - candidate_start_))
           {
             // We have proved optimality
             // As above, any future candidate must contain the interval [pivot_time_ end_time],
@@ -743,7 +746,8 @@ private:
             publishCandidate();  // This cleans up the virtual moves as a byproduct
             break;  // From the while(1) loop only
           }
-          if (age_check < (start_time - candidate_start_))
+          if ((end_time - candidate_end_) * (1 + age_penalty_) <
+            (start_time - candidate_start_))
           {
             // We cannot prove optimality
             // Indeed, we have a virtual (i.e. optimistic) candidate that is better than the current
