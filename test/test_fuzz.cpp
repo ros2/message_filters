@@ -129,7 +129,9 @@ TEST(Subscriber, fuzz_subscriber)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
-  message_filters::Subscriber<Msg> sub(node, "test_topic");
+  rclcpp::QoS default_qos =
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+  message_filters::Subscriber<Msg> sub(node, "test_topic", default_qos);
   sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
   rclcpp::Clock ros_clock;
