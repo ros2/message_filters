@@ -91,7 +91,7 @@ public:
     const std::vector<TimeAndTopic> & input,
     const std::vector<TimePair> & output,
     uint32_t queue_size)
-  : input_(input), output_(output), output_position_(0), sync_(Policy2(queue_size))
+  : input_(input), output_(output), output_position_(0), sync_(queue_size)
   {
     sync_.registerCallback(
       std::bind(
@@ -129,8 +129,8 @@ private:
   const std::vector<TimeAndTopic> & input_;
   const std::vector<TimePair> & output_;
   unsigned int output_position_;
-  typedef message_filters::sync_policies::ApproximateTime<Msg, Msg> Policy2;
-  typedef message_filters::Synchronizer<Policy2> Sync2;
+  typedef message_filters::Synchronizer<message_filters::sync_policies::ApproximateTime<Msg,
+      Msg>> Sync2;
 
 public:
   Sync2 sync_;
@@ -147,7 +147,7 @@ public:
     const std::vector<TimeAndTopic> & input,
     const std::vector<TimeQuad> & output,
     uint32_t queue_size)
-  : input_(input), output_(output), output_position_(0), sync_(Policy4(queue_size))
+  : input_(input), output_(output), output_position_(0), sync_(queue_size)
   {
     sync_.registerCallback(
       std::bind(
@@ -199,8 +199,8 @@ private:
   const std::vector<TimeAndTopic> & input_;
   const std::vector<TimeQuad> & output_;
   unsigned int output_position_;
-  typedef message_filters::sync_policies::ApproximateTime<Msg, Msg, Msg, Msg> Policy4;
-  typedef message_filters::Synchronizer<Policy4> Sync4;
+  typedef message_filters::Synchronizer<message_filters::sync_policies::ApproximateTime<Msg,
+      Msg, Msg, Msg>> Sync4;
 
 public:
   Sync4 sync_;

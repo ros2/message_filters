@@ -109,7 +109,7 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   typedef std::tuple<M0Vector, M1Vector, M2Vector, M3Vector, M4Vector, M5Vector, M6Vector, M7Vector,
       M8Vector> VectorTuple;
 
-  explicit ApproximateTime(uint32_t queue_size)
+  ApproximateTime(uint32_t queue_size)  // NOLINT(runtime/explicit)
   : parent_(0)
     , queue_size_(queue_size)
     , num_non_empty_deques_(0)

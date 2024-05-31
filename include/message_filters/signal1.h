@@ -59,7 +59,7 @@ public:
   typedef std::function<void (typename Adapter::Parameter)> Callback;
   typedef typename Adapter::Event Event;
 
-  explicit CallbackHelper1T(const Callback & cb)
+  CallbackHelper1T(const Callback & cb)  // NOLINT(runtime/explicit)
   : callback_(cb)
   {
   }

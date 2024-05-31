@@ -51,8 +51,9 @@ public:
   {
   }
 
+
   template<typename F>
-  explicit PassThrough(F & f)
+  PassThrough(F & f)  // NOLINT(runtime/explicit)
   {
     connectInput(f);
   }
