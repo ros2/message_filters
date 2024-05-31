@@ -157,7 +157,8 @@ public:
     const rmw_qos_profile_t qos,
     rclcpp::SubscriptionOptions options)
   {
-    this->subscribe(node.get(), topic, qos, options);
+    this->subscribe(
+      node.get(), topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(qos)), options);
   }
 
   /**
@@ -301,7 +302,7 @@ public:
     NodePtr node, const std::string & topic,
     const rmw_qos_profile_t qos = rmw_qos_profile_default)
   {
-    subscribe(node, topic, qos);
+    subscribe(node, topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(qos)));
   }
 
   [[deprecated("use rclcpp::QoS instead of rmw_qos_profile_t")]]
@@ -451,7 +452,9 @@ public:
     NodePtr node, const std::string & topic,
     const rmw_qos_profile_t qos = rmw_qos_profile_default) override
   {
-    subscribe(node.get(), topic, qos, rclcpp::SubscriptionOptions());
+    subscribe(
+      node.get(), topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(qos)),
+      rclcpp::SubscriptionOptions());
   }
 
   /**
@@ -468,7 +471,9 @@ public:
     NodeType * node, const std::string & topic,
     const rmw_qos_profile_t qos = rmw_qos_profile_default) override
   {
-    subscribe(node, topic, qos, rclcpp::SubscriptionOptions());
+    subscribe(
+      node, topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(qos)),
+      rclcpp::SubscriptionOptions());
   }
 
   /**
@@ -488,7 +493,7 @@ public:
     const rmw_qos_profile_t qos,
     rclcpp::SubscriptionOptions options) override
   {
-    subscribe(node.get(), topic, qos, options);
+    subscribe(node.get(), topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(qos)), options);
     node_raw_ = nullptr;
     node_shared_ = node;
   }
