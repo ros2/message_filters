@@ -60,8 +60,8 @@ struct TimeStamp<Msg>
     return m.header.stamp;
   }
 };
-}
-}
+}  // namespace message_traits
+}  // namespace message_filters
 
 void fillCacheEasy(message_filters::Cache<Msg> & cache, unsigned int start, unsigned int end)
 {

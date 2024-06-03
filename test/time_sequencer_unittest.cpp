@@ -58,8 +58,8 @@ struct TimeStamp<Msg>
     return m.header.stamp;
   }
 };
-}
-}
+}  // namespace message_traits
+}  // namespace message_filters
 
 class Helper
 {

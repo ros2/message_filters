@@ -29,6 +29,7 @@
 #ifndef MESSAGE_FILTERS__PASS_THROUGH_H_
 #define MESSAGE_FILTERS__PASS_THROUGH_H_
 
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -50,8 +51,9 @@ public:
   {
   }
 
+
   template<typename F>
-  PassThrough(F & f)
+  PassThrough(F & f)  // NOLINT(runtime/explicit)
   {
     connectInput(f);
   }

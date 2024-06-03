@@ -69,8 +69,9 @@ struct NullPolicy : public message_filters::PolicyBase<M0, M1, M2, M3, M4, M5, M
     }
   }
 
-  void initParent(Sync *)
+  void initParent(Sync * parent)
   {
+    (void)parent;
   }
 
   template<int i>

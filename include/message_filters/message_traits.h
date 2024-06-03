@@ -32,6 +32,7 @@
 #ifndef MESSAGE_FILTERS__MESSAGE_TRAITS_H_
 #define MESSAGE_FILTERS__MESSAGE_TRAITS_H_
 
+#include <string>
 #include <type_traits>
 
 #include <rclcpp/rclcpp.hpp>

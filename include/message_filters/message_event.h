@@ -33,7 +33,9 @@
 #define MESSAGE_FILTERS__MESSAGE_EVENT_H_
 
 #include <type_traits>
+#include <map>
 #include <memory>
+#include <string>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -42,8 +44,6 @@
 // https://github.com/ros2/rcutils/pull/112
 #define RCUTILS_ASSERT assert
 #endif
-// Uncomment below intead
-//#include <rcutils/assert.h>
 
 namespace message_filters
 {
@@ -118,7 +118,7 @@ public:
   /**
    * \todo Make this explicit in ROS 2.0.  Keep as auto-converting for now to maintain backwards compatibility in some places (message_filters)
    */
-  MessageEvent(const ConstMessagePtr & message)
+  MessageEvent(const ConstMessagePtr & message)  // NOLINT(runtime/explicit)
   {
     init(message, rclcpp::Clock().now(), true, message_filters::DefaultMessageCreator<Message>());
   }
@@ -240,7 +240,8 @@ private:
   }
 
   ConstMessagePtr message_;
-  // Kind of ugly to make this mutable, but it means we can pass a const MessageEvent to a callback and not worry about other things being modified
+  // Kind of ugly to make this mutable, but it means we can pass a const MessageEvent
+  // to a callback and not worry about other things being modified
   mutable MessagePtr message_copy_;
   rclcpp::Time receipt_time_;
   bool nonconst_need_copy_;

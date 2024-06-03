@@ -27,8 +27,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 
-#ifndef MESSAGE_FILTERS_TIME_SYNCHRONIZER_H
-#define MESSAGE_FILTERS_TIME_SYNCHRONIZER_H
+#ifndef MESSAGE_FILTERS__TIME_SYNCHRONIZER_H_
+#define MESSAGE_FILTERS__TIME_SYNCHRONIZER_H_
 
 #include <memory>
 
@@ -169,7 +169,7 @@ public:
     connectInput(f0, f1, f2, f3, f4, f5, f6, f7, f8);
   }
 
-  TimeSynchronizer(uint32_t queue_size)
+  TimeSynchronizer(uint32_t queue_size)  // NOLINT(runtime/explicit)
   : Base(Policy(queue_size))
   {
   }
@@ -225,4 +225,4 @@ public:
 
 }  // namespace message_filters
 
-#endif  // MESSAGE_FILTERS_TIME_SYNCHRONIZER_H
+#endif  // MESSAGE_FILTERS__TIME_SYNCHRONIZER_H_

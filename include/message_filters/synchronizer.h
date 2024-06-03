@@ -204,7 +204,7 @@ public:
     init();
   }
 
-  Synchronizer(const Policy & policy)
+  Synchronizer(const Policy & policy)  // NOLINT(runtime/explicit)
   : Policy(policy)
   {
     init();
