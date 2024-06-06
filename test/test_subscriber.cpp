@@ -61,7 +61,9 @@ TEST(Subscriber, simple)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
-  message_filters::Subscriber<Msg> sub(node, "test_topic");
+  rclcpp::QoS default_qos =
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+  message_filters::Subscriber<Msg> sub(node, "test_topic", default_qos);
   sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
   rclcpp::Clock ros_clock;
@@ -79,7 +81,9 @@ TEST(Subscriber, simple_raw)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
-  message_filters::Subscriber<Msg> sub(node.get(), "test_topic");
+  rclcpp::QoS default_qos =
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+  message_filters::Subscriber<Msg> sub(node.get(), "test_topic", default_qos);
   sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
   rclcpp::Clock ros_clock;
@@ -97,7 +101,9 @@ TEST(Subscriber, subUnsubSub)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
-  message_filters::Subscriber<Msg> sub(node, "test_topic");
+  rclcpp::QoS default_qos =
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+  message_filters::Subscriber<Msg> sub(node, "test_topic", default_qos);
   sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
 
@@ -119,7 +125,9 @@ TEST(Subscriber, subUnsubSub_raw)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
-  message_filters::Subscriber<Msg> sub(node.get(), "test_topic");
+  rclcpp::QoS default_qos =
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+  message_filters::Subscriber<Msg> sub(node.get(), "test_topic", default_qos);
   sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
 
@@ -141,12 +149,14 @@ TEST(Subscriber, switchRawAndShared)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
-  message_filters::Subscriber<Msg> sub(node, "test_topic");
+  rclcpp::QoS default_qos =
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+  message_filters::Subscriber<Msg> sub(node, "test_topic", default_qos);
   sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic2", 10);
 
   sub.unsubscribe();
-  sub.subscribe(node.get(), "test_topic2");
+  sub.subscribe(node.get(), "test_topic2", default_qos);
 
   rclcpp::Clock ros_clock;
   auto start = ros_clock.now();
@@ -164,7 +174,9 @@ TEST(Subscriber, subInChain)
   auto node = std::make_shared<rclcpp::Node>("test_node");
   Helper h;
   message_filters::Chain<Msg> c;
-  c.addFilter(std::make_shared<message_filters::Subscriber<Msg>>(node, "test_topic"));
+  rclcpp::QoS default_qos =
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+  c.addFilter(std::make_shared<message_filters::Subscriber<Msg>>(node, "test_topic", default_qos));
   c.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
 
@@ -203,7 +215,9 @@ TEST(Subscriber, singleNonConstCallback)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   NonConstHelper h;
-  message_filters::Subscriber<Msg> sub(node, "test_topic");
+  rclcpp::QoS default_qos =
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+  message_filters::Subscriber<Msg> sub(node, "test_topic", default_qos);
   sub.registerCallback(&NonConstHelper::cb, &h);
   auto pub = node->create_publisher<Msg>("test_topic", 10);
   Msg msg;
@@ -220,7 +234,9 @@ TEST(Subscriber, multipleNonConstCallbacksFilterSubscriber)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   NonConstHelper h, h2;
-  message_filters::Subscriber<Msg> sub(node, "test_topic");
+  rclcpp::QoS default_qos =
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+  message_filters::Subscriber<Msg> sub(node, "test_topic", default_qos);
   sub.registerCallback(&NonConstHelper::cb, &h);
   sub.registerCallback(&NonConstHelper::cb, &h2);
   auto pub = node->create_publisher<Msg>("test_topic", 10);
@@ -241,7 +257,9 @@ TEST(Subscriber, multipleCallbacksSomeFilterSomeDirect)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
   NonConstHelper h, h2;
-  message_filters::Subscriber<Msg> sub(node, "test_topic");
+  rclcpp::QoS default_qos =
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+  message_filters::Subscriber<Msg> sub(node, "test_topic", default_qos);
   sub.registerCallback(&NonConstHelper::cb, &h);
   auto sub2 = node->create_subscription<Msg>(
     "test_topic", 10, std::bind(&NonConstHelper::cb, &h2, std::placeholders::_1));
@@ -266,7 +284,10 @@ TEST(Subscriber, lifecycle)
 {
   auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("test_node");
   Helper h;
-  message_filters::Subscriber<Msg, rclcpp_lifecycle::LifecycleNode> sub(node, "test_topic");
+  rclcpp::QoS default_qos =
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+  message_filters::Subscriber<Msg, rclcpp_lifecycle::LifecycleNode> sub(node, "test_topic",
+    default_qos);
   sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
   pub->on_activate();

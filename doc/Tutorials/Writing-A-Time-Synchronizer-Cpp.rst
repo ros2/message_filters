@@ -71,8 +71,8 @@ Next, we can initialize these private elements within a basic ``Node`` construct
       temp_pub = this->create_publisher<sensor_msgs::msg::Temperature>("temp", qos);
       fluid_pub = this->create_publisher<sensor_msgs::msg::FluidPressure>("fluid", qos);
 
-      temp_sub.subscribe(this, "temp", qos.get_rmw_qos_profile());
-      fluid_sub.subscribe(this, "fluid", qos.get_rmw_qos_profile());
+      temp_sub.subscribe(this, "temp", qos);
+      fluid_sub.subscribe(this, "fluid", qos);
 
       timer = this->create_wall_timer(1000ms, std::bind(&TimeSyncNode::TimerCallback, this));
 
