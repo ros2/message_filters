@@ -70,7 +70,7 @@ struct ExactTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   typedef typename Super::M8Event M8Event;
   typedef Events Tuple;
 
-  ExactTime(uint32_t queue_size)  // NOLINT(runtime/explicit)
+  explicit ExactTime(uint32_t queue_size)
   : parent_(0)
     , queue_size_(queue_size)
   {

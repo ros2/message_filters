@@ -169,7 +169,7 @@ public:
     connectInput(f0, f1, f2, f3, f4, f5, f6, f7, f8);
   }
 
-  TimeSynchronizer(uint32_t queue_size)  // NOLINT(runtime/explicit)
+  explicit TimeSynchronizer(uint32_t queue_size)
   : Base(Policy(queue_size))
   {
   }
