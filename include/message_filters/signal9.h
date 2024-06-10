@@ -107,7 +107,7 @@ public:
       typename A5::Parameter, typename A6::Parameter, typename A7::Parameter,
       typename A8::Parameter)> Callback;
 
-  CallbackHelper9T(const Callback & cb)  // NOLINT(runtime/explicit)
+  explicit CallbackHelper9T(const Callback & cb)
   : callback_(cb)
   {
   }

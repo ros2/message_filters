@@ -96,7 +96,8 @@ typedef message_filters::Synchronizer<Policy3> Sync3;
 //////////////////////////////////////////////////////////////////////////////////////////////////
 TEST(ExactTime, multipleTimes)
 {
-  Sync3 sync(2);
+  Policy3 p(2);
+  Sync3 sync(p);
   Helper h;
   sync.registerCallback(std::bind(&Helper::cb, &h));
   MsgPtr m(std::make_shared<Msg>());
@@ -117,7 +118,8 @@ TEST(ExactTime, multipleTimes)
 
 TEST(ExactTime, queueSize)
 {
-  Sync3 sync(1);
+  Policy3 p(1);
+  Sync3 sync(p);
   Helper h;
   sync.registerCallback(std::bind(&Helper::cb, &h));
   MsgPtr m(std::make_shared<Msg>());
@@ -143,7 +145,8 @@ TEST(ExactTime, queueSize)
 
 TEST(ExactTime, dropCallback)
 {
-  Sync2 sync(1);
+  Policy2 p(1);
+  Sync2 sync(p);
   Helper h;
   sync.registerCallback(std::bind(&Helper::cb, &h));
   sync.getPolicy()->registerDropCallback(std::bind(&Helper::dropcb, &h));
@@ -174,7 +177,8 @@ struct EventHelper
 
 TEST(ExactTime, eventInEventOut)
 {
-  Sync2 sync(2);
+  Policy2 p(2);
+  Sync2 sync(p);
   EventHelper h;
   sync.registerCallback(&EventHelper::callback, &h);
   message_filters::MessageEvent<Msg const> evt(std::make_shared<Msg>(), rclcpp::Time(4, 0));

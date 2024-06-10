@@ -118,7 +118,7 @@ public:
   /**
    * \todo Make this explicit in ROS 2.0.  Keep as auto-converting for now to maintain backwards compatibility in some places (message_filters)
    */
-  MessageEvent(const ConstMessagePtr & message)  // NOLINT(runtime/explicit)
+  explicit MessageEvent(const ConstMessagePtr & message)
   {
     init(message, rclcpp::Clock().now(), true, message_filters::DefaultMessageCreator<Message>());
   }
