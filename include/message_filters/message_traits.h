@@ -88,7 +88,7 @@ struct TimeStamp
   static rclcpp::Time value(const M & m)
   {
     (void)m;
-    return rclcpp::Time();
+    return rclcpp::Time(0, 0, RCL_ROS_TIME);
   }
 };
 
