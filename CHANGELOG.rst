@@ -2,8 +2,8 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+5.0.0 (2024-06-17)
+------------------
 * fix: fallback Time used incorrect clock (`#118 <https://github.com/ros2/message_filters/issues/118>`_)
 * Adding explicit constructors (`#129 <https://github.com/ros2/message_filters/issues/129>`_)
 * Deprecated qos_profile in Subscriber (`#127 <https://github.com/ros2/message_filters/issues/127>`_)
