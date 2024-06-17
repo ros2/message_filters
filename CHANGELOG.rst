@@ -2,6 +2,18 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix: fallback Time used incorrect clock (`#118 <https://github.com/ros2/message_filters/issues/118>`_)
+* Adding explicit constructors (`#129 <https://github.com/ros2/message_filters/issues/129>`_)
+* Deprecated qos_profile in Subscriber (`#127 <https://github.com/ros2/message_filters/issues/127>`_)
+* Adding cpplint (`#125 <https://github.com/ros2/message_filters/issues/125>`_)
+* Move Docs From Wiki (`#119 <https://github.com/ros2/message_filters/issues/119>`_)
+* Adding lint_cmake (`#126 <https://github.com/ros2/message_filters/issues/126>`_)
+* Adding Uncrustify Changes (`#124 <https://github.com/ros2/message_filters/issues/124>`_)
+* Adding Copyright Linter (`#122 <https://github.com/ros2/message_filters/issues/122>`_)
+* Contributors: Lucas Wendland, Russ
+
 4.12.0 (2024-04-26)
 -------------------
 
