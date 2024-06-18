@@ -145,7 +145,7 @@ TEST(SimpleFilter, oldRegisterWithNewFilter)
 {
   OldFilter f;
   Helper h;
-  f.registerCallback(std::bind(&Helper::cb0, &h, std::placeholders::_1));
+  f.registerCallback(std::bind(&Helper::cb3, &h, std::placeholders::_1));
 }
 
 int main(int argc, char ** argv)
