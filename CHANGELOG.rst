@@ -2,6 +2,11 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Revert "Adding explicit constructors (`#129 <https://github.com/ros2/message_filters/issues/129>`_)" (`#132 <https://github.com/ros2/message_filters/issues/132>`_)
+* Contributors: Chris Lalancette
+
 5.0.0 (2024-06-17)
 ------------------
 * fix: fallback Time used incorrect clock (`#118 <https://github.com/ros2/message_filters/issues/118>`_)
