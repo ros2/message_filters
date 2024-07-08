@@ -30,7 +30,6 @@ import message_filters
 from message_filters import ApproximateTimeSynchronizer
 
 import random
-import rclpy
 from rclpy.clock import ROSClock
 from rclpy.duration import Duration
 from rclpy.time import Time

@@ -147,7 +147,7 @@ struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   template<int i>
   void add(const typename std::tuple_element<i, Events>::type & evt)
   {
-    RCUTILS_ASSERT(parent_);
+    assert(parent_);
 
     std::lock_guard<std::mutex> lock(data_mutex_);
 

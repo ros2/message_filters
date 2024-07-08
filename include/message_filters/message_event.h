@@ -39,12 +39,6 @@
 
 #include <rclcpp/rclcpp.hpp>
 
-#ifndef RCUTILS_ASSERT
-// TODO(tfoote) remove this after it's implemented upstream
-// https://github.com/ros2/rcutils/pull/112
-#define RCUTILS_ASSERT assert
-#endif
-
 namespace message_filters
 {
 typedef std::map<std::string, std::string> M_string;
@@ -59,13 +53,7 @@ struct DefaultMessageCreator
   }
 };
 
-/*
-template<typename M>
-ROS_DEPRECATED inline std::shared_ptr<M> defaultMessageCreateFunction()
-{
-  return DefaultMessageCreator<M>()();
-}
-*/
+
 /**
  * \brief Event type for subscriptions, const message_filters::MessageEvent<M const> & can be used in your callback instead of const std::shared_ptr<M const>&
  *
@@ -225,7 +213,7 @@ private:
       return message_copy_;
     }
 
-    RCUTILS_ASSERT(create_);
+    assert(create_);
     message_copy_ = create_();
     *message_copy_ = *message_;
 
