@@ -32,10 +32,11 @@
 #ifndef MESSAGE_FILTERS__MESSAGE_EVENT_H_
 #define MESSAGE_FILTERS__MESSAGE_EVENT_H_
 
-#include <type_traits>
+#include <cassert>
 #include <map>
 #include <memory>
 #include <string>
+#include <type_traits>
 
 #include <rclcpp/rclcpp.hpp>
 
