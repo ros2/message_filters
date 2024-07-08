@@ -105,7 +105,7 @@ public:
   template<size_t i>
   void add(const typename std::tuple_element<i, Events>::type & evt)
   {
-    RCUTILS_ASSERT(parent_);
+    assert(parent_);
 
     std::lock_guard<std::mutex> lock(mutex_);
 

@@ -33,6 +33,7 @@
 
 #include <rcutils/logging_macros.h>
 
+#include <cassert>
 #include <deque>
 #include <limits>
 #include <string>
@@ -46,19 +47,6 @@
 #include "message_filters/null_types.h"
 #include "message_filters/signal9.h"
 #include "message_filters/synchronizer.h"
-
-
-#ifndef RCUTILS_ASSERT
-// TODO(tfoote) remove this after it's implemented upstream
-// https://github.com/ros2/rcutils/pull/112
-#define RCUTILS_ASSERT assert
-#endif
-#ifndef RCUTILS_BREAK
-#include <cassert>
-// TODO(tfoote) remove this after it's implemented upstream
-// https://github.com/ros2/rcutils/pull/112
-#define RCUTILS_BREAK std::abort
-#endif
 
 namespace message_filters
 {
@@ -122,7 +110,7 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   {
     // The synchronizer will tend to drop many messages with a queue size of 1.
     // At least 2 is recommended.
-    RCUTILS_ASSERT(queue_size_ > 0);
+    assert(queue_size_ > 0);
   }
 
   ApproximateTime(const ApproximateTime & e)
@@ -165,7 +153,7 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
     }
     std::deque<typename std::tuple_element<i, Events>::type> & deque = std::get<i>(deques_);
     std::vector<typename std::tuple_element<i, Events>::type> & v = std::get<i>(past_);
-    RCUTILS_ASSERT(!deque.empty());
+    assert(!deque.empty());
     const typename std::tuple_element<i, Messages>::type & msg = *(deque.back()).getMessage();
     rclcpp::Time msg_time =
       mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(msg);
@@ -237,7 +225,7 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
       recover<7>();
       recover<8>();
       // Drop the oldest message in the offending topic
-      RCUTILS_ASSERT(!deque.empty());
+      assert(!deque.empty());
       deque.pop_front();
       has_dropped_messages_[i] = true;
       if (pivot_ != NO_PIVOT) {
@@ -254,7 +242,7 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   {
     // For correctness we only need age_penalty > -1.0,
     // but most likely a negative age_penalty is a mistake.
-    RCUTILS_ASSERT(age_penalty >= 0);
+    assert(age_penalty >= 0);
     age_penalty_ = age_penalty;
   }
 
@@ -262,7 +250,7 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   {
     // For correctness we only need age_penalty > -1.0,
     // but most likely a negative age_penalty is a mistake.
-    RCUTILS_ASSERT(lower_bound >= rclcpp::Duration(0, 0));
+    assert(lower_bound >= rclcpp::Duration(0, 0));
     inter_message_lower_bounds_[i] = lower_bound;
   }
 
@@ -270,7 +258,7 @@ struct ApproximateTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
   {
     // For correctness we only need age_penalty > -1.0,
     // but most likely a negative age_penalty is a mistake.
-    RCUTILS_ASSERT(max_interval_duration >= rclcpp::Duration(0, 0));
+    assert(max_interval_duration >= rclcpp::Duration(0, 0));
     max_interval_duration_ = max_interval_duration;
   }
 
@@ -280,7 +268,7 @@ private:
   void dequeDeleteFront()
   {
     std::deque<typename std::tuple_element<i, Events>::type> & deque = std::get<i>(deques_);
-    RCUTILS_ASSERT(!deque.empty());
+    assert(!deque.empty());
     deque.pop_front();
     if (deque.empty()) {
       --num_non_empty_deques_;
@@ -319,7 +307,7 @@ private:
         dequeDeleteFront<8>();
         break;
       default:
-        RCUTILS_BREAK();
+        std::abort();
     }
   }
 
@@ -329,7 +317,7 @@ private:
   {
     std::deque<typename std::tuple_element<i, Events>::type> & deque = std::get<i>(deques_);
     std::vector<typename std::tuple_element<i, Events>::type> & vector = std::get<i>(past_);
-    RCUTILS_ASSERT(!deque.empty());
+    assert(!deque.empty());
     vector.push_back(deque.front());
     deque.pop_front();
     if (deque.empty()) {
@@ -368,7 +356,7 @@ private:
         dequeMoveFrontToPast<8>();
         break;
       default:
-        RCUTILS_BREAK();
+        std::abort();
     }
   }
 
@@ -422,7 +410,7 @@ private:
 
     std::vector<typename std::tuple_element<i, Events>::type> & v = std::get<i>(past_);
     std::deque<typename std::tuple_element<i, Events>::type> & q = std::get<i>(deques_);
-    RCUTILS_ASSERT(num_messages <= v.size());
+    assert(num_messages <= v.size());
     while (num_messages > 0) {
       q.push_front(v.back());
       v.pop_back();
@@ -469,7 +457,7 @@ private:
       v.pop_back();
     }
 
-    RCUTILS_ASSERT(!q.empty());
+    assert(!q.empty());
 
     q.pop_front();
     if (!q.empty()) {
@@ -597,12 +585,12 @@ private:
     if (i >= RealTypeCount::value) {
       return rclcpp::Time(0, 0);  // Dummy return value
     }
-    RCUTILS_ASSERT(pivot_ != NO_PIVOT);
+    assert(pivot_ != NO_PIVOT);
 
     std::vector<typename std::tuple_element<i, Events>::type> & v = std::get<i>(past_);
     std::deque<typename std::tuple_element<i, Events>::type> & q = std::get<i>(deques_);
     if (q.empty()) {
-      RCUTILS_ASSERT(!v.empty());  // Because we have a candidate
+      assert(!v.empty());  // Because we have a candidate
       rclcpp::Time last_msg_time =
         mt::TimeStamp<typename std::tuple_element<i, Messages>::type>::value(
         *(v.back()).getMessage());
@@ -715,7 +703,7 @@ private:
         }
       }
       // INVARIANT: we have a candidate and pivot
-      RCUTILS_ASSERT(pivot_ != NO_PIVOT);
+      assert(pivot_ != NO_PIVOT);
       rclcpp::Duration age_check = (end_time - candidate_end_) * (1 + age_penalty_);
       if (start_index == pivot_) {  // TODO(anyone): replace with start_time == pivot_time_
         // We have exhausted all possible candidates for this pivot, we now can output the best one
@@ -764,14 +752,14 @@ private:
             recover<7>(num_virtual_moves[7]);
             recover<8>(num_virtual_moves[8]);
             (void)num_non_empty_deques_before_virtual_search;  // unused variable warning stopper
-            RCUTILS_ASSERT(num_non_empty_deques_before_virtual_search == num_non_empty_deques_);
+            assert(num_non_empty_deques_before_virtual_search == num_non_empty_deques_);
             break;
           }
           // Note: we cannot reach this point with start_index == pivot_ since in that case we would
           // have start_time == pivot_time, in which case the two tests above are the negation
           // of each other, so that one must be true. Therefore the while loop always terminates.
-          RCUTILS_ASSERT(start_index != pivot_);
-          RCUTILS_ASSERT(start_time < pivot_time_);
+          assert(start_index != pivot_);
+          assert(start_time < pivot_time_);
           dequeMoveFrontToPast(start_index);
           num_virtual_moves[start_index]++;
         }  // while(1)

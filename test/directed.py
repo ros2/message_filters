@@ -41,12 +41,11 @@
 #
 #    wide.registerCallback(boost::bind(&PersonDataRecorder::wideCB, this, _1, _2, _3, _4));
 
-import rclpy
 import random
 import unittest
 
 from builtin_interfaces.msg import Time as TimeMsg
-from message_filters import SimpleFilter, Subscriber, Cache, TimeSynchronizer
+from message_filters import SimpleFilter, TimeSynchronizer
 
 
 class MockHeader:
