@@ -33,8 +33,8 @@
 #include <vector>
 
 #include <rclcpp/rclcpp.hpp>
-#include "message_filters/cache.h"
-#include "message_filters/message_traits.h"
+#include "message_filters/cache.hpp"
+#include "message_filters/message_traits.hpp"
 
 struct Header
 {

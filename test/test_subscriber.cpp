@@ -34,8 +34,8 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
-#include "message_filters/subscriber.h"
-#include "message_filters/chain.h"
+#include "message_filters/subscriber.hpp"
+#include "message_filters/chain.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 
 typedef sensor_msgs::msg::Imu Msg;

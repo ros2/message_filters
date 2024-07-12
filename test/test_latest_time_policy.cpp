@@ -37,8 +37,8 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include "rclcpp/time_source.hpp"
-#include "message_filters/synchronizer.h"
-#include "message_filters/sync_policies/latest_time.h"
+#include "message_filters/synchronizer.hpp"
+#include "message_filters/sync_policies/latest_time.hpp"
 
 #include "rosgraph_msgs/msg/clock.hpp"
 

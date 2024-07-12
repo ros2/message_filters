@@ -19,8 +19,8 @@ If you have not done so already `create a workspace <https://docs.ros.org/en/rol
     #include <functional>
     #include <memory>
 
-    #include "message_filters/subscriber.h"
-    #include "message_filters/time_synchronizer.h"
+    #include "message_filters/subscriber.hpp"
+    #include "message_filters/time_synchronizer.hpp"
 
     #include "sensor_msgs/msg/temperature.hpp"
     #include "sensor_msgs/msg/fluid_pressure.hpp"

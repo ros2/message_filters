@@ -34,7 +34,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 
-#include "message_filters/simple_filter.h"
+#include "message_filters/simple_filter.hpp"
 
 struct Msg
 {

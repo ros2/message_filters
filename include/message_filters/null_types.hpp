@@ -1,4 +1,4 @@
-// Copyright 2022, Kenji Brameld All rights reserved.
+// Copyright 2010, Willow Garage, Inc. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,27 +26,51 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <gtest/gtest.h>
+#ifndef MESSAGE_FILTERS__NULL_TYPES_HPP_
+#define MESSAGE_FILTERS__NULL_TYPES_HPP_
 
+#include <memory>
+
+#include <rclcpp/rclcpp.hpp>
+
+#include "message_filters/connection.hpp"
 #include "message_filters/message_traits.hpp"
-#include "rclcpp/time.hpp"
-#include "std_msgs/msg/header.hpp"
 
-struct Msg
+namespace message_filters
 {
-  std_msgs::msg::Header header;
+
+struct NullType
+{
+};
+typedef std::shared_ptr<NullType const> NullTypeConstPtr;
+
+template<class M>
+struct NullFilter
+{
+  template<typename C>
+  Connection registerCallback(const C &)
+  {
+    return Connection();
+  }
+
+  template<typename P>
+  Connection registerCallback(const std::function<void(P)> &)
+  {
+    return Connection();
+  }
 };
 
-// Test that message_filters::message_traits::TimeStamp<Msg>::value returns RCL_ROS_TIME.
-TEST(MessageTraits, timeSource)
+namespace message_traits
 {
-  Msg msg;
-  rclcpp::Time time = message_filters::message_traits::TimeStamp<Msg>::value(msg);
+template<>
+struct TimeStamp<message_filters::NullType>
+{
+  static rclcpp::Time value(const message_filters::NullType &)
+  {
+    return rclcpp::Time();
+  }
+};
+}  // namespace message_traits
+}  // namespace message_filters
 
-  EXPECT_EQ(time.get_clock_type(), RCL_ROS_TIME);
-
-  // Ensure an exception isn't thrown when compared with a RCL_ROS_TIME time.
-  bool unused;
-  EXPECT_NO_THROW(unused = (time == rclcpp::Time{msg.header.stamp, RCL_ROS_TIME}));
-  (void)unused;
-}
+#endif  // MESSAGE_FILTERS__NULL_TYPES_HPP_

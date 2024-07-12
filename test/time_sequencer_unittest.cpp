@@ -31,7 +31,7 @@
 #include <memory>
 
 #include <rclcpp/rclcpp.hpp>
-#include "message_filters/time_sequencer.h"
+#include "message_filters/time_sequencer.hpp"
 
 struct Header
 {

@@ -32,7 +32,7 @@
 #include <memory>
 
 #include <rclcpp/rclcpp.hpp>
-#include "message_filters/synchronizer.h"
+#include "message_filters/synchronizer.hpp"
 
 struct Header
 {
