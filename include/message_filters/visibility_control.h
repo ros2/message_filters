@@ -1,4 +1,4 @@
-// Copyright 2018 Open Source Robotics Foundation, Inc.
+// Copyright 2024 Open Source Robotics Foundation, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,42 +15,8 @@
 #ifndef MESSAGE_FILTERS__VISIBILITY_CONTROL_H_
 #define MESSAGE_FILTERS__VISIBILITY_CONTROL_H_
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#warning This header is obsolete, please include message_filters/visibility_control.hpp instead
 
-// This logic was borrowed (then namespaced) from the examples on the gcc wiki:
-//     https://gcc.gnu.org/wiki/Visibility
-
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef __GNUC__
-    #define MESSAGE_FILTERS_EXPORT __attribute__ ((dllexport))
-    #define MESSAGE_FILTERS_IMPORT __attribute__ ((dllimport))
-  #else
-    #define MESSAGE_FILTERS_EXPORT __declspec(dllexport)
-    #define MESSAGE_FILTERS_IMPORT __declspec(dllimport)
-  #endif
-  #ifdef MESSAGE_FILTERS_BUILDING_DLL
-    #define MESSAGE_FILTERS_PUBLIC MESSAGE_FILTERS_EXPORT
-  #else
-    #define MESSAGE_FILTERS_PUBLIC MESSAGE_FILTERS_IMPORT
-  #endif
-  #define MESSAGE_FILTERS_LOCAL
-#else
-  #define MESSAGE_FILTERS_EXPORT __attribute__ ((visibility("default")))
-  #define MESSAGE_FILTERS_IMPORT
-  #if __GNUC__ >= 4
-    #define MESSAGE_FILTERS_PUBLIC __attribute__ ((visibility("default")))
-    #define MESSAGE_FILTERS_LOCAL  __attribute__ ((visibility("hidden")))
-  #else
-    #define MESSAGE_FILTERS_PUBLIC
-    #define MESSAGE_FILTERS_LOCAL
-  #endif
-#endif
-
-#ifdef __cplusplus
-}
-#endif
+#include <message_filters/visibility_control.hpp>
 
 #endif  // MESSAGE_FILTERS__VISIBILITY_CONTROL_H_

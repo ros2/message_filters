@@ -1,4 +1,4 @@
-// Copyright 2022, Kenji Brameld All rights reserved.
+// Copyright 2009, Willow Garage, Inc. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,27 +26,47 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <gtest/gtest.h>
+#ifndef MESSAGE_FILTERS__CONNECTION_HPP_
+#define MESSAGE_FILTERS__CONNECTION_HPP_
 
-#include "message_filters/message_traits.hpp"
-#include "rclcpp/time.hpp"
-#include "std_msgs/msg/header.hpp"
+#include <functional>
+#include <memory>
 
-struct Msg
+#include "message_filters/visibility_control.hpp"
+
+namespace message_filters
 {
-  std_msgs::msg::Header header;
+
+class noncopyable
+{
+protected:
+  noncopyable() {}
+  ~noncopyable() {}
+  noncopyable(const noncopyable &) = delete;
+  noncopyable & operator=(const noncopyable &) = delete;
 };
 
-// Test that message_filters::message_traits::TimeStamp<Msg>::value returns RCL_ROS_TIME.
-TEST(MessageTraits, timeSource)
+/**
+ * \brief Encapsulates a connection from one filter to another (or to a user-specified callback)
+ */
+class Connection
 {
-  Msg msg;
-  rclcpp::Time time = message_filters::message_traits::TimeStamp<Msg>::value(msg);
+public:
+  using VoidDisconnectFunction = std::function<void (void)>;
+  using WithConnectionDisconnectFunction = std::function<void (const Connection &)>;
+  MESSAGE_FILTERS_PUBLIC Connection() {}
+  MESSAGE_FILTERS_PUBLIC Connection(const VoidDisconnectFunction & func);
 
-  EXPECT_EQ(time.get_clock_type(), RCL_ROS_TIME);
+  /**
+   * \brief disconnects this connection
+   */
+  MESSAGE_FILTERS_PUBLIC void disconnect();
 
-  // Ensure an exception isn't thrown when compared with a RCL_ROS_TIME time.
-  bool unused;
-  EXPECT_NO_THROW(unused = (time == rclcpp::Time{msg.header.stamp, RCL_ROS_TIME}));
-  (void)unused;
-}
+private:
+  VoidDisconnectFunction void_disconnect_;
+  WithConnectionDisconnectFunction connection_disconnect_;
+};
+
+}  // namespace message_filters
+
+#endif  // MESSAGE_FILTERS__CONNECTION_HPP_

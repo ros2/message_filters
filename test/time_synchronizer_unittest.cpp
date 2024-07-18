@@ -30,9 +30,9 @@
 
 #include <memory>
 
-#include "message_filters/time_synchronizer.h"
-#include "message_filters/pass_through.h"
-#include "message_filters/message_traits.h"
+#include "message_filters/time_synchronizer.hpp"
+#include "message_filters/pass_through.hpp"
+#include "message_filters/message_traits.hpp"
 #include <rclcpp/rclcpp.hpp>
 
 struct Header

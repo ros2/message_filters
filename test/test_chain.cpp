@@ -31,7 +31,7 @@
 #include <memory>
 
 #include <rclcpp/rclcpp.hpp>
-#include "message_filters/chain.h"
+#include "message_filters/chain.hpp"
 
 struct Msg
 {

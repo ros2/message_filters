@@ -1,4 +1,4 @@
-// Copyright 2022, Kenji Brameld All rights reserved.
+// Copyright 2010, Willow Garage, Inc. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,27 +26,69 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <gtest/gtest.h>
+#ifndef MESSAGE_FILTERS__PASS_THROUGH_HPP_
+#define MESSAGE_FILTERS__PASS_THROUGH_HPP_
 
-#include "message_filters/message_traits.hpp"
-#include "rclcpp/time.hpp"
-#include "std_msgs/msg/header.hpp"
+#include <memory>
+#include <utility>
+#include <vector>
 
-struct Msg
+#include "message_filters/simple_filter.hpp"
+
+namespace message_filters
 {
-  std_msgs::msg::Header header;
+/**
+ * \brief Simple passthrough filter.  What comes in goes out immediately.
+ */
+template<typename M>
+class PassThrough : public SimpleFilter<M>
+{
+public:
+  typedef std::shared_ptr<M const> MConstPtr;
+  typedef MessageEvent<M const> EventType;
+
+  PassThrough()
+  {
+  }
+
+
+  template<typename F>
+  PassThrough(F & f)  // NOLINT(runtime/explicit)
+  {
+    connectInput(f);
+  }
+
+  template<class F>
+  void connectInput(F & f)
+  {
+    incoming_connection_.disconnect();
+    incoming_connection_ =
+      f.registerCallback(
+      typename SimpleFilter<M>::EventCallback(
+        std::bind(
+          &PassThrough::cb, this,
+          std::placeholders::_1)));
+  }
+
+  void add(const MConstPtr & msg)
+  {
+    add(EventType(msg));
+  }
+
+  void add(const EventType & evt)
+  {
+    this->signalMessage(evt);
+  }
+
+private:
+  void cb(const EventType & evt)
+  {
+    add(evt);
+  }
+
+  Connection incoming_connection_;
 };
 
-// Test that message_filters::message_traits::TimeStamp<Msg>::value returns RCL_ROS_TIME.
-TEST(MessageTraits, timeSource)
-{
-  Msg msg;
-  rclcpp::Time time = message_filters::message_traits::TimeStamp<Msg>::value(msg);
+}  // namespace message_filters
 
-  EXPECT_EQ(time.get_clock_type(), RCL_ROS_TIME);
-
-  // Ensure an exception isn't thrown when compared with a RCL_ROS_TIME time.
-  bool unused;
-  EXPECT_NO_THROW(unused = (time == rclcpp::Time{msg.header.stamp, RCL_ROS_TIME}));
-  (void)unused;
-}
+#endif  // MESSAGE_FILTERS__PASS_THROUGH_HPP_
