@@ -2,6 +2,13 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.1 (2024-07-19)
+------------------
+* Deprecating all C headers (`#135 <https://github.com/ros2/message_filters/issues/135>`_)
+* Cleanups (`#134 <https://github.com/ros2/message_filters/issues/134>`_)
+* fix link of index.rst in README.md (`#133 <https://github.com/ros2/message_filters/issues/133>`_)
+* Contributors: Alejandro Hernández Cordero, Iván López Broceño, Lucas Wendland
+
 6.0.0 (2024-06-26)
 ------------------
 * Revert "Adding explicit constructors (`#129 <https://github.com/ros2/message_filters/issues/129>`_)" (`#132 <https://github.com/ros2/message_filters/issues/132>`_)
