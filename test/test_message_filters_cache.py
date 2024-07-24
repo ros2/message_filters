@@ -15,7 +15,7 @@
 #      contributors may be used to endorse or promote products derived from
 #      this software without specific prior written permission.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS'
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
 # ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
@@ -32,9 +32,8 @@ import unittest
 
 from message_filters import Cache, Subscriber
 import rclpy
+from rclpy.clock import ROSClock, ClockType
 from rclpy.time import Time
-from rclpy.clock import ClockType
-from rclpy.clock import ROSClock
 from rclpy.duration import Duration
 from std_msgs.msg import String
 
