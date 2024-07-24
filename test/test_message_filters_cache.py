@@ -32,9 +32,9 @@ import unittest
 
 from message_filters import Cache, Subscriber
 import rclpy
-from rclpy.clock import ROSClock, ClockType
-from rclpy.time import Time
+from rclpy.clock import ClockType, ROSClock
 from rclpy.duration import Duration
+from rclpy.time import Time
 from std_msgs.msg import String
 
 PKG = 'message_filters'
