@@ -28,8 +28,6 @@
 
 #include <gtest/gtest.h>
 
-#include <gtest/gtest.h>
-
 #include <functional>
 #include <memory>
 
