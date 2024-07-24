@@ -252,9 +252,10 @@ private:
       do {
         double period = 0.0;
         try {
-          period = (now-prev).seconds();
+          period = (now - prev).seconds();
         } catch (const std::runtime_error & /*e*/) {
-          // Different time sources that might happen on initialization if the messages are not yet available.
+          // Different time sources that might happen on initialization if the messages are not yet
+          // available.
           // std::cout << "Exception: " << e.what() << std::endl;
           return false;
         }
