@@ -51,14 +51,17 @@ from message_filters import SimpleFilter, TimeSynchronizer
 class MockHeader:
     pass
 
+
 class MockMessage:
     def __init__(self, stamp, data):
         self.header = MockHeader()
         self.header.stamp = TimeMsg(sec=stamp)
         self.data = data
 
+
 class MockFilter(SimpleFilter):
     pass
+
 
 class TestDirected(unittest.TestCase):
 
@@ -100,6 +103,7 @@ class TestDirected(unittest.TestCase):
             for msg in random.sample(seq1, N):
                 m1.signalMessage(msg)
             self.assertEqual(set(self.collector), set(zip(seq0, seq1)))
+
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
