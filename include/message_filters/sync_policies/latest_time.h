@@ -73,6 +73,8 @@ void callback(const sensor_msgs::CameraInfo::ConstPtr&, const sensor_msgs::Image
 #include <tuple>
 #include <vector>
 
+#include <iostream>
+
 #include <rclcpp/rclcpp.hpp>
 
 #include "message_filters/message_traits.h"
@@ -255,7 +257,14 @@ private:
     {
       bool step_change_detected = false;
       do {
-        double period = (now-prev).seconds();
+        double period = 0.0;
+        try {
+          period = (now-prev).seconds();
+        } catch (const std::runtime_error & /*e*/) {
+          // Different time sources that might happen on initialization if the messages are not yet available.
+          // std::cout << "Exception: " << e.what() << std::endl;
+          return false;
+        }
         if (period <= 0.0) {
           // multiple messages and time isn't updating
           return false;
