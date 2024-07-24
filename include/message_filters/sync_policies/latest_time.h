@@ -73,8 +73,6 @@ void callback(const sensor_msgs::CameraInfo::ConstPtr&, const sensor_msgs::Image
 #include <tuple>
 #include <vector>
 
-#include <iostream>
-
 #include <rclcpp/rclcpp.hpp>
 
 #include "message_filters/message_traits.h"
