@@ -27,24 +27,25 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from message_filters import Cache, Subscriber
-import rclpy
-from rclpy.time import Time
-from rclpy.clock import ClockType
-from rclpy.clock import ROSClock
-from rclpy.duration import Duration
-from std_msgs.msg import String
-import time
+# import time
 import unittest
 
+from message_filters import Cache, Subscriber
+import rclpy
+from rclpy.clock import ClockType, ROSClock
+from rclpy.duration import Duration
+from rclpy.time import Time
+from std_msgs.msg import String
+
 PKG = 'message_filters'
+
 
 class AnonymMsg:
     class AnonymHeader:
         stamp = None
 
         def __init__(self):
-            stamp = Time()
+            self.stamp = Time()
 
     header = None
 
@@ -53,6 +54,7 @@ class AnonymMsg:
 
 
 class TestCache(unittest.TestCase):
+
     @classmethod
     def setUpClass(cls):
         rclpy.init()
@@ -64,7 +66,7 @@ class TestCache(unittest.TestCase):
         rclpy.shutdown()
 
     def test_all_funcs(self):
-        sub = Subscriber(self.node, String, "/empty")
+        sub = Subscriber(self.node, String, '/empty')
         cache = Cache(sub, 5)
 
         msg = AnonymMsg()
@@ -87,35 +89,35 @@ class TestCache(unittest.TestCase):
         msg.header.stamp = Time(seconds=4)
         cache.add(msg)
 
-        l = len(cache.getInterval(Time(seconds=2.5),
-                                  Time(seconds=3.5)))
-        self.assertEqual(l, 1, "invalid number of messages" +
-                                " returned in getInterval 1")
+        length = len(cache.getInterval(Time(seconds=2.5),
+                                       Time(seconds=3.5)))
+        self.assertEqual(length, 1, 'invalid number of messages' +
+                                    ' returned in getInterval 1')
 
-        l = len(cache.getInterval(Time(seconds=2),
-                                  Time(seconds=3)))
-        self.assertEqual(l, 2, "invalid number of messages" +
-                                " returned in getInterval 2")
+        length = len(cache.getInterval(Time(seconds=2),
+                                       Time(seconds=3)))
+        self.assertEqual(length, 2, 'invalid number of messages' +
+                                    ' returned in getInterval 2')
 
-        l = len(cache.getInterval(Time(),
-                                  Time(seconds=4)))
-        self.assertEqual(l, 5, "invalid number of messages" +
-                                " returned in getInterval 5")
+        length = len(cache.getInterval(Time(),
+                                       Time(seconds=4)))
+        self.assertEqual(length, 5, 'invalid number of messages' +
+                                    ' returned in getInterval 5')
 
         s = cache.getElemAfterTime(Time()).header.stamp
-        self.assertEqual(s, Time(), "invalid msg return by getElemAfterTime")
+        self.assertEqual(s, Time(), 'invalid msg return by getElemAfterTime')
 
         s = cache.getElemBeforeTime(Time(seconds=3.5)).header.stamp
         self.assertEqual(s, Time(seconds=3),
-                         "invalid msg return by getElemBeforeTime")
+                         'invalid msg return by getElemBeforeTime')
 
         s = cache.getLastestTime()
         self.assertEqual(s, Time(seconds=4),
-                         "invalid stamp return by getLastestTime")
+                         'invalid stamp return by getLastestTime')
 
         s = cache.getOldestTime()
         self.assertEqual(s, Time(),
-                         "invalid stamp return by getOldestTime")
+                         'invalid stamp return by getOldestTime')
 
         # Add another msg to fill the buffer
         msg = AnonymMsg()
@@ -124,41 +126,40 @@ class TestCache(unittest.TestCase):
 
         # Test that it discarded the right one
         s = cache.getOldestTime()
-        self.assertEqual(s, Time(seconds=1), "wrong message discarded")
+        self.assertEqual(s, Time(seconds=1), 'wrong message discarded')
 
     def test_headerless(self):
-        sub = Subscriber(self.node, String, "/empty")
+        sub = Subscriber(self.node, String, '/empty')
         cache = Cache(sub, 5, allow_headerless=False)
 
         msg = String()
         cache.add(msg)
 
         self.assertIsNone(cache.getElemAfterTime(Time(clock_type=ClockType.ROS_TIME)),
-                          "Headerless message invalidly added.")
+                          'Headerless message invalidly added.')
 
         cache = Cache(sub, 5, allow_headerless=True)
         cache.add(msg)
 
         s = cache.getElemAfterTime(Time(clock_type=ClockType.ROS_TIME))
         self.assertEqual(s, msg,
-                         "invalid msg returned in headerless scenario")
+                         'invalid msg returned in headerless scenario')
 
         currentRosTime = ROSClock().now()
         s = cache.getElemAfterTime(currentRosTime)
-        self.assertIsNone(s, "invalid msg returned in headerless scenario")
-
+        self.assertIsNone(s, 'invalid msg returned in headerless scenario')
 
         cache.add(msg)
 
         s = cache.getInterval(Time(clock_type=ClockType.ROS_TIME),
                               currentRosTime)
         self.assertEqual(s, [msg],
-                         "invalid msg returned in headerless scenario")
+                         'invalid msg returned in headerless scenario')
 
         s = cache.getInterval(Time(clock_type=ClockType.ROS_TIME),
                               (currentRosTime + Duration(seconds=2)))
         self.assertEqual(s, [msg, msg],
-                         "invalid msg returned in headerless scenario")
+                         'invalid msg returned in headerless scenario')
 
 
 if __name__ == '__main__':
