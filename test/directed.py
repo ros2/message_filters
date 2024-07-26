@@ -53,6 +53,7 @@ class MockHeader:
 
 
 class MockMessage:
+
     def __init__(self, stamp, data):
         self.header = MockHeader()
         self.header.stamp = TimeMsg(sec=stamp)

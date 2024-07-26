@@ -54,6 +54,7 @@ class AnonymMsg:
 
 
 class TestCache(unittest.TestCase):
+
     @classmethod
     def setUpClass(cls):
         rclpy.init()

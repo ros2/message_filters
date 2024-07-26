@@ -42,6 +42,7 @@ class MockHeader:
 
 
 class MockMessage:
+
     def __init__(self, stamp, data):
         self.header = MockHeader()
         self.header.stamp = stamp
@@ -49,6 +50,7 @@ class MockMessage:
 
 
 class MockHeaderlessMessage:
+
     def __init__(self, data):
         self.data = data
 
