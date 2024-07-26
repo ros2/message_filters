@@ -58,6 +58,7 @@ ament_export_dependencies(rclcpp rcutils std_msgs)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
+  set(ament_cmake_cppcheck_LANGUAGE "c++")
   find_package(rclcpp_lifecycle REQUIRED)
   find_package(sensor_msgs REQUIRED)
 
