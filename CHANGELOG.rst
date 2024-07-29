@@ -2,6 +2,12 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix cppcheck warning on Windwos (`#138 <https://github.com/ros2/message_filters/issues/138>`_)
+* Adding ament_lint_common (`#120 <https://github.com/ros2/message_filters/issues/120>`_)
+* Contributors: Alejandro Hernández Cordero, Lucas Wendland
+
 6.0.1 (2024-07-19)
 ------------------
 * Deprecating all C headers (`#135 <https://github.com/ros2/message_filters/issues/135>`_)
