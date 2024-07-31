@@ -117,9 +117,9 @@ TEST(TimeSynchronizer, fuzz_synchronizer)
     msg1->header.stamp = rclcpp::Clock().now();
     fuzz_msg(msg2);
     msg2->header.stamp = msg1->header.stamp;
-    sync.add0(msg1);
+    sync.add<0>(msg1);
     ASSERT_EQ(h.count_, 0);
-    sync.add1(msg2);
+    sync.add<1>(msg2);
     ASSERT_EQ(h.count_, 1);
     rclcpp::Rate(50).sleep();
   }

@@ -49,14 +49,11 @@ typedef std::shared_ptr<Msg> MsgPtr;
 typedef std::shared_ptr<Msg const> MsgConstPtr;
 
 
-template<typename M0, typename M1, typename M2 = message_filters::NullType,
-  typename M3 = message_filters::NullType, typename M4 = message_filters::NullType,
-  typename M5 = message_filters::NullType, typename M6 = message_filters::NullType,
-  typename M7 = message_filters::NullType, typename M8 = message_filters::NullType>
-struct NullPolicy : public message_filters::PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
+template<typename ... Ms>
+struct NullPolicy : public message_filters::PolicyBase<Ms...>
 {
   typedef message_filters::Synchronizer<NullPolicy> Sync;
-  typedef message_filters::PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8> Super;
+  typedef message_filters::PolicyBase<Ms...> Super;
   typedef typename Super::Messages Messages;
   typedef typename Super::Signal Signal;
   typedef typename Super::Events Events;

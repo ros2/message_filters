@@ -81,14 +81,11 @@ namespace message_filters
 namespace sync_policies
 {
 
-template<typename M0, typename M1,
-  typename M2 = NullType, typename M3 = NullType, typename M4 = NullType,
-  typename M5 = NullType, typename M6 = NullType, typename M7 = NullType,
-  typename M8 = NullType>
-struct LatestTime : public PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8>
+template<typename ... M>
+struct LatestTime : public PolicyBase<M...>
 {
   typedef Synchronizer<LatestTime> Sync;
-  typedef PolicyBase<M0, M1, M2, M3, M4, M5, M6, M7, M8> Super;
+  typedef PolicyBase<M...> Super;
   typedef typename Super::Messages Messages;
   typedef typename Super::Signal Signal;
   typedef typename Super::Events Events;
@@ -204,10 +201,7 @@ private:
   // assumed data_mutex_ is locked
   void publish()
   {
-    parent_->signal(
-      std::get<0>(events_), std::get<1>(events_), std::get<2>(events_),
-      std::get<3>(events_), std::get<4>(events_), std::get<5>(events_),
-      std::get<6>(events_), std::get<7>(events_), std::get<8>(events_));
+    std::apply([this](auto &&... args) {this->parent_->signal(args ...);}, events_);
   }
 
   struct Rate
@@ -315,23 +309,22 @@ private:
   template<int i>
   bool received_msg()
   {
-    return RealTypeCount::value > i ? static_cast<bool>(std::get<i>(events_).getMessage()) : true;
+    return static_cast<bool>(std::get<i>(events_).getMessage());
   }
 
   // assumed data_mutex_ is locked
   bool is_full()
   {
-    bool full = received_msg<0>();
-    full = full && received_msg<1>();
-    full = full && received_msg<2>();
-    full = full && received_msg<3>();
-    full = full && received_msg<4>();
-    full = full && received_msg<5>();
-    full = full && received_msg<6>();
-    full = full && received_msg<7>();
-    full = full && received_msg<8>();
+    return is_full_impl(std::make_index_sequence<std::tuple_size_v<Events>>{});
+  }
 
-    return full;
+  template<std::size_t... Is>
+  bool is_full_impl(std::index_sequence<Is...>)
+  {
+    /* *INDENT-OFF* */
+    // uncrustify messes with the brackets which are required (at least by GCC)
+    return (... && received_msg<Is>());
+    /* *INDENT-ON* */
   }
 
   // assumed data_mutex_ is locked
