@@ -79,10 +79,7 @@ TEST(Cache, emptySurroundingInterval)
 {
   message_filters::Cache<Msg> cache(10);
   const std::vector<std::shared_ptr<Msg const>> interval_data = cache.getSurroundingInterval(
-    rclcpp::Time(
-      5,
-      0), rclcpp::Time(
-      9, 0));
+    rclcpp::Time(5, 0), rclcpp::Time(9, 0));
 
   EXPECT_EQ(interval_data.size(), (unsigned int) 0);  // empty cache shall return empty interval
 }
