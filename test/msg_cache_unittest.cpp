@@ -81,7 +81,8 @@ TEST(Cache, emptySurroundingInterval)
   const std::vector<std::shared_ptr<Msg const>> interval_data = cache.getSurroundingInterval(
     rclcpp::Time(5, 0), rclcpp::Time(9, 0));
 
-  EXPECT_EQ(interval_data.size(), static_cast<unsigned int>(0));  // empty cache shall return empty interval
+  // empty cache shall return empty interval
+  EXPECT_EQ(interval_data.size(), static_cast<unsigned int>(0));
 }
 
 TEST(Cache, easyInterval)
