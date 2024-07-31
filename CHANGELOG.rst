@@ -2,6 +2,13 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.7.1 (2024-07-31)
+------------------
+* [LatestTimeSync] Fix crash when Synchronizer is started before the messges are available. (`#136 <https://github.com/ros2/message_filters/issues/136>`_) (`#140 <https://github.com/ros2/message_filters/issues/140>`_)
+  (cherry picked from commit 5ce2b58a0383f83bfde6edd17dc310c19dbd789c)
+  Co-authored-by: Dr. Denis <denis@stoglrobotics.de>
+* Contributors: mergify[bot]
+
 4.7.0 (2023-02-13)
 ------------------
 * Update message_filters to C++17. (`#88 <https://github.com/ros2/message_filters/issues/88>`_)
