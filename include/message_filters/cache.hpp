@@ -210,7 +210,8 @@ public:
 
     std::lock_guard<std::mutex> lock(cache_lock_);
     if (cache_.size() == 0) {
-      // early return for empty cache; Logic below is only valid for caches with at least one element.
+      // Early return for empty cache
+      // Logic below is only valid for caches with at least one element
       return {};
     }
 

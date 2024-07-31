@@ -84,7 +84,7 @@ TEST(Cache, emptySurroundingInterval)
       0), rclcpp::Time(
       9, 0));
 
-  EXPECT_EQ(interval_data.size(), (unsigned int) 0); // empty cache shall return empty interval
+  EXPECT_EQ(interval_data.size(), (unsigned int) 0);  // empty cache shall return empty interval
 }
 
 TEST(Cache, easyInterval)
