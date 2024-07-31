@@ -2,6 +2,11 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.3.5 (2024-07-31)
+------------------
+* [LatestTimeSync] Fix crash when Synchronizer is started before the messges are available. (`#136 <https://github.com/ros2/message_filters/issues/136>`_)
+* Contributors: Dr. Denis
+
 4.3.4 (2024-05-15)
 ------------------
 * Fix cache.h std::placeholder namespace (`#87 <https://github.com/ros2/message_filters/issues/87>`_) (`#121 <https://github.com/ros2/message_filters/issues/121>`_)
