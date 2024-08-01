@@ -40,10 +40,10 @@ namespace message_filters
 {
 
 /**
- * \brief Synchronizes up to 9 messages by their timestamps.
+ * \brief Synchronizes up to N messages by their timestamps.
  *
- * TimeSynchronizer synchronizes up to 9 incoming channels by the timestamps contained in their messages' headers.
- * TimeSynchronizer takes anywhere from 2 to 9 message types as template parameters, and passes them through to a
+ * TimeSynchronizer synchronizes up to N incoming channels by the timestamps contained in their messages' headers.
+ * TimeSynchronizer takes anywhere from 2 to N message types as template parameters, and passes them through to a
  * callback which takes a shared pointer of each.
  *
  * The required queue size parameter when constructing the TimeSynchronizer tells it how many sets of messages it should
