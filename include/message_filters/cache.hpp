@@ -209,6 +209,12 @@ public:
     namespace mt = message_filters::message_traits;
 
     std::lock_guard<std::mutex> lock(cache_lock_);
+    if (cache_.size() == 0) {
+      // Early return for empty cache
+      // Logic below is only valid for caches with at least one element
+      return {};
+    }
+
     // Find the starting index. (Find the first index after [or at] the start of the interval)
     int start_index = static_cast<int>(cache_.size()) - 1;
     while (start_index > 0 &&
