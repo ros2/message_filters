@@ -27,9 +27,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 /**
- * \brief Synchronizes up to 9 messages by their rates with upsampling via zero-order-hold.
+ * \brief Synchronizes up to N messages by their rates with upsampling via zero-order-hold.
  *
- * LatestTime policy synchronizes up to 9 incoming channels by the rates they are received.
+ * LatestTime policy synchronizes up to N incoming channels by the rates they are received.
  * The callback with all the messages will be triggered whenever the fastest message is received.
  * The slower messages will be repeated at the rate of the fastest message and will be updated
  * whenever a new one is received. This is essentially an upsampling of slower messages using a
@@ -375,7 +375,7 @@ private:
 
   std::vector<RateConfig> rate_configs_;
 
-  const int NO_PIVOT{9};
+  const int NO_PIVOT{Super::N_MESSAGES};
 
   rclcpp::Clock::SharedPtr ros_clock_{nullptr};
 };

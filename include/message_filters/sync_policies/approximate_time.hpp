@@ -74,9 +74,9 @@ struct ApproximateTime : public PolicyBase<Ms...>
     , pivot_(NO_PIVOT)
     , max_interval_duration_(rclcpp::Duration(std::numeric_limits<int32_t>::max(), 999999999))
     , age_penalty_(0.1)
-    , has_dropped_messages_(9, false)
-    , inter_message_lower_bounds_(9, rclcpp::Duration(0, 0))
-    , warned_about_incorrect_bound_(9, false)
+    , has_dropped_messages_(N_MESSAGES, false)
+    , inter_message_lower_bounds_(N_MESSAGES, rclcpp::Duration(0, 0))
+    , warned_about_incorrect_bound_(N_MESSAGES, false)
   {
     // The synchronizer will tend to drop many messages with a queue size of 1.
     // At least 2 is recommended.
