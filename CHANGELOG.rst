@@ -2,6 +2,13 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.4 (2024-08-19)
+------------------
+* Apply some simplifications and deduplications to ExactTime sync policy (`#142 <https://github.com/ros2/message_filters/issues/142>`_)
+* Minor fixes for `#93 <https://github.com/ros2/message_filters/issues/93>`_ (`#143 <https://github.com/ros2/message_filters/issues/143>`_)
+* Bugfix/segfault when getting surrounding interval of empty cache (`#116 <https://github.com/ros2/message_filters/issues/116>`_)
+* Contributors: Christopher Wecht, Matthias Holoch
+
 6.0.3 (2024-07-31)
 ------------------
 * Migrate to C++11 variadic templates (`#93 <https://github.com/ros2/message_filters/issues/93>`_)
