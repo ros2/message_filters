@@ -91,12 +91,11 @@ struct ExactTime : public PolicyBase<Ms...>
     assert(parent_);
 
     namespace mt = message_filters::message_traits;
+    using Message = typename std::tuple_element<i, Messages>::type;
 
     std::lock_guard<std::mutex> lock(mutex_);
 
-    Tuple & t =
-      tuples_[mt::TimeStamp<typename std::tuple_element<i,
-        Messages>::type>::value(*evt.getMessage())];
+    Tuple & t = tuples_[mt::TimeStamp<Message>::value(*evt.getMessage())];
     std::get<i>(t) = evt;
 
     checkTuple(t);
@@ -154,40 +153,39 @@ private:
       clearOldTuples();
     }
 
-    if (queue_size_ > 0) {
-      while (tuples_.size() > queue_size_) {
-        Tuple & t2 = tuples_.begin()->second;
-        std::apply([this](auto &&... args) {this->drop_signal_.call(args ...);}, t2);
-        tuples_.erase(tuples_.begin());
-      }
+    if (queue_size_ > 0 && tuples_.size() > queue_size_) {
+      const auto n_exceeding_tuples = tuples_.size() - queue_size_;
+      const auto oldest_to_keep = std::next(tuples_.begin(), n_exceeding_tuples);
+      drop_range(tuples_.begin(), oldest_to_keep);
     }
   }
+
 
   // assumes mutex_ is already locked
   void clearOldTuples()
   {
-    typename M_TimeToTuple::iterator it = tuples_.begin();
-    typename M_TimeToTuple::iterator end = tuples_.end();
-    for (; it != end; ) {
-      if (it->first <= last_signal_time_) {
-        typename M_TimeToTuple::iterator old = it;
-        ++it;
-
-        Tuple & t = old->second;
-        std::apply([this](auto &&... args) {this->drop_signal_.call(args ...);}, t);
-        tuples_.erase(old);
-      } else {
-        // the map is sorted by time, so we can ignore anything after this if this one's time is ok
-        break;
-      }
-    }
+    const auto first_arrived_after = tuples_.upper_bound(last_signal_time_);
+    drop_range(tuples_.begin(), first_arrived_after);
   }
 
 private:
+  using M_TimeToTuple = std::map<rclcpp::Time, Tuple>;
+  using map_iterator = typename M_TimeToTuple::iterator;
+
+  void call_drop_signal(Tuple & t)
+  {
+    std::apply([this](auto &&... args) {this->drop_signal_.call(args ...);}, t);
+  }
+
+  void drop_range(map_iterator begin, map_iterator end)
+  {
+    std::for_each(begin, end, [this](auto & e) {call_drop_signal(e.second);});
+    tuples_.erase(begin, end);
+  }
+
   Sync * parent_;
 
   uint32_t queue_size_;
-  typedef std::map<rclcpp::Time, Tuple> M_TimeToTuple;
   M_TimeToTuple tuples_;
   rclcpp::Time last_signal_time_;
 
