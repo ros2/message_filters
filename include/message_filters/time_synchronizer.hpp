@@ -95,46 +95,46 @@ public:
   }
 
   template<class F0, class F1>
-  [[deprecated("Use variade constructor instead")]]
+  [[deprecated("Use variadic constructor instead")]]
   TimeSynchronizer(F0 & f0, F1 & f1, uint32_t queue_size)
   : TimeSynchronizer(queue_size, f0, f1) {}
 
   template<class F0, class F1, class F2>
-  [[deprecated("Use variade constructor instead")]]
+  [[deprecated("Use variadic constructor instead")]]
   TimeSynchronizer(F0 & f0, F1 & f1, F2 & f2, uint32_t queue_size)
   : TimeSynchronizer(queue_size, f0, f1, f2) {}
 
   template<class F0, class F1, class F2, class F3>
-  [[deprecated("Use variade constructor instead")]]
+  [[deprecated("Use variadic constructor instead")]]
   TimeSynchronizer(F0 & f0, F1 & f1, F2 & f2, F3 & f3, uint32_t queue_size)
   : TimeSynchronizer(queue_size, f0, f1, f2, f3) {}
 
   template<class F0, class F1, class F2, class F3, class F4>
-  [[deprecated("Use variade constructor instead")]]
+  [[deprecated("Use variadic constructor instead")]]
   TimeSynchronizer(F0 & f0, F1 & f1, F2 & f2, F3 & f3, F4 & f4, uint32_t queue_size)
   : TimeSynchronizer(queue_size, f0, f1, f2, f3, f4) {}
 
   template<class F0, class F1, class F2, class F3, class F4, class F5>
-  [[deprecated("Use variade constructor instead")]]
+  [[deprecated("Use variadic constructor instead")]]
   TimeSynchronizer(F0 & f0, F1 & f1, F2 & f2, F3 & f3, F4 & f4, F5 & f5, uint32_t queue_size)
   : TimeSynchronizer(queue_size, f0, f1, f2, f3, f4, f5) {}
 
   template<class F0, class F1, class F2, class F3, class F4, class F5, class F6>
-  [[deprecated("Use variade constructor instead")]]
+  [[deprecated("Use variadic constructor instead")]]
   TimeSynchronizer(
     F0 & f0, F1 & f1, F2 & f2, F3 & f3, F4 & f4, F5 & f5, F6 & f6,
     uint32_t queue_size)
   : TimeSynchronizer(queue_size, f0, f1, f2, f3, f4, f5, f6) {}
 
   template<class F0, class F1, class F2, class F3, class F4, class F5, class F6, class F7>
-  [[deprecated("Use variade constructor instead")]]
+  [[deprecated("Use variadic constructor instead")]]
   TimeSynchronizer(
     F0 & f0, F1 & f1, F2 & f2, F3 & f3, F4 & f4, F5 & f5, F6 & f6, F7 & f7,
     uint32_t queue_size)
   : TimeSynchronizer(queue_size, f0, f1, f2, f3, f4, f5, f6, f7) {}
 
   template<class F0, class F1, class F2, class F3, class F4, class F5, class F6, class F7, class F8>
-  [[deprecated("Use variade constructor instead")]]
+  [[deprecated("Use variadic constructor instead")]]
   TimeSynchronizer(
     F0 & f0, F1 & f1, F2 & f2, F3 & f3, F4 & f4, F5 & f5, F6 & f6, F7 & f7, F8 & f8,
     uint32_t queue_size)
