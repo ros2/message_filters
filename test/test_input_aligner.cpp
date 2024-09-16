@@ -29,7 +29,11 @@
 #include <gtest/gtest.h>
 
 #include <array>
+#include <chrono>
+#include <cstddef>
 #include <memory>
+#include <type_traits>
+#include <vector>
 
 #include <rclcpp/rclcpp.hpp>
 #include "message_filters/input_aligner.hpp"
