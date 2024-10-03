@@ -2,8 +2,8 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+6.0.5 (2024-10-03)
+------------------
 * Fix the wording in the deprecation messages. (`#144 <https://github.com/ros2/message_filters/issues/144>`_)
 * Contributors: Chris Lalancette
 
