@@ -14,6 +14,7 @@ The filters currently implemented in this package are:
  * :class:`message_filters.Cache` Caches messages which pass through it, allowing later lookup by time stamp.
  * :class:`message_filters.TimeSynchronizer` Synchronizes multiple messages by their timestamps, only passing them through when all have arrived.
  * :class:`message_filters.TimeSequencer` Tries to pass messages through ordered by their timestamps, even if some arrive out of order.
+ * :class:`message_filters.InputAligner` Synchronizes multiple messages by their timestamps, passing them through to individial callbacks in the right order.
 
 1. Filter Pattern
 -----------------
@@ -220,6 +221,36 @@ It is possible to pass bare pointers in. These will not be automatically deleted
      Chain<Msg> c;
      size_t sub_index = c.addFilter(std::shared_ptr<Subscriber<Msg> >(new Subscriber<Msg>));
      std::shared_ptr<Subscriber<Msg> > sub = c.getFilter<Subscriber<Msg> >(sub_index);
+
+
+8. Input Aligner
+-----------------
+* Python: the InputAligner filter is not yet implemented.
+
+The InputAligner filter aligns multiple inputs in time and passing them through in order. For N inputs this filter provides N outputs. Often sensors or pre-processing chains might introduce delays to messages until they arrive at a target node. The input aligner ensures that the messages are forwarded in order.
+
+8.1 Connections
+~~~~~~~~~~~~~~~
+Input:
+  * C++: N separted filters, each of which is of the signature ``void callback(const std::shared_ptr<M const>&)``. The number of filters supported is determined by the number of template arguments the class was created with.
+Output:
+  * C++: N separted filters, each of which is of the signature ``void callback(const std::shared_ptr<M const>&)``. The number of filters supported is determined by the number of template arguments the class was created with.
+
+8.2 Example (C++)
+~~~~~~~~~~~~~~~~~
+.. code-block:: C++
+
+     message_filters::Subscriber<geometry_msgs::msg::TwistStamped> sub0(node, "my_twist", 10);
+     message_filters::Subscriber<geometry_msgs::msg::Vector3Stamped> sub1(node, "my_vector", 10);
+     message_filters::InputAligner<geometry_msgs::msg::TwistStamped, geometry_msgs::msg::Vector3Stamped> aligner(
+       rclcpp::Duration(0.5), sub0, sub1);
+     aligner.registerCallback<0>(myTwistCallback);
+     aligner.registerCallback<1>(myVectorCallback);
+     // optinally give a hint about the input periods
+     aligner.setInputPeriod<0>(rclcpp::Duration(0.009));
+     aligner.setInputPeriod<1>(rclcpp::Duration(0.045));
+     // Setup dispatch timer (alternativly `aligner.dispatchMessages()` can be called as required)
+     aligner.setupDispatchTimer(node, rclcpp::Duration(0.01));
 
 
 The message filter interface
