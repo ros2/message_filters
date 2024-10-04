@@ -161,10 +161,22 @@ struct LatestTime : public PolicyBase<M...>
 
     std::get<i>(events_) = evt;
     rclcpp::Time now = ros_clock_->now();
+    rclcpp::Time event_time_received_prev = rates_[i].prev;
     bool valid_rate = rates_[i].compute_hz(now);
-    if (valid_rate && (i == find_pivot(now)) && is_full()) {
-      publish();
+    int pivot = find_pivot(now);
+    if (valid_rate && is_full()) {
+      if (i == pivot) {
+        publish(now);
+      } else if (i == pivot_prev_) {
+        rclcpp::Duration period_event_received = now - event_time_received_prev;
+        if (last_time_published_ + period_event_received * SLACK_DURATION_FACTOR_EXAMPLE <
+          event_time_received_prev)
+        {
+          publish(now);
+        }
+      }
     }
+    pivot_prev_ = pivot;
   }
 
 private:
@@ -199,9 +211,10 @@ private:
   }
 
   // assumed data_mutex_ is locked
-  void publish()
+  void publish(const rclcpp::Time & now)
   {
     std::apply([this](auto &&... args) {this->parent_->signal(args ...);}, events_);
+    last_time_published_ = now;
   }
 
   struct Rate
@@ -378,6 +391,12 @@ private:
   const int NO_PIVOT{Super::N_MESSAGES};
 
   rclcpp::Clock::SharedPtr ros_clock_{nullptr};
+
+  int pivot_prev_ = NO_PIVOT;
+
+  rclcpp::Time last_time_published_ = rclcpp::Time(0, 0);
+
+  static constexpr double SLACK_DURATION_FACTOR_EXAMPLE{1.1};
 };
 
 }  // namespace sync_policies
