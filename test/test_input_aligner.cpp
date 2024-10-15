@@ -136,10 +136,10 @@ TEST_F(InputAlignerTest, dispatch_inputs_in_order)
   aligner.registerCallback<3>(&InputAlignerTest::cb<Msg2>, test_fixture);
 
   // set period for all inputs to one millisecond
-  aligner.setInputPeriod<0>(rclcpp::Duration(0, 4e6));
-  aligner.setInputPeriod<1>(rclcpp::Duration(0, 4e6));
-  aligner.setInputPeriod<2>(rclcpp::Duration(0, 4e6));
-  aligner.setInputPeriod<3>(rclcpp::Duration(0, 4e6));
+  aligner.setInputPeriod<0>(rclcpp::Duration(0, static_cast<uint32_t>(4e6)));
+  aligner.setInputPeriod<1>(rclcpp::Duration(0, static_cast<uint32_t>(4e6)));
+  aligner.setInputPeriod<2>(rclcpp::Duration(0, static_cast<uint32_t>(4e6)));
+  aligner.setInputPeriod<3>(rclcpp::Duration(0, static_cast<uint32_t>(4e6)));
 
   // send msgs in unaligned order
   aligner.add<2>(createMsg<Msg1>(std::chrono::milliseconds(3), 3));
@@ -173,9 +173,9 @@ TEST_F(InputAlignerTest, ignores_inactive_inputs)
   aligner.registerCallback<2>(&InputAlignerTest::cb<Msg1>, test_fixture);
 
   // set period for all inputs to one millisecond
-  aligner.setInputPeriod<0>(rclcpp::Duration(0, 2e6));
-  aligner.setInputPeriod<1>(rclcpp::Duration(0, 2e6));
-  aligner.setInputPeriod<2>(rclcpp::Duration(0, 2e6));
+  aligner.setInputPeriod<0>(rclcpp::Duration(0, static_cast<uint32_t>(2e6)));
+  aligner.setInputPeriod<1>(rclcpp::Duration(0, static_cast<uint32_t>(2e6)));
+  aligner.setInputPeriod<2>(rclcpp::Duration(0, static_cast<uint32_t>(2e6)));
 
   // send msgs in unaligned order only to two inputs
   aligner.add<2>(createMsg<Msg1>(std::chrono::milliseconds(2), 2));
@@ -197,7 +197,7 @@ TEST_F(InputAlignerTest, ignores_inactive_inputs)
 TEST_F(InputAlignerTest, input_timeout)
 {
   // set timeout of 10 ms
-  timeout_ = rclcpp::Duration(0, 1e7);
+  timeout_ = rclcpp::Duration(0, static_cast<uint32_t>(1e7));
   message_filters::InputAligner<Msg1, Msg2> aligner(timeout_);
 
   // register callbacks
@@ -206,8 +206,8 @@ TEST_F(InputAlignerTest, input_timeout)
   aligner.registerCallback<1>(&InputAlignerTest::cb<Msg2>, test_fixture);
 
   // set period for all inputs to 2 milliseconds
-  aligner.setInputPeriod<0>(rclcpp::Duration(0, 2e6));
-  aligner.setInputPeriod<1>(rclcpp::Duration(0, 2e6));
+  aligner.setInputPeriod<0>(rclcpp::Duration(0, static_cast<uint32_t>(2e6)));
+  aligner.setInputPeriod<1>(rclcpp::Duration(0, static_cast<uint32_t>(2e6)));
 
   // adds 8 msgs on input 0
   for (int i = 1; i < 17; i = i + 2) {
@@ -249,8 +249,8 @@ TEST_F(InputAlignerTest, drops_msgs)
   aligner.registerCallback<1>(&InputAlignerTest::cb<Msg2>, test_fixture);
 
   // set period for all inputs to 2 milliseconds
-  aligner.setInputPeriod<0>(rclcpp::Duration(0, 2e6));
-  aligner.setInputPeriod<1>(rclcpp::Duration(0, 2e6));
+  aligner.setInputPeriod<0>(rclcpp::Duration(0, static_cast<uint32_t>(2e6)));
+  aligner.setInputPeriod<1>(rclcpp::Duration(0, static_cast<uint32_t>(2e6)));
 
 
   aligner.add<1>(createMsg<Msg2>(std::chrono::milliseconds(4), 4));
@@ -291,8 +291,8 @@ TEST_F(InputAlignerTest, dispatch_by_timer)
   aligner.registerCallback<1>(&InputAlignerTest::cb<Msg2>, test_fixture);
 
   // set period for all inputs to 2 milliseconds
-  aligner.setInputPeriod<0>(rclcpp::Duration(0, 2e6));
-  aligner.setInputPeriod<1>(rclcpp::Duration(0, 2e6));
+  aligner.setInputPeriod<0>(rclcpp::Duration(0, static_cast<uint32_t>(2e6)));
+  aligner.setInputPeriod<1>(rclcpp::Duration(0, static_cast<uint32_t>(2e6)));
 
   aligner.add<1>(createMsg<Msg2>(std::chrono::milliseconds(2), 2));
   aligner.add<0>(createMsg<Msg1>(std::chrono::milliseconds(1), 1));
@@ -309,7 +309,7 @@ TEST_F(InputAlignerTest, dispatch_by_timer)
 TEST_F(InputAlignerTest, no_period_information)
 {
   // set timeout of 10 ms
-  timeout_ = rclcpp::Duration(0, 1e7);
+  timeout_ = rclcpp::Duration(0, static_cast<uint32_t>(1e7));
   message_filters::InputAligner<Msg1, Msg2, Msg1> aligner(timeout_);
 
   // register callbacks
@@ -346,7 +346,7 @@ TEST_F(InputAlignerTest, no_period_information)
 TEST_F(InputAlignerTest, get_queue_status)
 {
   // set timeout of 10 ms
-  timeout_ = rclcpp::Duration(0, 1e7);
+  timeout_ = rclcpp::Duration(0, static_cast<uint32_t>(1e7));
   message_filters::InputAligner<Msg1, Msg2> aligner(timeout_);
 
   // register callbacks
@@ -355,8 +355,8 @@ TEST_F(InputAlignerTest, get_queue_status)
   aligner.registerCallback<1>(&InputAlignerTest::cb<Msg2>, test_fixture);
 
   // set period for all inputs to 2 milliseconds
-  aligner.setInputPeriod<0>(rclcpp::Duration(0, 2e6));
-  aligner.setInputPeriod<1>(rclcpp::Duration(0, 2e6));
+  aligner.setInputPeriod<0>(rclcpp::Duration(0, static_cast<uint32_t>(2e6)));
+  aligner.setInputPeriod<1>(rclcpp::Duration(0, static_cast<uint32_t>(2e6)));
 
   aligner.add<1>(createMsg<Msg2>(std::chrono::milliseconds(2), 2));
   aligner.add<0>(createMsg<Msg1>(std::chrono::milliseconds(3), 3));
