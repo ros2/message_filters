@@ -132,6 +132,11 @@ if(BUILD_TESTING)
     target_link_libraries(${PROJECT_NAME}-test_message_traits ${PROJECT_NAME} rclcpp::rclcpp ${std_msgs_TARGETS})
   endif()
 
+  ament_add_gtest(${PROJECT_NAME}-test_input_aligner test/test_input_aligner.cpp)
+  if(TARGET ${PROJECT_NAME}-test_input_aligner)
+    target_link_libraries(${PROJECT_NAME}-test_input_aligner ${PROJECT_NAME})
+  endif()
+
   # python tests with python interfaces of message filters
   find_package(ament_cmake_pytest REQUIRED)
   ament_add_pytest_test(directed.py "test/directed.py")
