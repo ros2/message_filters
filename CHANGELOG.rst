@@ -2,6 +2,12 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+6.0.6 (2024-10-16)
+------------------
+* Adds an input aligner filter (`#148 <https://github.com/ros2/message_filters/issues/148>`_)
+* Stop using python_cmake_module. (`#114 <https://github.com/ros2/message_filters/issues/114>`_)
+* Contributors: Chris Lalancette, Sascha Arnold, Alejandro Hernández Cordero
+
 6.0.5 (2024-10-03)
 ------------------
 * Fix the wording in the deprecation messages. (`#144 <https://github.com/ros2/message_filters/issues/144>`_)
