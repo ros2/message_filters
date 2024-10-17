@@ -10,7 +10,7 @@ at some time in the future, depending on a policy defined for that filter.
 
 The filters currently implemented in this package are:
 
- * :class:`message_filters.Subscriber` A source filter, which wraps a ROS 2 subscription.  Most filter chains will begin with a Subscriber.
+ * :class:`message_filters.Subscriber` A source filter, which wraps a ROS 2 subscription. Most filter chains will begin with a Subscriber.
  * :class:`message_filters.Cache` Caches messages which pass through it, allowing later lookup by time stamp.
  * :class:`message_filters.TimeSynchronizer` Synchronizes multiple messages by their timestamps, only passing them through when all have arrived.
  * :class:`message_filters.TimeSequencer` Tries to pass messages through ordered by their timestamps, even if some arrive out of order.
@@ -70,7 +70,7 @@ or
 
 .. code-block:: Python
 
-   sub = message_filters.Subscriber("pose_topic", robot_msgs.msg.Pose)
+   sub = message_filters.Subscriber(node_object, "pose_topic", robot_msgs.msg.Pose)
    sub.registerCallback(myCallback)
 
 3. Time Synchronizer
@@ -140,7 +140,7 @@ Output:
 ~~~~~~~~~~~~~~~~~~~~
 .. code-block:: Python
 
-    sub = message_filters.Subscriber('my_topic', sensor_msgs.msg.Image)
+    sub = message_filters.Subscriber(node_object, 'my_topic', sensor_msgs.msg.Image)
     cache = message_filters.Cache(sub, 100)
 
 In this example, the Cache stores the last 100 messages received on ``my_topic``, and ``myCallback`` is called on the addition of every new message. The user can then make calls like ``cache.getInterval(start, end)`` to extract part of the cache.
