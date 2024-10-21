@@ -247,15 +247,18 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
     by the timestamps contained in their messages' headers. The API is the same
     as TimeSynchronizer except for an extra `slop` parameter in the constructor
     that defines the delay (in seconds) with which messages can be synchronized.
+    The ``queue_offset`` option allow to have temporal offset between subsribers
+    , define as a list of offset int in nanoseconds.
     The ``allow_headerless`` option specifies whether to allow storing
     headerless messages with current ROS time instead of timestamp. You should
     avoid this as much as you can, since the delays are unpredictable.
     """
 
-    def __init__(self, fs, queue_size, slop, allow_headerless=False):
+    def __init__(self, fs, queue_size, slop, queue_offset=False, allow_headerless=False):
         TimeSynchronizer.__init__(self, fs, queue_size)
         self.slop = Duration(seconds=slop)
         self.allow_headerless = allow_headerless
+        self.queue_offset = queue_offset
 
     def add(self, msg, my_queue, my_queue_index=None):
         if not hasattr(msg, 'header') or not hasattr(msg.header, 'stamp'):
@@ -276,8 +279,11 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
             if not hasattr(stamp, 'nanoseconds'):
                 stamp = Time.from_msg(stamp)
             # print(stamp)
+        new_timestamp = stamp.nanoseconds
+        if my_queue_index is not None and self.queue_offset:
+            new_timestamp += self.queue_offset[my_queue_index]
         self.lock.acquire()
-        my_queue[stamp.nanoseconds] = msg
+        my_queue[new_timestamp] = msg
         while len(my_queue) > self.queue_size:
             del my_queue[min(my_queue)]
         # self.queues = [topic_0 {stamp: msg}, topic_1 {stamp: msg}, ...]
@@ -291,7 +297,7 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
         for queue in search_queues:
             topic_stamps = []
             for s in queue:
-                stamp_delta = Duration(nanoseconds=abs(s - stamp.nanoseconds))
+                stamp_delta = Duration(nanoseconds=abs(s - new_timestamp))
                 if stamp_delta > self.slop:
                     continue  # far over the slop
                 topic_stamps.append(((Time(nanoseconds=s,
