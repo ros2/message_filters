@@ -258,6 +258,7 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
         TimeSynchronizer.__init__(self, fs, queue_size)
         self.slop = Duration(seconds=slop)
         self.allow_headerless = allow_headerless
+        self.queue_offset = queue_offset
 
     def add(self, msg, my_queue, my_queue_index=None):
         if not hasattr(msg, 'header') or not hasattr(msg.header, 'stamp'):
