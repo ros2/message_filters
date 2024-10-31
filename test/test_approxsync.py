@@ -154,7 +154,7 @@ class TestApproxSync(unittest.TestCase):
             seq1 = [MockMessage(Time(seconds=t), random.random())
                     for t in range(N)]
             # random.shuffle(seq0)
-            ts = ApproximateTimeSynchronizer([m0, m1], N, 0.1, queue_offset=[int(0.5*1e9),0])
+            ts = ApproximateTimeSynchronizer([m0, m1], N, 0.1, queue_offset=[int(0.5*1e9), 0])
             ts.registerCallback(self.cb_collector_2msg)
             self.collector = []
             for msg in random.sample(seq0, N):
