@@ -188,6 +188,7 @@ class TestApproxSync(unittest.TestCase):
                 m1.signalMessage(msg)
             self.assertEqual(set(self.collector), set(zip(seq0, seq1)))
 
+
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(TestApproxSync('test_approx'))
