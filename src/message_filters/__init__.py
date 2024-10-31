@@ -281,7 +281,7 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
             # print(stamp)
         new_timestamp = stamp.nanoseconds
         if my_queue_index is not None and self.queue_offset:
-            new_timestamp += self.queue_offset[my_queue_index]
+            new_timestamp -= self.queue_offset[my_queue_index]
         self.lock.acquire()
         my_queue[new_timestamp] = msg
         while len(my_queue) > self.queue_size:
