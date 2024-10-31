@@ -131,7 +131,7 @@ class TestApproxSync(unittest.TestCase):
         # make sure that they get combined
         m0 = MockFilter()
         m1 = MockFilter()
-        ts = ApproximateTimeSynchronizer([m0, m1], 1, 0.1,queue_offset=[int(0.5*1e9),0])
+        ts = ApproximateTimeSynchronizer([m0, m1], 1, 0.1, queue_offset=[int(0.5*1e9), 0])
         ts.registerCallback(self.cb_collector_2msg)
 
         for t in range(10):
@@ -175,7 +175,7 @@ class TestApproxSync(unittest.TestCase):
             seq1 = [MockHeaderlessMessage(random.random()) for t in range(N)]
 
             ts = ApproximateTimeSynchronizer([m0, m1], N, 10,
-                                             queue_offset=[int(0.5*1e9),0],
+                                             queue_offset=[int(0.5*1e9), 0],
                                              allow_headerless=True)
             ts.registerCallback(self.cb_collector_2msg)
             self.collector = []
@@ -188,12 +188,8 @@ class TestApproxSync(unittest.TestCase):
                 m1.signalMessage(msg)
             self.assertEqual(set(self.collector), set(zip(seq0, seq1)))
 
-
-
-
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(TestApproxSync('test_approx'))
     suite.addTest(TestApproxSync('test_approx_offset'))
-    
     unittest.TextTestRunner(verbosity=2).run(suite)
