@@ -247,7 +247,7 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
     by the timestamps contained in their messages' headers. The API is the same
     as TimeSynchronizer except for an extra `slop` parameter in the constructor
     that defines the delay (in seconds) with which messages can be synchronized.
-    The ``queue_offset`` option allow to have temporal offset between subsribers
+    The ``queue_offset`` option allow to have temporal offset between subscribers
     , define as a list of offset int in nanoseconds.
     The ``allow_headerless`` option specifies whether to allow storing
     headerless messages with current ROS time instead of timestamp. You should
