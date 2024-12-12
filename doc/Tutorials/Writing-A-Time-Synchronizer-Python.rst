@@ -5,7 +5,7 @@ Prerequisites
 ~~~~~~~~~~~~~
 This tutorial assumes you have a working knowledge of ROS 2
 
-If you have not done so already `create a workspace <https://docs.ros.org/en/rolling/Tutorials/Beginner-Client-Libraries/Creating-A-Workspace/Creating-A-Workspace.html>`_ and `create a package <https://docs.ros.org/en/rolling/Tutorials/Beginner-Client-Libraries/Creating-Your-First-ROS2-Package.html>`_
+If you have not done so already `create a workspace <https://docs.ros.org/en/jazzy/Tutorials/Beginner-Client-Libraries/Creating-A-Workspace/Creating-A-Workspace.html>`_ and `create a package <https://docs.ros.org/en/jazzy/Tutorials/Beginner-Client-Libraries/Creating-Your-First-ROS2-Package.html>`_
 
 
 1. Create a Basic Node with Imports
@@ -40,7 +40,7 @@ If you have not done so already `create a workspace <https://docs.ros.org/en/rol
 
 
 For this example we will be using the ``temperature`` and ``fluid_pressure`` messages found in
-`sensor_msgs <https://github.com/ros2/common_interfaces/tree/rolling/sensor_msgs/msg>`_.
+`sensor_msgs <https://github.com/ros2/common_interfaces/tree/jazzy/sensor_msgs/msg>`_.
 To simulate a working ``TimeSynchronizer`` we will be publishing and subscribing to topics of those respective types, to showcase how real sensors would be working. To simulate them we will also need some sort of ``Timer``. Then, we will be utilizing said ``TimeSynchronizer`` to get these messages from the sensor topics aligned, seen with the two ``Subscribers`` conjoined in the ``TimeSynchronizer`` initialization.
 
 It is essential that the QoS is the same for all of the publishers and subscribers, otherwise the Message Filter cannot align the topics together. So, create one ``QoSProfile`` and stick with it, or find out what ``qos`` is being used in the native sensor code, and replicate it. For each class member, do basic construction of the object relating to the ``Node`` and callback methods that may be used in the future. Notice that we must call ``sync.registerCallback`` to sync up the two (or more) chosen topics.
