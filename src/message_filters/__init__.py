@@ -32,6 +32,7 @@
 from functools import reduce
 import itertools
 import threading
+from typing_extensions import deprecated
 # import builtin_interfaces
 
 import rclpy
@@ -171,6 +172,15 @@ class Cache(SimpleFilter):
         if not older:
             return None
         return older[-1]
+
+    @deprecated("Deprecated in favour of :py:classmethod:Cache.getLatestTime:.")
+    def getLastestTime(self):
+        """
+        Return the newest recorded timestamp.
+
+        Deprecated in favour of :py:classmethod:Cache.getLatestTime:.
+        """
+        return self.getLatestTime()
 
     def getLatestTime(self):
         """Return the newest recorded timestamp."""
