@@ -172,7 +172,7 @@ class Cache(SimpleFilter):
             return None
         return older[-1]
 
-    def getLastestTime(self):
+    def getLatestTime(self):
         """Return the newest recorded timestamp."""
         if not self.cache_times:
             return None
@@ -185,9 +185,9 @@ class Cache(SimpleFilter):
         return self.cache_times[0]
 
     def getLast(self):
-        if self.getLastestTime() is None:
+        if self.getLatestTime() is None:
             return None
-        return self.getElemAfterTime(self.getLastestTime())
+        return self.getElemAfterTime(self.getLatestTime())
 
 
 class TimeSynchronizer(SimpleFilter):

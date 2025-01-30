@@ -111,9 +111,9 @@ class TestCache(unittest.TestCase):
         self.assertEqual(s, Time(seconds=3),
                          'invalid msg return by getElemBeforeTime')
 
-        s = cache.getLastestTime()
+        s = cache.getLatestTime()
         self.assertEqual(s, Time(seconds=4),
-                         'invalid stamp return by getLastestTime')
+                         'invalid stamp return by getLatestTime')
 
         s = cache.getOldestTime()
         self.assertEqual(s, Time(),
