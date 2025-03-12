@@ -43,6 +43,8 @@ from rclpy.logging import LoggingSeverity
 from rclpy.node import Node
 from rclpy.time import Time
 
+from typing_extensions import deprecated
+
 
 class SimpleFilter(object):
 
@@ -175,7 +177,16 @@ class Cache(SimpleFilter):
             return None
         return older[-1]
 
+    @deprecated('Deprecated in favour of :py:classmethod:Cache.getLatestTime:.')
     def getLastestTime(self):
+        """
+        Return the newest recorded timestamp.
+
+        Deprecated in favour of :py:classmethod:Cache.getLatestTime:.
+        """
+        return self.getLatestTime()
+
+    def getLatestTime(self):
         """Return the newest recorded timestamp."""
         if not self.cache_times:
             return None
@@ -188,9 +199,9 @@ class Cache(SimpleFilter):
         return self.cache_times[0]
 
     def getLast(self):
-        if self.getLastestTime() is None:
+        if self.getLatestTime() is None:
             return None
-        return self.getElemAfterTime(self.getLastestTime())
+        return self.getElemAfterTime(self.getLatestTime())
 
 
 class TimeSynchronizer(SimpleFilter):
@@ -250,19 +261,30 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
     by the timestamps contained in their messages' headers. The API is the same
     as TimeSynchronizer except for an extra `slop` parameter in the constructor
     that defines the delay (in seconds) with which messages can be synchronized.
+    The ``queue_offset`` option allow to have temporal offset between subscribers
+    , define as a list of offset int in nanoseconds.
     The ``allow_headerless`` option specifies whether to allow storing
     headerless messages with current ROS time instead of timestamp. You should
     avoid this as much as you can, since the delays are unpredictable.
+    The ```sync_arrival_time``` option enables synchronizing incoming messages
+    with the arrival ROS time instead of the message timestamp. You should
+    avoid this as much as you can, since the delays are unpredictable.
     """
 
-    def __init__(self, fs, queue_size, slop, allow_headerless=False):
+    def __init__(self, fs, queue_size, slop,
+                 queue_offset=False,
+                 allow_headerless=False,
+                 sync_arrival_time=False):
         TimeSynchronizer.__init__(self, fs, queue_size)
         self.slop = Duration(seconds=slop)
         self.allow_headerless = allow_headerless
+        self.queue_offset = queue_offset
+        self.sync_arrival_time = sync_arrival_time
 
     def add(self, msg, my_queue, my_queue_index=None):
-        if not hasattr(msg, 'header') or not hasattr(msg.header, 'stamp'):
-            if not self.allow_headerless:
+        if not hasattr(msg, 'header') or not hasattr(msg.header, 'stamp') or \
+                self.sync_arrival_time:
+            if not self.allow_headerless and not self.sync_arrival_time:
                 msg_filters_logger = rclpy.logging.get_logger('message_filters_approx')
                 msg_filters_logger.set_level(LoggingSeverity.INFO)
                 msg_filters_logger.warn('can not use message filters messages '
@@ -279,8 +301,11 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
             if not hasattr(stamp, 'nanoseconds'):
                 stamp = Time.from_msg(stamp)
             # print(stamp)
+        new_timestamp = stamp.nanoseconds
+        if my_queue_index is not None and self.queue_offset:
+            new_timestamp -= self.queue_offset[my_queue_index]
         self.lock.acquire()
-        my_queue[stamp.nanoseconds] = msg
+        my_queue[new_timestamp] = msg
         while len(my_queue) > self.queue_size:
             del my_queue[min(my_queue)]
         # self.queues = [topic_0 {stamp: msg}, topic_1 {stamp: msg}, ...]
@@ -294,7 +319,7 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
         for queue in search_queues:
             topic_stamps = []
             for s in queue:
-                stamp_delta = Duration(nanoseconds=abs(s - stamp.nanoseconds))
+                stamp_delta = Duration(nanoseconds=abs(s - new_timestamp))
                 if stamp_delta > self.slop:
                     continue  # far over the slop
                 topic_stamps.append(((Time(nanoseconds=s,
