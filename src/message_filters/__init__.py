@@ -33,6 +33,7 @@ from bisect import insort_right
 from functools import reduce
 import itertools
 import threading
+from typing import Union
 
 from builtin_interfaces.msg import Time as TimeMsg
 import rclpy
@@ -337,8 +338,8 @@ class TimeSequencer(SimpleFilter):
     def __init__(
         self,
         input_filter: SimpleFilter,
-        delay: Duration | float,
-        update_rate: Duration | float,
+        delay: Union[Duration, float],
+        update_rate: Union[Duration, float],
         queue_size: int,
         node: Node,
         msg_stamp_attr: str = 'header.stamp',
