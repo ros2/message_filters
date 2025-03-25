@@ -287,7 +287,7 @@ TEST(Subscriber, lifecycle)
   rclcpp::QoS default_qos =
     rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
   message_filters::Subscriber<Msg, rclcpp_lifecycle::LifecycleNode> sub(node, "test_topic",
-                                                                        default_qos);
+    default_qos);
   sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
   pub->on_activate();
@@ -310,18 +310,22 @@ TEST(Subscriber, node_interfaces)
     // disassemble node into relevant interfaces
     using NodeParametersInterface = rclcpp::node_interfaces::NodeParametersInterface;
     using NodeTopicsInterface = rclcpp::node_interfaces::NodeTopicsInterface;
-    using RequiredInterfaces = rclcpp::node_interfaces::NodeInterfaces<NodeParametersInterface, NodeTopicsInterface>;
+    using RequiredInterfaces = rclcpp::node_interfaces::NodeInterfaces<NodeParametersInterface,
+      NodeTopicsInterface>;
 
-    message_filters::Subscriber<Msg> sub(RequiredInterfaces(*node), "test_topic");
+    rclcpp::QoS default_qos =
+      rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+    message_filters::Subscriber<Msg> sub(RequiredInterfaces(*node), "test_topic",
+      default_qos);
     sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
     auto pub = node->create_publisher<Msg>("test_topic", 10);
     pub->on_activate();
     rclcpp::Clock ros_clock;
     auto start = ros_clock.now();
     while (h.count_ == 0 && (ros_clock.now() - start) < rclcpp::Duration(1, 0)) {
-        pub->publish(Msg());
-        rclcpp::Rate(50).sleep();
-        rclcpp::spin_some(node->get_node_base_interface());
+      pub->publish(Msg());
+      rclcpp::Rate(50).sleep();
+      rclcpp::spin_some(node->get_node_base_interface());
     }
 
     ASSERT_GT(h.count_, 0);
