@@ -278,7 +278,7 @@ public:
   using NodeParametersInterface = typename SubscriberBase<NodeType>::NodeParametersInterface;
   using NodeTopicsInterface = typename SubscriberBase<NodeType>::NodeTopicsInterface;
 
-  // Note: the duplicate implementation of most methods is unfortunately necessary in order to be
+  // Note: the duplicate implementation of the constructors is unfortunately necessary in order to be
   //       able to equip the second template parameter of the Subscriber class with a
   //       deprecation warning
   /**
@@ -641,7 +641,7 @@ public:
     }
   }
 
-   /**
+  /**
    * \brief Re-subscribe to a topic.  Only works if this subscriber has previously been subscribed to a topic.
    */
   void subscribe() override
