@@ -286,7 +286,7 @@ TEST(Subscriber, lifecycle)
   Helper h;
   rclcpp::QoS default_qos =
     rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
-  message_filters::Subscriber<Msg, rclcpp_lifecycle::LifecycleNode> sub(node, "test_topic",
+  message_filters::Subscriber<Msg> sub(node, "test_topic",
     default_qos);
   sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
