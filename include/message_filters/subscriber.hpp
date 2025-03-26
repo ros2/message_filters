@@ -34,9 +34,9 @@
 #include <string>
 #include <type_traits>
 
-#include <rclcpp/rclcpp.hpp>
-#include <rclcpp/node_interfaces/node_interfaces.hpp>
 #include <rclcpp/create_subscription.hpp>
+#include <rclcpp/node_interfaces/node_interfaces.hpp>
+#include <rclcpp/rclcpp.hpp>
 
 #include "message_filters/connection.hpp"
 #include "message_filters/simple_filter.hpp"
@@ -278,8 +278,8 @@ public:
   using NodeParametersInterface = typename SubscriberBase<NodeType>::NodeParametersInterface;
   using NodeTopicsInterface = typename SubscriberBase<NodeType>::NodeTopicsInterface;
 
-  // Note: the duplicate implementation of the constructors is unfortunately necessary in order to be
-  //       able to equip the second template parameter of the Subscriber class with a
+  // Note: the duplicate implementation of the constructors is unfortunately necessary in order to
+  //       be able to equip the second template parameter of the Subscriber class with a
   //       deprecation warning
   /**
    * \brief Solely for highlighting deprecated template parameters with a compiler warning
