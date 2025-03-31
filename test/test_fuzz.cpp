@@ -131,7 +131,14 @@ TEST(Subscriber, fuzz_subscriber)
   Helper h;
   rclcpp::QoS default_qos =
     rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+#ifdef _WIN32
+# pragma warning(push)
+# pragma warning(disable : 4996)
+#endif
   message_filters::Subscriber<Msg> sub(node, "test_topic", default_qos);
+#ifdef _WIN32
+# pragma warning(pop)
+#endif
   sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
   rclcpp::Clock ros_clock;

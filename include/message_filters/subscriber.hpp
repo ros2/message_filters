@@ -97,7 +97,10 @@ public:
     const std::string & topic,
     const rclcpp::QoS & qos,
     rclcpp::SubscriptionOptions options) = 0;
-
+#ifdef _WIN32
+# pragma warning(push)
+# pragma warning(disable : 4996)
+#endif
   // collection of deprecated methods which have to be kept for one release cycle until they can
   // be removed
   [[deprecated("use rclcpp::NodeInterfaces instead")]]
@@ -110,7 +113,9 @@ public:
       subscribe(*node, topic, qos);
     }
   }
-
+#ifdef _WIN32
+# pragma warning(pop)
+#endif
   [[deprecated("use rclcpp::NodeInterfaces instead")]]
   virtual void subscribe(
     NodeType *node,
@@ -131,6 +136,10 @@ public:
     subscribe(node_interfaces, topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(qos)));
   }
 
+#ifdef _WIN32
+# pragma warning(push)
+# pragma warning(disable : 4996)
+#endif
   [[deprecated("use rclcpp::QoS instead of rmw_qos_profile_t")]]
   virtual void subscribe(
     NodePtr node,
@@ -141,7 +150,9 @@ public:
       subscribe(*node, topic, rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(qos)));
     }
   }
-
+#ifdef _WIN32
+# pragma warning(pop)
+#endif
   [[deprecated("use rclcpp::QoS instead of rmw_qos_profile_t")]]
   virtual void subscribe(
     NodeType * node,
@@ -153,6 +164,10 @@ public:
     }
   }
 
+#ifdef _WIN32
+# pragma warning(push)
+# pragma warning(disable : 4996)
+#endif
   [[deprecated("use rclcpp::NodeInterfaces instead")]]
   virtual void subscribe(
     NodePtr node,
@@ -164,6 +179,9 @@ public:
       subscribe(*node, topic, qos, options);
     }
   }
+#ifdef _WIN32
+# pragma warning(pop)
+#endif
 
   [[deprecated("use rclcpp::NodeInterfaces instead")]]
   virtual void subscribe(
@@ -188,6 +206,10 @@ public:
               options);
   }
 
+#ifdef _WIN32
+# pragma warning(push)
+# pragma warning(disable : 4996)
+#endif
   [[deprecated("use rclcpp::QoS instead of rmw_qos_profile_t")]]
   virtual void subscribe(
     NodePtr node,
@@ -200,6 +222,9 @@ public:
                 options);
     }
   }
+#ifdef _WIN32
+# pragma warning(pop)
+#endif
 
   [[deprecated("use rclcpp::QoS instead of rmw_qos_profile_t")]]
   virtual void subscribe(
