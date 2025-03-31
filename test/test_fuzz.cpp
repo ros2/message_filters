@@ -36,7 +36,14 @@
 #include <random>
 
 #include <rclcpp/rclcpp.hpp>
+#ifdef _WIN32
+# pragma warning(push)
+# pragma warning(disable : 4996)
+#endif
 #include "message_filters/subscriber.hpp"
+#ifdef _WIN32
+# pragma warning(pop)
+#endif
 #include "message_filters/time_sequencer.hpp"
 #include "message_filters/time_synchronizer.hpp"
 #include "message_filters/chain.hpp"
