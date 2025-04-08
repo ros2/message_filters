@@ -80,11 +80,11 @@ The TimeSynchronizer filter synchronizes incoming channels by the timestamps con
 3.1 Connections
 ~~~~~~~~~~~~~~~
 Input:
-  * C++: Up to 9 separate filters, each of which is of the form ``void callback(const std::shared_ptr<M const>&)``. The number of filters supported is determined by the number of template arguments the class was created with.
+  * C++: N separate filters, each of which is of the form ``void callback(const std::shared_ptr<M const>&)``. The number of filters supported is determined by the number of template arguments the class was created with.
   * Python: N separate filters, each of which has signature ``callback(msg)``.
 
 Output:
-  * C++: For message types M0..M8, ``void callback(const std::shared_ptr<M0 const>&, ..., const std::shared_ptr<M8 const>&)``. The number of parameters is determined by the number of template arguments the class was created with.
+  * C++: For message types M0..MN, ``void callback(const std::shared_ptr<M0 const>&, ..., const std::shared_ptr<MN const>&)``. The number of parameters is determined by the number of template arguments the class was created with.
   * Python: ``callback(msg0.. msgN)``. The number of parameters is determined by the number of template arguments the class was created with.
 
 4. Time Sequencer
