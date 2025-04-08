@@ -75,7 +75,7 @@ or
 
 3. Time Synchronizer
 --------------------
-The TimeSynchronizer filter synchronizes incoming channels by the timestamps contained in their headers, and outputs them in the form of a single callback that takes the same number of channels. The C++ implementation can synchronize up to 9 channels.
+The TimeSynchronizer filter synchronizes incoming channels by the timestamps contained in their headers, and outputs them in the form of a single callback that takes the same number of channels.
 
 3.1 Connections
 ~~~~~~~~~~~~~~~
