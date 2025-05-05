@@ -341,7 +341,3 @@ int main(int argc, char ** argv)
   rclcpp::shutdown();
   return ret;
 }
-
-#ifdef _WIN32
-# pragma warning(pop)
-#endif
