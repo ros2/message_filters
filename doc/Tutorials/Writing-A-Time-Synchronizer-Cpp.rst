@@ -152,7 +152,7 @@ Now open the ``CMakeLists.txt`` add the executable and name it ``time_sync``, wh
    find_package(message_filters REQUIRED)
 
    add_executable(time_sync src/time_synchronizer.cpp)
-   ament_target_dependencies(time_sync rclcpp sensor_msgs message_filters)
+   target_link_libraries(time_sync PUBLIC rclcpp::rclcpp ${sensor_msgs_TARGETS} message_filters::message_filters)
 
 Finally, add the ``install(TARGETS…)`` section so ``ros2 run`` can find your executable:
 
