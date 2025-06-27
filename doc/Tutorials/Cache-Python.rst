@@ -284,7 +284,7 @@ The first message in the output is going to be
 
 	[INFO] [1750884527.235426721] [cache_node]: Cache filters cache is empty
 	
-As there were no messages published yet, and the cahce is empty.
+As there were no messages published yet, and the cache is empty.
 After that, the publisher will start populate the cache with messages:
 
 .. code-block:: bash
