@@ -22,7 +22,12 @@ import sys, os
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
+<<<<<<< HEAD
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx', 'sphinx.ext.imgmath', 'sphinx_rtd_theme']
+=======
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx',
+              'sphinx.ext.imgmath', 'sphinx_rtd_theme', 'sphinx_tabs.tabs']
+>>>>>>> 4f4e42f (Fix cache tutorial: added tab extension (#190))
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
