@@ -33,35 +33,22 @@
 #include <vector>
 
 #include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/header.hpp>
+
 #include "message_filters/cache.hpp"
 #include "message_filters/message_traits.hpp"
 
-struct Header
-{
-  rclcpp::Time stamp;
-};
-
-
 struct Msg
 {
-  Header header;
+  std_msgs::msg::Header header;
   int data;
 };
 typedef std::shared_ptr<Msg const> MsgConstPtr;
-namespace message_filters
+struct HeaderlessMsg
 {
-namespace message_traits
-{
-template<>
-struct TimeStamp<Msg>
-{
-  static rclcpp::Time value(const Msg & m)
-  {
-    return m.header.stamp;
-  }
+  int data;
 };
-}  // namespace message_traits
-}  // namespace message_filters
+typedef std::shared_ptr<HeaderlessMsg const> HeaderlessMsgConstPtr;
 
 void fillCacheEasy(message_filters::Cache<Msg> & cache, unsigned int start, unsigned int end)
 {
@@ -85,16 +72,25 @@ TEST(Cache, emptySurroundingInterval)
   EXPECT_EQ(interval_data.size(), static_cast<unsigned int>(0));
 }
 
+TEST(Cache, emptySurroundingIntervalHeaderless) {
+  message_filters::Cache<HeaderlessMsg> cache(10, true);
+
+  const std::vector<std::shared_ptr<HeaderlessMsg const>> interval_data =
+    cache.getSurroundingInterval(rclcpp::Time(5, 0), rclcpp::Time(9, 0));
+
+  // empty cache shall return empty interval
+  EXPECT_EQ(interval_data.size(), static_cast<unsigned int>(0));
+}
+
 TEST(Cache, easyInterval)
 {
   message_filters::Cache<Msg> cache(10);
   fillCacheEasy(cache, 0, 5);
 
   std::vector<std::shared_ptr<Msg const>> interval_data = cache.getInterval(
-    rclcpp::Time(
-      5,
-      0), rclcpp::Time(
-      35, 0));
+    rclcpp::Time(5, 0, RCL_ROS_TIME),
+    rclcpp::Time(35, 0, RCL_ROS_TIME)
+  );
 
   ASSERT_EQ(interval_data.size(), (unsigned int) 3);
   EXPECT_EQ(interval_data[0]->data, 1);
@@ -102,12 +98,18 @@ TEST(Cache, easyInterval)
   EXPECT_EQ(interval_data[2]->data, 3);
 
   // Look for an interval past the end of the cache
-  interval_data = cache.getInterval(rclcpp::Time(55, 0), rclcpp::Time(65, 0));
+  interval_data = cache.getInterval(
+    rclcpp::Time(55, 0, RCL_ROS_TIME),
+    rclcpp::Time(65, 0, RCL_ROS_TIME)
+  );
   EXPECT_EQ(interval_data.size(), (unsigned int) 0);
 
   // Look for an interval that fell off the back of the cache
   fillCacheEasy(cache, 5, 20);
-  interval_data = cache.getInterval(rclcpp::Time(5, 0), rclcpp::Time(35, 0));
+  interval_data = cache.getInterval(
+    rclcpp::Time(5, 0, RCL_ROS_TIME),
+    rclcpp::Time(35, 0, RCL_ROS_TIME)
+  );
   EXPECT_EQ(interval_data.size(), (unsigned int) 0);
 }
 
@@ -117,23 +119,34 @@ TEST(Cache, easySurroundingInterval)
   fillCacheEasy(cache, 1, 6);
 
   std::vector<std::shared_ptr<Msg const>> interval_data;
-  interval_data = cache.getSurroundingInterval(rclcpp::Time(15, 0), rclcpp::Time(35, 0));
+  interval_data = cache.getSurroundingInterval(
+    rclcpp::Time(15, 0, RCL_ROS_TIME),
+    rclcpp::Time(35, 0, RCL_ROS_TIME));
   ASSERT_EQ(interval_data.size(), (unsigned int) 4);
   EXPECT_EQ(interval_data[0]->data, 1);
   EXPECT_EQ(interval_data[1]->data, 2);
   EXPECT_EQ(interval_data[2]->data, 3);
   EXPECT_EQ(interval_data[3]->data, 4);
 
-  interval_data = cache.getSurroundingInterval(rclcpp::Time(0, 0), rclcpp::Time(35, 0));
+  interval_data = cache.getSurroundingInterval(
+    rclcpp::Time(0, 0, RCL_ROS_TIME),
+    rclcpp::Time(35, 0, RCL_ROS_TIME)
+  );
   ASSERT_EQ(interval_data.size(), (unsigned int) 4);
   EXPECT_EQ(interval_data[0]->data, 1);
 
-  interval_data = cache.getSurroundingInterval(rclcpp::Time(35, 0), rclcpp::Time(35, 0));
+  interval_data = cache.getSurroundingInterval(
+    rclcpp::Time(35, 0, RCL_ROS_TIME),
+    rclcpp::Time(35, 0, RCL_ROS_TIME)
+  );
   ASSERT_EQ(interval_data.size(), (unsigned int) 2);
   EXPECT_EQ(interval_data[0]->data, 3);
   EXPECT_EQ(interval_data[1]->data, 4);
 
-  interval_data = cache.getSurroundingInterval(rclcpp::Time(55, 0), rclcpp::Time(55, 0));
+  interval_data = cache.getSurroundingInterval(
+    rclcpp::Time(55, 0, RCL_ROS_TIME),
+    rclcpp::Time(55, 0, RCL_ROS_TIME)
+  );
   ASSERT_EQ(interval_data.size(), (unsigned int) 1);
   EXPECT_EQ(interval_data[0]->data, 5);
 }
@@ -160,17 +173,19 @@ TEST(Cache, easyUnsorted)
   cache.add(buildMsg(20, 2));
 
   std::vector<std::shared_ptr<Msg const>> interval_data = cache.getInterval(
-    rclcpp::Time(
-      3,
-      0), rclcpp::Time(
-      15, 0));
+    rclcpp::Time(3, 0, RCL_ROS_TIME),
+    rclcpp::Time(15, 0, RCL_ROS_TIME)
+  );
 
   ASSERT_EQ(interval_data.size(), (unsigned int) 2);
   EXPECT_EQ(interval_data[0]->data, 0);
   EXPECT_EQ(interval_data[1]->data, 1);
 
   // Grab all the data
-  interval_data = cache.getInterval(rclcpp::Time(0, 0), rclcpp::Time(80, 0));
+  interval_data = cache.getInterval(
+    rclcpp::Time(0, 0, RCL_ROS_TIME),
+    rclcpp::Time(80, 0, RCL_ROS_TIME)
+  );
   ASSERT_EQ(interval_data.size(), (unsigned int) 5);
   EXPECT_EQ(interval_data[0]->data, 0);
   EXPECT_EQ(interval_data[1]->data, 1);
@@ -187,16 +202,16 @@ TEST(Cache, easyElemBeforeAfter)
 
   fillCacheEasy(cache, 5, 10);
 
-  elem_ptr = cache.getElemAfterTime(rclcpp::Time(85, 0));
+  elem_ptr = cache.getElemAfterTime(rclcpp::Time(85, 0, RCL_ROS_TIME));
 
   ASSERT_FALSE(!elem_ptr);
   EXPECT_EQ(elem_ptr->data, 9);
 
-  elem_ptr = cache.getElemBeforeTime(rclcpp::Time(85, 0));
+  elem_ptr = cache.getElemBeforeTime(rclcpp::Time(85, 0, RCL_ROS_TIME));
   ASSERT_FALSE(!elem_ptr);
   EXPECT_EQ(elem_ptr->data, 8);
 
-  elem_ptr = cache.getElemBeforeTime(rclcpp::Time(45, 0));
+  elem_ptr = cache.getElemBeforeTime(rclcpp::Time(45, 0, RCL_ROS_TIME));
   EXPECT_TRUE(!elem_ptr);
 }
 
