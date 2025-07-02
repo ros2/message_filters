@@ -307,15 +307,9 @@ TEST(Subscriber, node_interfaces)
   auto node = std::make_shared<rclcpp_lifecycle::LifecycleNode>("test_node");
   Helper h;
 
-  // disassemble node into relevant interfaces
-  using NodeParametersInterface = rclcpp::node_interfaces::NodeParametersInterface;
-  using NodeTopicsInterface = rclcpp::node_interfaces::NodeTopicsInterface;
-  using RequiredInterfaces = rclcpp::node_interfaces::NodeInterfaces<NodeParametersInterface,
-      NodeTopicsInterface>;
-
   rclcpp::QoS default_qos =
     rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
-  message_filters::Subscriber<Msg> sub(RequiredInterfaces(*node), "test_topic",
+  message_filters::Subscriber<Msg> sub(*node, "test_topic",
     default_qos);
   sub.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   auto pub = node->create_publisher<Msg>("test_topic", 10);
