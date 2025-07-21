@@ -217,7 +217,7 @@ And define the timer callbacks
 
 
 
-1. Update package.xml
+2. Update package.xml
 ~~~~~~~~~~~~~~~~~~~~~
 
 Navigate to your package root and add the following dependencies in ``package.xml``:

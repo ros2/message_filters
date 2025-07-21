@@ -22,3 +22,4 @@ Basic Tutorials
    Tutorials/Approximate-Synchronizer-Cpp
    Tutorials/Approximate-Synchronizer-Python
    Tutorials/Cache-Python
+   Tutorials/Cache-Cpp
