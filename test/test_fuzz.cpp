@@ -78,6 +78,8 @@ static void fuzz_msg(MsgPtr msg)
 TEST(TimeSequencer, fuzz_sequencer)
 {
   rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("test_node");
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node);
   message_filters::TimeSequencer<Msg> seq(rclcpp::Duration(0, 10000000), rclcpp::Duration(
       0, 1000000),
     10, node);
@@ -94,9 +96,9 @@ TEST(TimeSequencer, fuzz_sequencer)
 
     rclcpp::Rate(20).sleep();
     ASSERT_EQ(h.count_, 0);
-    rclcpp::spin_some(node);
+    executor.spin_some();
     rclcpp::Rate(100).sleep();
-    rclcpp::spin_some(node);
+    executor.spin_some();
     ASSERT_EQ(h.count_, 1);
   }
 }
@@ -128,6 +130,8 @@ TEST(TimeSynchronizer, fuzz_synchronizer)
 TEST(Subscriber, fuzz_subscriber)
 {
   auto node = std::make_shared<rclcpp::Node>("test_node");
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node);
   Helper h;
   rclcpp::QoS default_qos =
     rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
@@ -143,10 +147,10 @@ TEST(Subscriber, fuzz_subscriber)
     msg->header.stamp = ros_clock.now();
     pub->publish(*msg);
     rclcpp::Rate(50).sleep();
-    rclcpp::spin_some(node);
+    executor.spin_some();
     ASSERT_EQ(h.count_, 1);
   }
-  rclcpp::spin_some(node);
+  executor.spin_some();
 }
 
 int main(int argc, char ** argv)

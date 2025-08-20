@@ -284,6 +284,8 @@ TEST_F(InputAlignerTest, dispatch_by_timer)
 {
   message_filters::InputAligner<Msg1, Msg2> aligner(timeout_);
   aligner.setupDispatchTimer(node_, update_rate_);
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node_);
 
   // register callbacks
   InputAlignerTest * test_fixture = dynamic_cast<InputAlignerTest *>(this);
@@ -298,7 +300,7 @@ TEST_F(InputAlignerTest, dispatch_by_timer)
   aligner.add<0>(createMsg<Msg1>(std::chrono::milliseconds(1), 1));
 
   rclcpp::Rate(50).sleep();
-  rclcpp::spin_some(node_);
+  executor.spin_some();
 
   ASSERT_EQ(cb_content_.size(), 2);
   for (size_t i = 0; i < cb_content_.size(); i++) {
