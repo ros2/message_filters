@@ -96,6 +96,7 @@ public:
     , update_rate_(update_rate)
     , queue_size_(queue_size)
     , node_(node)
+    , last_time_ (0, 0, RCL_ROS_TIME)
   {
     init();
     connectInput(f);
@@ -118,6 +119,7 @@ public:
     , update_rate_(update_rate)
     , queue_size_(queue_size)
     , node_(node)
+    , last_time_ (0, 0, RCL_ROS_TIME)
   {
     init();
   }
@@ -199,7 +201,7 @@ public:
       while (!messages_.empty()) {
         const EventType & e = *messages_.begin();
         rclcpp::Time stamp = mt::TimeStamp<M>::value(*e.getMessage());
-        if ((stamp + delay_) <= rclcpp::Clock().now()) {
+        if ((stamp + delay_) <= node_->get_clock()->now()) {
           last_time_ = stamp;
           to_call.push_back(e);
           messages_.erase(messages_.begin());
@@ -220,7 +222,7 @@ public:
 
   void init()
   {
-    update_timer_ = node_->create_wall_timer(
+    update_timer_ = rclcpp::create_timer(node_, node_->get_clock(), 
       std::chrono::nanoseconds(update_rate_.nanoseconds()), [this]() {
         dispatch();
       });
