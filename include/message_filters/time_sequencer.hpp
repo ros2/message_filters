@@ -222,7 +222,9 @@ public:
 
   void init()
   {
-    update_timer_ = rclcpp::create_timer(node_, node_->get_clock(), 
+    update_timer_ = rclcpp::create_timer(
+      node_,
+      node_->get_clock(),
       std::chrono::nanoseconds(update_rate_.nanoseconds()), [this]() {
         dispatch();
       });

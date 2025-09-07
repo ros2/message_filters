@@ -55,7 +55,7 @@ struct TimeStamp<Msg>
 {
   static rclcpp::Time value(const Msg & m)
   {
-    return m.header.stamp;
+    return rclcpp::Time(m.header.stamp, RCL_ROS_TIME);
   }
 };
 }  // namespace message_traits
@@ -86,7 +86,7 @@ TEST(TimeSequencer, simple)
   Helper h;
   seq.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
   MsgPtr msg(std::make_shared<Msg>());
-  msg->header.stamp = rclcpp::Clock().now();
+  msg->header.stamp = rclcpp::Clock(RCL_ROS_TIME).now();
   seq.add(msg);
 
   rclcpp::Rate(10).sleep();
@@ -137,7 +137,7 @@ TEST(TimeSequencer, eventInEventOut)
   seq2.registerCallback(&EventHelper::cb, &h);
 
   message_filters::MessageEvent<Msg const> evt(std::make_shared<Msg const>(),
-    rclcpp::Clock().now());
+    rclcpp::Clock(RCL_ROS_TIME).now());
   seq.add(evt);
 
   while (!h.event_.getMessage()) {
