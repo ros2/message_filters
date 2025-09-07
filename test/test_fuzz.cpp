@@ -85,7 +85,7 @@ TEST(TimeSequencer, fuzz_sequencer)
     10, node);
   Helper h;
   seq.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
-  rclcpp::Clock ros_clock;
+  rclcpp::Clock ros_clock(RCL_ROS_TIME);
   auto start = ros_clock.now();
   auto msg = std::make_shared<Msg>();
   while ((ros_clock.now() - start) < rclcpp::Duration(5, 0)) {
