@@ -23,3 +23,4 @@ Basic Tutorials
    Tutorials/Approximate-Synchronizer-Python
    Tutorials/Cache-Python
    Tutorials/Cache-Cpp
+   Tutorials/Chain-Cpp
