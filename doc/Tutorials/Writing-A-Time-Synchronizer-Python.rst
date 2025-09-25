@@ -40,15 +40,10 @@ If you have not done so already `create a workspace <https://docs.ros.org/en/hum
 
 
 For this example we will be using the ``temperature`` and ``fluid_pressure`` messages found in
-<<<<<<< HEAD
 `sensor_msgs <https://github.com/ros2/common_interfaces/tree/humble/sensor_msgs/msg>`_.
-To simulate a working ``TimeSynchronizer`` we will be publishing and subscribing to topics of those respective types, to showcase how real sensors would be working. To simulate them we will also need some sort of ``Timer``. Then, we will be utilizing said ``TimeSynchronizer`` to get these messages from the sensor topics aligned, seen with the two ``Subscribers`` conjoined in the ``TimeSynchronizer`` initialization.
-=======
-`sensor_msgs <https://github.com/ros2/common_interfaces/tree/rolling/sensor_msgs/msg>`_.
 To simulate a working ``TimeSynchronizer`` we will be publishing and subscribing to topics of those respective types, to showcase how real sensors would be working.
 To simulate them we will also need some sort of ``Timer``.
 Then, we will be utilizing said ``TimeSynchronizer`` to get these messages from the sensor topics aligned, seen with the two ``Subscribers`` conjoined in the ``TimeSynchronizer`` initialization.
->>>>>>> e849a8e (Some fixes to documentation (#208))
 
 It is essential that the QoS is the same for all of the publishers and subscribers, otherwise the Message Filter cannot align the topics together.
 So, create one ``QoSProfile`` and stick with it, or find out what ``qos`` is being used in the native sensor code, and replicate it.
