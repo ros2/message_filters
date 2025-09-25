@@ -47,14 +47,9 @@ If you have not done so already `create a workspace <https://docs.ros.org/en/jaz
 
 
 For this example we will be using the ``temperature`` and ``fluid_pressure`` messages found in
-<<<<<<< HEAD
 `sensor_msgs <https://github.com/ros2/common_interfaces/tree/jazzy/sensor_msgs/msg>`_.
-To simulate a working ``Synchronizer`` using the ``ApproximateTime`` Policy. We will be publishing and subscribing to topics of those respective types, to showcase how real sensors would be working.
-=======
-`sensor_msgs <https://github.com/ros2/common_interfaces/tree/rolling/sensor_msgs/msg>`_.
 To simulate a working ``Synchronizer`` using the ``ApproximateTime`` Policy.
 We will be publishing and subscribing to topics of those respective types, to showcase how real sensors would be working.
->>>>>>> e849a8e (Some fixes to documentation (#208))
 
 .. code-block:: C++
 
