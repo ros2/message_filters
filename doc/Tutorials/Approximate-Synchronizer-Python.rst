@@ -43,8 +43,13 @@ If you have not done so already `create a workspace <https://docs.ros.org/en/rol
 
 For this example we will be using the ``temperature`` and ``fluid_pressure`` messages found in
 `sensor_msgs <https://github.com/ros2/common_interfaces/tree/rolling/sensor_msgs/msg>`_.
-To simulate a working ``ApproximateTimeSynchronizer``. We will be publishing and subscribing to topics of those respective types, to showcase how real sensors would be working. To simulate them we will also need two ``Timers`` on different intervals. Then, we will be utilizing an ``ApproximateTimeSynchronizer`` to get these messages from the sensor topics aligned with a slight delay between messages..
-It is essential that the QoS is the same for all of the publishers and subscribers, otherwise the Message Filter cannot align the topics together. So, create one ``QoSProfile`` and stick with it, or find out what ``qos`` is being used in the native sensor code, and replicate it. Do basic construction of each object relating to the ``Node`` and callback methods that may be used in the future. Both of the two timers we utilize will have different timer values of ``1`` and ``1.05`` which causes the timers to off at different points, which is an advantage of using ``ApproximateTime``. Notice that we must call ``sync->registerCallback`` to sync up the two (or more) chosen topics.
+To simulate a working ``ApproximateTimeSynchronizer``.
+We will be publishing and subscribing to topics of those respective types, to showcase how real sensors would be working.
+To simulate them we will also need two ``Timers`` on different intervals.
+Then, we will be utilizing an ``ApproximateTimeSynchronizer`` to get these messages from the sensor topics aligned with a slight delay between messages..
+It is essential that the QoS is the same for all of the publishers and subscribers, otherwise the Message Filter cannot align the topics together. So, create one ``QoSProfile`` and stick with it, or find out what ``qos`` is being used in the native sensor code, and replicate it.
+Do basic construction of each object relating to the ``Node`` and callback methods that may be used in the future.
+Both of the two timers we utilize will have different timer values of ``1`` and ``1.05`` which causes the timers to off at different points, which is an advantage of using ``ApproximateTime``. Notice that we must call ``sync->registerCallback`` to sync up the two (or more) chosen topics.
 
 So, we must create three (or more) private callbacks, one for the ``ApproximateTimeSynchronizer``, then two for our ``Timers`` which are each for a certain ``sensor_msg``.
 
@@ -80,7 +85,10 @@ So, we must create three (or more) private callbacks, one for the ``ApproximateT
         self.fluid_pub.publish(fluid)
 
 
-``SyncCallback`` takes both messages relating to both topics, then, from here you can compare these topics, set values, etc. This callback is the final goal of synching multiple topics and the reason why the qos must be the same. This will be seen with the logging statement as both of the times will be the same. Though, the headers have to have the same ``stamp`` value, they don't have to be triggered at the same time using an ``ApproximateTimeSynchronizer`` which will be seen in a delay between logging calls. For both ``TimerCallbacks`` just initialize both the ``Temperature`` and ``FluidPressure`` in whatever way necessary. .
+``SyncCallback`` takes both messages relating to both topics, then, from here you can compare these topics, set values, etc.
+This callback is the final goal of synching multiple topics and the reason why the qos must be the same.
+This will be seen with the logging statement as both of the times will be the same. Though, the headers have to have the same ``stamp`` value, they don't have to be triggered at the same time using an ``ApproximateTimeSynchronizer`` which will be seen in a delay between logging calls.
+For both ``TimerCallbacks`` just initialize both the ``Temperature`` and ``FluidPressure`` in whatever way necessary. .
 
 Finally, create a main function and spin the node
 
@@ -107,7 +115,7 @@ Finally, create a main function and spin the node
 ^^^^^^^^^^^^^^^^^^^^^^
 Navigate to the root of your package's directory, where ``package.xml`` is located, open, and add the following dependencies:
 
-.. code-block:: Python
+.. code-block:: xml
 
    <exec_depend>rclpy</exec_depend>
    <exec_depend>message_filters</exec_depend>

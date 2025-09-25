@@ -22,8 +22,8 @@ If you have not done so already `create a workspace <https://docs.ros.org/en/rol
   #include "message_filters/synchronizer.hpp"
   #include "message_filters/sync_policies/approximate_time.hpp"
 
-  #include "sensor_msgs/msg/temperature.hpp"
-  #include "sensor_msgs/msg/fluid_pressure.hpp"
+  #include <sensor_msgs/msg/temperature.hpp>
+  #include <sensor_msgs/msg/fluid_pressure.hpp>
 
   using namespace std::chrono_literals;
 
@@ -48,7 +48,8 @@ If you have not done so already `create a workspace <https://docs.ros.org/en/rol
 
 For this example we will be using the ``temperature`` and ``fluid_pressure`` messages found in
 `sensor_msgs <https://github.com/ros2/common_interfaces/tree/rolling/sensor_msgs/msg>`_.
-To simulate a working ``Synchronizer`` using the ``ApproximateTime`` Policy. We will be publishing and subscribing to topics of those respective types, to showcase how real sensors would be working.
+To simulate a working ``Synchronizer`` using the ``ApproximateTime`` Policy.
+We will be publishing and subscribing to topics of those respective types, to showcase how real sensors would be working.
 
 .. code-block:: C++
 
@@ -57,7 +58,8 @@ To simulate a working ``Synchronizer`` using the ``ApproximateTime`` Policy. We 
     message_filters::Subscriber<sensor_msgs::msg::Temperature> temp_sub;
     message_filters::Subscriber<sensor_msgs::msg::FluidPressure> fluid_sub;
 
-Notice that the ``Subscribers`` are in the ``message_filters`` namespace, while we can utilize ``rclcpp::Publishers``. To simulate them we will also need two ``TimerBases``. Then, we will be utilizing a ``Synchronizer`` to get these messages from the sensor topics aligned.
+Notice that the ``Subscribers`` are in the ``message_filters`` namespace, while we can utilize ``rclcpp::Publishers``.
+To simulate them we will also need two ``TimerBases``. Then, we will be utilizing a ``Synchronizer`` to get these messages from the sensor topics aligned.
 
 Next, we can initialize these private elements within a basic ``Node`` constructor
 
@@ -87,7 +89,11 @@ Next, we can initialize these private elements within a basic ``Node`` construct
 
      }
 
-It is essential that the QoS is the same for all of the publishers and subscribers, otherwise the Message Filter cannot align the topics together. So, create one ``rclcpp::QoS`` and stick with it, or find out what ``qos`` is being used in the native sensor code, and replicate it. For each private class member, do basic construction of the object relating to the ``Node`` and callback methods that may be used in the future. Both of the two timers we utilize will have different timer values of ``500ms`` and ``550ms`` which causes the timers to off at different points, which is an advantage of using ``ApproximateTime``. This will then work since we called ``setAgePenalty`` to ``0.50`` (50ms)  Notice that we must call ``sync->registerCallback`` to sync up the two (or more) chosen topics.
+It is essential that the QoS is the same for all of the publishers and subscribers, otherwise the Message Filter cannot align the topics together.
+So, create one ``rclcpp::QoS`` and stick with it, or find out what ``qos`` is being used in the native sensor code, and replicate it.
+For each private class member, do basic construction of the object relating to the ``Node`` and callback methods that may be used in the future.
+Both of the two timers we utilize will have different timer values of ``500ms`` and ``550ms`` which causes the timers to off at different points, which is an advantage of using ``ApproximateTime``.
+This will then work since we called ``setAgePenalty`` to ``0.50`` (50ms) Notice that we must call ``sync->registerCallback`` to sync up the two (or more) chosen topics.
 
 So, we must create three (or more) private callbacks, one for the ``Synchronizer``, then two for our ``TimerBases`` which are each for a certain ``sensor_msgs``.
 
@@ -131,7 +137,8 @@ So, we must create three (or more) private callbacks, one for the ``Synchronizer
     }
 
 
-``SyncCallback`` takes ``const shared_ptr references`` relating to both topics becasue they will be taken at the exact time, from here you can compare these topics, set values, etc. This callback is the final goal of synching multiple topics and the reason why the qos and header stamps must be the same. This will be seen with the logging statement as both of the times will be the same. Though, the headers have to have the same ``stamp`` value, they don't have to be triggered at the same time with ``ApproximateTime`` which will be seen in a delay between logging calls. For the ``TimerCallback`` just initialize both the ``Temperature`` and ``FluidPressure`` in whatever way necessary. .
+``SyncCallback`` takes ``const shared_ptr references`` relating to both topics because they will be taken at the exact time, from here you can compare these topics, set values, etc. This callback is the final goal of syncing multiple topics and the reason why the qos and header stamps must be the same. This will be seen with the logging statement as both of the times will be the same. Though, the headers have to have the same ``stamp`` value, they don't have to be triggered at the same time with ``ApproximateTime`` which will be seen in a delay between logging calls.
+For the ``TimerCallback`` just initialize both the ``Temperature`` and ``FluidPressure`` in whatever way necessary. .
 
 Finally, create a main function and spin the node
 
@@ -169,14 +176,30 @@ Finally, add the ``install(TARGETS…)`` section so ``ros2 run`` can find your e
         approximate_time_sync
         DESTINATION lib/${PROJECT_NAME})
 
-
 3. Build
 ~~~~~~~~
 From the root of your package, build and source.
 
-.. code-block:: bash
+.. tabs::
 
-    colcon build && . install/setup.zsh
+    .. group-tab:: Linux
+
+        .. code-block:: console
+
+            $ colcon build && . install/setup.bash
+
+    .. group-tab:: macOS
+
+        .. code-block:: console
+
+            $ colcon build && . install/setup.bash
+
+    .. group-tab:: Windows
+
+        .. code-block:: console
+
+            $ colcon build
+            $ call C:\dev\ros2\local_setup.bat
 
 4. Run
 ~~~~~~

@@ -41,9 +41,14 @@ If you have not done so already `create a workspace <https://docs.ros.org/en/rol
 
 For this example we will be using the ``temperature`` and ``fluid_pressure`` messages found in
 `sensor_msgs <https://github.com/ros2/common_interfaces/tree/rolling/sensor_msgs/msg>`_.
-To simulate a working ``TimeSynchronizer`` we will be publishing and subscribing to topics of those respective types, to showcase how real sensors would be working. To simulate them we will also need some sort of ``Timer``. Then, we will be utilizing said ``TimeSynchronizer`` to get these messages from the sensor topics aligned, seen with the two ``Subscribers`` conjoined in the ``TimeSynchronizer`` initialization.
+To simulate a working ``TimeSynchronizer`` we will be publishing and subscribing to topics of those respective types, to showcase how real sensors would be working.
+To simulate them we will also need some sort of ``Timer``.
+Then, we will be utilizing said ``TimeSynchronizer`` to get these messages from the sensor topics aligned, seen with the two ``Subscribers`` conjoined in the ``TimeSynchronizer`` initialization.
 
-It is essential that the QoS is the same for all of the publishers and subscribers, otherwise the Message Filter cannot align the topics together. So, create one ``QoSProfile`` and stick with it, or find out what ``qos`` is being used in the native sensor code, and replicate it. For each class member, do basic construction of the object relating to the ``Node`` and callback methods that may be used in the future. Notice that we must call ``sync.registerCallback`` to sync up the two (or more) chosen topics.
+It is essential that the QoS is the same for all of the publishers and subscribers, otherwise the Message Filter cannot align the topics together.
+So, create one ``QoSProfile`` and stick with it, or find out what ``qos`` is being used in the native sensor code, and replicate it.
+For each class member, do basic construction of the object relating to the ``Node`` and callback methods that may be used in the future.
+Notice that we must call ``sync.registerCallback`` to sync up the two (or more) chosen topics.
 
 So, we must create some callbacks.
 
@@ -75,7 +80,10 @@ So, we must create some callbacks.
         fluid.fluid_pressure = 2.0
         self.fluid_pub.publish(fluid)
 
-``SyncCallback`` takes a fluid_pressure and a temperature  relating to both topics becasue they will be taken at the exact time, from here you can compare these topics, set values, etc. This callback is the final goal of synching multiple topics and the reason why the qos and header stamps must be the same. This will be seen with the logging statement as both of the times will be the same. For the ``TimerCallback`` just initialize both the ``Temperature`` and ``FluidPressure`` in whatever way necessary, but make sure the header stamp of both have the same exact time, otherwise the ``TimeSynchronizer`` will be misaligned and won't do anything.
+``SyncCallback`` takes a fluid_pressure and a temperature relating to both topics because they will be taken at the exact time, from here you can compare these topics, set values, etc.
+This callback is the final goal of synching multiple topics and the reason why the qos and header stamps must be the same.
+This will be seen with the logging statement as both of the times will be the same.
+For the ``TimerCallback`` just initialize both the ``Temperature`` and ``FluidPressure`` in whatever way necessary, but make sure the header stamp of both have the same exact time, otherwise the ``TimeSynchronizer`` will be misaligned and won't do anything.
 
 Finally, create a main function and spin the node
 
@@ -102,7 +110,7 @@ Finally, create a main function and spin the node
 ^^^^^^^^^^^^^^^^^^^^^^
 Navigate to the root of your package's directory, where ``package.xml`` is located, open, and add the following dependencies:
 
-.. code-block:: Python
+.. code-block:: xml
 
    <exec_depend>rclpy</exec_depend>
    <exec_depend>message_filters</exec_depend>
@@ -118,15 +126,31 @@ Add the following line between the 'console_scripts': brackets, with the name of
 
    'time_sync = pkg_name.time_sync:main',
 
-
 3. Build
 ~~~~~~~~
 From the root of your package, build and source.
 
 
-.. code-block:: bash
+.. tabs::
 
-    colcon build && . install/setup.zsh
+    .. group-tab:: Linux
+
+        .. code-block:: console
+
+             $ colcon build && . install/setup.bash
+
+    .. group-tab:: macOS
+
+        .. code-block:: console
+
+            $ colcon build && . install/setup.bash
+
+    .. group-tab:: Windows
+
+        .. code-block:: console
+
+            $ colcon build
+            $ call C:\dev\ros2\local_setup.bat
 
 4. Run
 ~~~~~~
