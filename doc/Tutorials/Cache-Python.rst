@@ -162,7 +162,7 @@ It is the way to chain these two filters together. Message is going to pass thro
 down the chain.
 
 It may be useful to point out that the ``Subscriber`` filter is not the only
-way to start a chain of filters. One may consider using ``SimpleFilter``. 
+way to start a chain of filters. One may consider using ``SimpleFilter``.
 It does not create a new subscription on it's own and may be used directly
 in a subscription callback instead.
 
@@ -254,7 +254,7 @@ From the root of your workspace:
 
         .. code-block:: console
 
-             $ colcon build && . install/setup.bash
+            $ colcon build && . install/setup.bash
 
     .. group-tab:: macOS
 
@@ -283,7 +283,7 @@ The first message in the output is going to be
 .. code-block:: bash
 
 	[INFO] [1750884527.235426721] [cache_node]: Cache filters cache is empty
-	
+
 As there were no messages published yet, and the cache is empty.
 After that, the publisher will start populate the cache with messages:
 
@@ -302,7 +302,7 @@ Note as the oldest time is starting to update after the 5'th message is added to
 The cache size for the ``cache`` in this example is 5. So as the 5'th message is added to
 the cache, the oldest messages are being removed from it, thus updating oldest time.
 
-6. Other methods of the Cache filter interface 
+6. Other methods of the Cache filter interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``Cache`` filter stores the last N messages (in this case, 5), and allows querying:

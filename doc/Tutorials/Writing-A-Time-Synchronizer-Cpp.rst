@@ -173,7 +173,7 @@ From the root of your package, build and source.
 
         .. code-block:: console
 
-             $ colcon build && . install/setup.bash
+            $ colcon build && . install/setup.bash
 
     .. group-tab:: macOS
 
