@@ -45,12 +45,9 @@ PKG = 'message_filters'
 
 class AnonymMsg:
     class AnonymHeader:
-        stamp = None
 
         def __init__(self):
             stamp = Time()
-
-    header = None
 
     def __init__(self):
         self.header = AnonymMsg.AnonymHeader()

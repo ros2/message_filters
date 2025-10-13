@@ -142,12 +142,19 @@ if(BUILD_TESTING)
 
   # python tests with python interfaces of message filters
   find_package(ament_cmake_pytest REQUIRED)
+<<<<<<< HEAD
   ament_add_pytest_test(directed.py "test/directed.py"
     PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}")
   ament_add_pytest_test(test_approxsync.py "test/test_approxsync.py"
     PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}")
   ament_add_pytest_test(test_message_filters_cache.py "test/test_message_filters_cache.py"
     PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}")
+=======
+  ament_add_pytest_test(directed.py "test/directed.py")
+  ament_add_pytest_test(test_approxsync.py "test/test_approxsync.py")
+  ament_add_pytest_test(test_message_filters_cache.py "test/test_message_filters_cache.py")
+  ament_add_pytest_test(test_message_filters_chain.py "test/test_message_filters_chain.py")
+>>>>>>> 0617849 (Add Python implementation for a Chain filter (#213))
 endif()
 
 ament_package()
