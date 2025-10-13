@@ -30,6 +30,7 @@
 """Message Filter Objects."""
 
 from bisect import insort_right
+from dataclasses import dataclass
 from functools import reduce
 import itertools
 import threading
@@ -202,6 +203,68 @@ class Cache(SimpleFilter):
         if self.getLatestTime() is None:
             return None
         return self.getElemAfterTime(self.getLatestTime())
+
+
+class Chain(SimpleFilter):
+    """
+    Chains a dynamic number of simple filters together.
+
+    Allows retrieval of filters by index after they are added.
+
+    The Chain filter provides a container for simple filters.
+    It allows you to store an N-long set of filters inside a single
+    structure, making it much easier to manage them.
+
+    Adding filters to the chain is done by adding shared_ptrs of them
+    to the filter. They are automatically connected to each other
+    and the output of the last filter in the chain is forwarded
+    to the callback you've registered with Chain::registerCallback.
+    """
+
+    @dataclass
+    class FilterInfo:
+        message_filter: any
+        connection_callback_index: int
+
+    def __init__(self, message_filter=None):
+        SimpleFilter.__init__(self)
+        if message_filter is not None:
+            self.connectInput(message_filter)
+
+        self.incoming_connection = None
+
+        self._message_filters: dict[int, Chain.FilterInfo] = {}
+
+    def connectInput(self, message_filter):
+        if self.incoming_connection is not None:
+            raise RuntimeError('Already connected')
+        self.incoming_connection = message_filter.registerCallback(self.add)
+
+    def add(self, message):
+        if self._message_filters:
+            self._message_filters[0].message_filter.add(message)
+        else:
+            self.signalMessage(message)
+
+    def addFilter(self, message_filter):
+        new_filter_index = len(self._message_filters)
+        last_filter_index = new_filter_index - 1
+
+        self._message_filters[new_filter_index] = Chain.FilterInfo(
+            message_filter=message_filter,
+            connection_callback_index=message_filter.registerCallback(self.signalMessage),
+        )
+
+        if last_filter_index >= 0:
+            last_filter = self._message_filters[last_filter_index].message_filter
+            callback_index = self._message_filters[last_filter_index].connection_callback_index
+            last_filter.callbacks.pop(callback_index)
+
+            self._message_filters[last_filter_index].connection_callback_index = \
+                last_filter.registerCallback(message_filter.add)
+
+    def getFilter(self, index: int):
+        return self._message_filters[index].message_filter
 
 
 class TimeSynchronizer(SimpleFilter):

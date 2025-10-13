@@ -142,6 +142,7 @@ if(BUILD_TESTING)
   ament_add_pytest_test(directed.py "test/directed.py")
   ament_add_pytest_test(test_approxsync.py "test/test_approxsync.py")
   ament_add_pytest_test(test_message_filters_cache.py "test/test_message_filters_cache.py")
+  ament_add_pytest_test(test_message_filters_chain.py "test/test_message_filters_chain.py")
 endif()
 
 ament_package()
