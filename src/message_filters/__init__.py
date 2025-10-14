@@ -30,13 +30,10 @@ Message Filter Objects
 ======================
 """
 
-<<<<<<< HEAD
-=======
 """Message Filter Objects."""
 
 from bisect import insort_right
 from dataclasses import dataclass
->>>>>>> 0617849 (Add Python implementation for a Chain filter (#213))
 from functools import reduce
 import itertools
 import threading
@@ -71,7 +68,7 @@ class SimpleFilter(object):
             cb(*(msg + args))
 
 class Subscriber(SimpleFilter):
-    
+
     """
     ROS2 subscription filter,Identical arguments as :class:`rclpy.Subscriber`.
 
@@ -190,7 +187,7 @@ class Cache(SimpleFilter):
         if not self.cache_times:
             return None
         return self.cache_times[0]
-        
+
     def getLast(self):
         if self.getLastestTime() is None:
             return None
