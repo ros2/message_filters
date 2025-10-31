@@ -76,12 +76,13 @@ class Subscriber(SimpleFilter):
     to it.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, node, msg_type, topic, qos_profile=10, **kwargs):
         SimpleFilter.__init__(self)
-        self.node = args[0]
-        self.topic = args[2]
-        kwargs.setdefault('qos_profile', 10)
-        self.sub = self.node.create_subscription(*args[1:], self.callback, **kwargs)
+        self.node = node
+        self.topic = topic
+        self.sub = self.node.create_subscription(
+            msg_type, topic, self.callback, qos_profile, **kwargs
+        )
 
     def callback(self, msg):
         self.signalMessage(msg)
