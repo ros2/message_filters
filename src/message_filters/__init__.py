@@ -98,7 +98,6 @@ class Subscriber(SimpleFilter):
             subscription. In the case that a history depth is provided, the QoS history is
             set to KEEP_LAST, the QoS history depth is set to the value of the parameter,
             and all other QoS settings are set to their default values.
-
         """
         SimpleFilter.__init__(self)
         self.node = node
