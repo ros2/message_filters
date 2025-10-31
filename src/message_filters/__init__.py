@@ -85,7 +85,7 @@ class Subscriber(SimpleFilter):
         topic: str,
         qos_profile: Union[QoSProfile, int] = 10,
         **kwargs,
-    ):
+    ) -> None:
         """
         Construct a Subscriber.
 
