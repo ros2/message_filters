@@ -89,12 +89,10 @@ class Subscriber(SimpleFilter):
         """
         Construct a Subscriber.
 
-        Args:
-        ----
-        node (Node): The node to create a subscriber for.
-        msg_type (Type[MsgT]): The type of ROS messages the subscription will subscribe to.
-        topic (str): The name of the topic the subscription will subscribe to.
-        qos_profile (QoSProfile | int): A QoSProfile or a history depth to apply to the
+        :param node: The node to create a subscriber for.
+        :param msg_type: The type of ROS messages the subscription will subscribe to.
+        :param topic: The name of the topic the subscription will subscribe to.
+        :param qos_profile: A QoSProfile or a history depth to apply to the
             subscription. In the case that a history depth is provided, the QoS history is
             set to KEEP_LAST, the QoS history depth is set to the value of the parameter,
             and all other QoS settings are set to their default values.
