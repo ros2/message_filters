@@ -24,7 +24,7 @@ If you have not done so already `create a workspace <https://docs.ros.org/en/rol
 1. Create a Basic Node with Includes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Let's assume, you've already created an empty ROS package for C++.
+Let's assume, you've already created an empty ROS 2 package for C++.
 The next step is to create a new C++ file inside your package, e.g., ``chain_tutorial.cpp``, and write an example code:
 
 .. code-block:: C++
@@ -66,10 +66,6 @@ The next step is to create a new C++ file inside your package, e.g., ``chain_tut
           std::placeholders::_1
         )
       );
-    }
-
-    void counterCallback(const std_msgs::msg::String::ConstSharedPtr& _) {
-      ++counter_;
     }
 
     size_t getCounterValue() {
@@ -232,10 +228,6 @@ Next we define a ``CounterFilter`` class.
       );
     }
   
-    void counterCallback(const std_msgs::msg::String::ConstSharedPtr& _) {
-      ++counter_;
-    }
-  
     size_t getCounterValue() {
       return counter_;
     }
@@ -299,13 +291,13 @@ Now let's take a look at the ``ChainNode`` constructor
       chain_filter_(subscriber_filter_)
     {
       auto qos = rclcpp::QoS(10);
-  
+
       subscriber_filter_.subscribe(this, TUTORIAL_TOPIC_NAME, qos);
-  
+
       // Set up the chain of filters
       chain_filter_.addFilter(first_counter_);
       chain_filter_.addFilter(second_counter_);
-  
+
       chain_filter_.registerCallback(
         std::bind(
           &ChainNode::chain_exit_callback,
@@ -313,14 +305,14 @@ Now let's take a look at the ``ChainNode`` constructor
           std::placeholders::_1
         )
       );
-  
+
       publisher_ = create_publisher<std_msgs::msg::String>(TUTORIAL_TOPIC_NAME, qos);
-      
+
       publisher_timer_ = this->create_wall_timer(
         1s,
         std::bind(&ChainNode::publisher_timer_callback, this)
       );
-  
+
       query_timer_ = this->create_wall_timer(
         1s,
         std::bind(&ChainNode::query_timer_callback, this)
