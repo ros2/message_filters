@@ -19,7 +19,7 @@ If you have not done so already `create a workspace <https://docs.ros.org/en/rol
 1. Create a Basic Node with Includes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Let's assume, you've already created an empty ROS package for C++.
+Let's assume, you've already created an empty ROS 2 package for C++.
 The next step is to create a new C++ file inside your package, e.g., ``cache_tutorial.cpp``, and create an example node:
 
 .. code-block:: C++

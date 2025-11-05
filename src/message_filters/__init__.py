@@ -217,10 +217,11 @@ class Chain(SimpleFilter):
 
     def __init__(self, message_filter=None):
         SimpleFilter.__init__(self)
-        if message_filter is not None:
-            self.connectInput(message_filter)
 
         self.incoming_connection = None
+
+        if message_filter is not None:
+            self.connectInput(message_filter)
 
         self._message_filters: dict[int, Chain.FilterInfo] = {}
 
