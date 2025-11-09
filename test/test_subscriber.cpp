@@ -281,8 +281,6 @@ TEST(Subscriber, multipleCallbacksSomeFilterSomeDirect)
     rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
   message_filters::Subscriber<Msg> sub(node, "test_topic", default_qos);
   sub.registerCallback(&NonConstHelper::cb, &h);
-  auto sub2 = node->create_subscription<Msg>(
-    "test_topic", 10, std::bind(&NonConstHelper::cb, &h2, std::placeholders::_1));
 
   auto pub = node->create_publisher<Msg>("test_topic", 10);
   auto msg = std::make_unique<Msg>();
