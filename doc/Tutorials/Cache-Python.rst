@@ -224,8 +224,8 @@ Navigate to your package root and add the following dependencies in ``package.xm
 
 .. code-block:: xml
 
-    <depend>rclpy</depend>
     <depend>message_filters</depend>
+    <depend>rclpy</depend>
     <depend>std_msgs</depend>
 
 3. Add Entry Point in setup.py
