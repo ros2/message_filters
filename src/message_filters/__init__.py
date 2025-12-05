@@ -41,7 +41,6 @@ import rclpy
 
 from typing import Type, Union
 
-import builtin_interfaces
 from rclpy.clock import ROSClock
 from rclpy.duration import Duration
 from rclpy.logging import LoggingSeverity
@@ -101,12 +100,6 @@ class Subscriber(SimpleFilter):
             and all other QoS settings are set to their default values.
         """
         SimpleFilter.__init__(self)
-    def __init__(self, *args, **kwargs):
-        SimpleFilter.__init__(self)
-        self.node = args[0]
-        self.topic = args[2]
-        kwargs.setdefault('qos_profile', 10)
-        self.sub = self.node.create_subscription(*args[1:], self.callback, **kwargs)
         self.node = node
         self.topic = topic
         self.sub = self.node.create_subscription(
