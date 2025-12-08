@@ -34,15 +34,18 @@ from dataclasses import dataclass
 from functools import reduce
 import itertools
 import threading
-from typing import Union
+from typing import Type, Union
 
 from builtin_interfaces.msg import Time as TimeMsg
+
 import rclpy
 from rclpy.clock import ROSClock
 from rclpy.duration import Duration
 from rclpy.logging import LoggingSeverity
+from rclpy.qos import QoSProfile
 from rclpy.node import Node
 from rclpy.time import Time
+from rclpy.type_support import MsgT
 
 from typing_extensions import deprecated
 
@@ -78,14 +81,6 @@ class Subscriber(SimpleFilter):
     to it.
     """
 
-<<<<<<< HEAD
-    def __init__(self, *args, **kwargs):
-        SimpleFilter.__init__(self)
-        self.node = args[0]
-        self.topic = args[2]
-        kwargs.setdefault('qos_profile', 10)
-        self.sub = self.node.create_subscription(*args[1:], self.callback, **kwargs)
-=======
     def __init__(
         self,
         node: Node,
@@ -113,7 +108,6 @@ class Subscriber(SimpleFilter):
             callback=self.callback,
             qos_profile=qos_profile,
         )
->>>>>>> c31a7a9 (Add simple filter tutorials (#226))
 
     def callback(self, msg):
         self.signalMessage(msg)
