@@ -429,8 +429,8 @@ Navigate to your package root and add the following dependencies in ``package.xm
 
 .. code-block:: xml
 
-    <depend>rclcpp</depend>
     <depend>message_filters</depend>
+    <depend>rclcpp</depend>
     <depend>std_msgs</depend>
 
 3. Add the Node to a CMakeLists.txt

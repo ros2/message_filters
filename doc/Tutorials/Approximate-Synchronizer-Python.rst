@@ -117,8 +117,8 @@ Navigate to the root of your package's directory, where ``package.xml`` is locat
 
 .. code-block:: xml
 
-   <exec_depend>rclpy</exec_depend>
    <exec_depend>message_filters</exec_depend>
+   <exec_depend>rclpy</exec_depend>
    <exec_depend>sensor_msgs</exec_depend>
 
 2.2 Add an entry point
