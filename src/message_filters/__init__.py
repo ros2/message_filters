@@ -47,7 +47,6 @@ from rclpy.logging import LoggingSeverity
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from rclpy.time import Time
-from rclpy.type_support import MsgT
 
 
 class SimpleFilter(object):
@@ -84,7 +83,7 @@ class Subscriber(SimpleFilter):
     def __init__(
         self,
         node: Node,
-        msg_type: Type[MsgT],
+        msg_type: Type,
         topic: str,
         qos_profile: Union[QoSProfile, int] = QoSProfile(depth=10),
     ) -> None:
