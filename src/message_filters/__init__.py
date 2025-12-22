@@ -323,12 +323,25 @@ class TimeSynchronizer(SimpleFilter):
             del my_queue[min(my_queue)]
         # common is the set of timestamps that occur in all queues
         common = reduce(set.intersection, [set(q) for q in self.queues])
+        signaled_time = None
         for t in sorted(common):
             # msgs is list of msgs (one from each queue) with stamp t
             msgs = [q[t] for q in self.queues]
             self.signalMessage(*msgs)
             for q in self.queues:
                 del q[t]
+            signaled_time = t
+            break
+
+        # for consistency with the C++ implementation:
+        #     Delete all stored messages with a timestamp
+        #     older than the time of the latest signaled time
+        if signaled_time is not None:
+            for queue in self.queues:
+                for stamp in list(queue.keys()):
+                    if stamp < signaled_time:
+                        del queue[stamp]
+
         self.lock.release()
 
 class ApproximateTimeSynchronizer(TimeSynchronizer):
