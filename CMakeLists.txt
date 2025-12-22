@@ -142,6 +142,7 @@ if(BUILD_TESTING)
 
   # python tests with python interfaces of message filters
   find_package(ament_cmake_pytest REQUIRED)
+<<<<<<< HEAD
   ament_add_pytest_test(directed.py "test/directed.py"
     PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}")
   ament_add_pytest_test(test_approxsync.py "test/test_approxsync.py"
@@ -150,6 +151,12 @@ if(BUILD_TESTING)
     PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}")
   ament_add_pytest_test(test_message_filters_chain.py "test/test_message_filters_chain.py"
     PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}")
+=======
+  ament_add_pytest_test(test_time_synchronizer.py "test/test_time_synchronizer.py")
+  ament_add_pytest_test(test_approxsync.py "test/test_approxsync.py")
+  ament_add_pytest_test(test_message_filters_cache.py "test/test_message_filters_cache.py")
+  ament_add_pytest_test(test_message_filters_chain.py "test/test_message_filters_chain.py")
+>>>>>>> 8cf647e (#200 fix inconsistensy between cpp and python exact time synchronizer impl (#238))
 endif()
 
 ament_package()
