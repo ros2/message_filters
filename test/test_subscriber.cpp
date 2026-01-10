@@ -349,6 +349,43 @@ TEST(Subscriber, node_interfaces)
   ASSERT_GT(h.count_, 0);
 }
 
+TEST(Subscriber, topicNoRemap) {
+  auto node = std::make_shared<rclcpp::Node>("test_node");
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node);
+  const std::string original_topic_name = "test_topic";
+
+  rclcpp::QoS default_qos =
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+  message_filters::Subscriber<Msg> sub(node, original_topic_name, default_qos);
+
+  std::string reported_topic = sub.getTopic();
+  ASSERT_TRUE(reported_topic == original_topic_name ||
+              reported_topic == "/" + original_topic_name);
+}
+
+TEST(Subscriber, topicWithRemap) {
+  const std::string original_topic_name = "test_topic";
+  const std::string remapped_topic_name = "remapped_topic";
+  // Create node with remap arguments
+  rclcpp::NodeOptions options;
+  options.arguments({
+    "--ros-args",
+    "-r", original_topic_name + ":=" + remapped_topic_name
+  });
+
+  auto node = std::make_shared<rclcpp::Node>("test_node", options);
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node);
+  rclcpp::QoS default_qos =
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+  message_filters::Subscriber<Msg> sub(node, original_topic_name, default_qos);
+
+  std::string reported_topic = sub.getTopic();
+  ASSERT_TRUE(reported_topic == remapped_topic_name ||
+              reported_topic == "/" + remapped_topic_name);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
