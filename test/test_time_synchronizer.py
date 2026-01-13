@@ -13,12 +13,7 @@
 #
 #    wide.registerCallback(boost::bind(&PersonDataRecorder::wideCB, this, _1, _2, _3, _4));
 
-<<<<<<< HEAD:test/directed.py
-import rclpy
-import random
-=======
 import functools
->>>>>>> 8cf647e (#200 fix inconsistensy between cpp and python exact time synchronizer impl (#238)):test/test_time_synchronizer.py
 import unittest
 
 from builtin_interfaces.msg import Time as TimeMsg
