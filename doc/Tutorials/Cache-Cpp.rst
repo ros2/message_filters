@@ -293,7 +293,7 @@ Now open the ``CMakeLists.txt`` add the executable and name it ``cache_tutorial`
 
 	ament_auto_add_executable(cache_tutorial src/cache_tutorial.cpp)
 
-Finally, add the install(TARGETS…) section so ros2 run can find your executable:
+Finally, add the ``install(TARGETS…)`` section so ros2 run can find your executable:
 
 .. code-block:: CMake
 
