@@ -445,7 +445,7 @@ Now open the ``CMakeLists.txt`` add the executable and name it ``chain_tutorial`
 
 	ament_auto_add_executable(chain_tutorial src/chain_tutorial.cpp)
 
-Finally, add the install(TARGETS…) section so ros2 run can find your executable:
+Finally, add the ``install(TARGETS…)`` section so ros2 run can find your executable:
 
 .. code-block:: CMake
 
