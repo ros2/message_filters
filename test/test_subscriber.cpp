@@ -349,7 +349,8 @@ TEST(Subscriber, node_interfaces)
   ASSERT_GT(h.count_, 0);
 }
 
-TEST(Subscriber, topicNoRemap) {
+TEST(Subscriber, topicNoRemap)
+{
   auto node = std::make_shared<rclcpp::Node>("test_node");
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node);
