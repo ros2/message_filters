@@ -14,7 +14,7 @@ Prerequisites
 
 This tutorial assumes you have a working knowledge of ROS 2.
 
-If you have not done so already `create a workspace <https://docs.ros.org/en/rolling/Tutorials/Beginner-Client-Libraries/Creating-A-Workspace/Creating-A-Workspace.html>`_ and `create a package <https://docs.ros.org/en/rolling/Tutorials/Beginner-Client-Libraries/Creating-Your-First-ROS2-Package.html>`_
+If you have not done so already `create a workspace <https://docs.ros.org/en/kilted/Tutorials/Beginner-Client-Libraries/Creating-A-Workspace/Creating-A-Workspace.html>`_ and `create a package <https://docs.ros.org/en/kilted/Tutorials/Beginner-Client-Libraries/Creating-Your-First-ROS2-Package.html>`_
 
 1. Create a Basic Node
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -200,7 +200,7 @@ After that we include the ``rclcpp.hpp`` header that provides us with classes fr
 To use message filters and some other classes from ``message_filters`` library we need to include corresponding headers.
 In this case we include ``simple_filter.hpp``, ``subscriber.hpp`` and ``connection.hpp``.
 
-Next we defne ``CounterWithLastMessageCache`` and make it a part of the ``message_filters`` namespace. 
+Next we defne ``CounterWithLastMessageCache`` and make it a part of the ``message_filters`` namespace.
 
 .. code-block:: C++
 
@@ -310,7 +310,7 @@ Now let's take a look at the ``SimpleFilterExampleNode``.
 The public interface of the node consists of three methods.
 The node's constructor, the ``publisher_timer_callback`` and the ``query_timer_callback``.
 
-.. code-block:: C++ 
+.. code-block:: C++
 
   class SimpleFilterExampleNode : public rclcpp::Node {
     public:
@@ -502,4 +502,3 @@ as well as the last message cache starts to update
   ... Last message: Pub count: 5
   ... Last message: Pub count: 6
   ... Last message: Pub count: 7
-
