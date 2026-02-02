@@ -86,6 +86,7 @@ class Subscriber(SimpleFilter):
         msg_type: Type,
         topic: str,
         qos_profile: Union[QoSProfile, int] = QoSProfile(depth=10),
+        **kwargs,
     ) -> None:
         """
         Construct a Subscriber.
@@ -97,6 +98,7 @@ class Subscriber(SimpleFilter):
             subscription. In the case that a history depth is provided, the QoS history is
             set to KEEP_LAST, the QoS history depth is set to the value of the parameter,
             and all other QoS settings are set to their default values.
+        :param kwargs: Additional keyword arguments passed to node.create_subscription.
         """
         SimpleFilter.__init__(self)
         self.node = node
@@ -106,6 +108,7 @@ class Subscriber(SimpleFilter):
             topic=self.topic,
             callback=self.callback,
             qos_profile=qos_profile,
+            **kwargs,
         )
 
     def callback(self, msg):
