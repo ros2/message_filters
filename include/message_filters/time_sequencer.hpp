@@ -198,25 +198,22 @@ public:
     {
       std::lock_guard<std::mutex> lock(messages_mutex_);
 
-      while (!messages_.empty()) {
-        const EventType & e = *messages_.begin();
-        rclcpp::Time stamp = mt::TimeStamp<M>::value(*e.getMessage());
-        if ((stamp + delay_) <= node_->get_clock()->now()) {
+      const rclcpp::Time now = node_->get_clock()->now();
+      auto it = messages_.begin();
+      while (it != messages_.end()) {
+        const rclcpp::Time stamp = mt::TimeStamp<M>::value(*it->getMessage());
+        if ((stamp + delay_) <= now) {
           last_time_ = stamp;
-          to_call.push_back(e);
-          messages_.erase(messages_.begin());
+          to_call.push_back(*it);
+          it = messages_.erase(it);
         } else {
           break;
         }
       }
     }
 
-    {
-      typename V_Message::iterator it = to_call.begin();
-      typename V_Message::iterator end = to_call.end();
-      for (; it != end; ++it) {
-        this->signalMessage(*it);
-      }
+    for (const EventType & evt : to_call) {
+      this->signalMessage(evt);
     }
   }
 

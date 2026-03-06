@@ -87,7 +87,7 @@ public:
     CallbackHelper1T<P, M> * helper = new CallbackHelper1T<P, M>(callback);
 
     std::lock_guard<std::mutex> lock(mutex_);
-    callbacks_.push_back(CallbackHelper1Ptr(helper));
+    callbacks_.emplace_back(CallbackHelper1Ptr(helper));
     return callbacks_.back();
   }
 
@@ -103,12 +103,13 @@ public:
 
   void call(const MessageEvent<M const> & event)
   {
-    std::lock_guard<std::mutex> lock(mutex_);
-    bool nonconst_force_copy = callbacks_.size() > 1;
-    typename V_CallbackHelper1::iterator it = callbacks_.begin();
-    typename V_CallbackHelper1::iterator end = callbacks_.end();
-    for (; it != end; ++it) {
-      const CallbackHelper1Ptr & helper = *it;
+    V_CallbackHelper1 local_callbacks;
+    {
+      std::lock_guard<std::mutex> lock(mutex_);
+      local_callbacks = callbacks_;
+    }
+    bool nonconst_force_copy = local_callbacks.size() > 1;
+    for (const CallbackHelper1Ptr & helper : local_callbacks) {
       helper->call(event, nonconst_force_copy);
     }
   }

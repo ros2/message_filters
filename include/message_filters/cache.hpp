@@ -29,6 +29,7 @@
 #ifndef MESSAGE_FILTERS__CACHE_HPP_
 #define MESSAGE_FILTERS__CACHE_HPP_
 
+#include <algorithm>
 #include <cstddef>
 #include <deque>
 #include <functional>
@@ -153,33 +154,23 @@ public:
    */
   void add(const EventType & evt)
   {
-    namespace mt = message_filters::message_traits;
-
-    // printf("  Cache Size: %u\n", cache_.size());
     {
       std::lock_guard<std::mutex> lock(cache_lock_);
 
-      // Keep popping off old data until we have space for a new msg
-      // The front of the deque has the oldest elem, so we can get rid of it
+      // Keep popping off old data until we have space for a new msg.
+      // The front of the deque has the oldest elem.
       while (cache_.size() >= cache_size_) {
         cache_.pop_front();
       }
 
-      // No longer naively pushing msgs to back. Want to make sure they're sorted correctly
-      // cache_.push_back(msg);
-      // Add the newest message to the back of the deque
-
-      typename std::deque<EventType>::reverse_iterator rev_it = cache_.rbegin();
-
-      // Keep walking backwards along deque until we hit the beginning,
-      // or until we find a timestamp that's smaller than (or equal to) msg's timestamp
-      rclcpp::Time evt_stamp = getMessageTime(evt);
-      while (rev_it != cache_.rend() && getMessageTime(*rev_it) > evt_stamp) {
-        rev_it++;
-      }
-
-      // Add msg to the cache
-      cache_.insert(rev_it.base(), evt);
+      // Insert in sorted position using binary search (deque is kept time-ordered).
+      const rclcpp::Time evt_stamp = getMessageTime(evt);
+      auto it = std::lower_bound(
+        cache_.begin(), cache_.end(), evt_stamp,
+        [this](const EventType & e, const rclcpp::Time & t) {
+          return getMessageTime(e) < t;
+        });
+      cache_.insert(it, evt);
     }
 
     this->signalMessage(evt);
@@ -195,33 +186,26 @@ public:
    */
   std::vector<MConstPtr> getInterval(const rclcpp::Time & start, const rclcpp::Time & end) const
   {
-    namespace mt = message_filters::message_traits;
     std::lock_guard<std::mutex> lock(cache_lock_);
 
-    // Find the starting index. (Find the first index after [or at] the start of the interval)
-    size_t start_index = 0;
-    while (
-      start_index < cache_.size() &&
-      getMessageTime(cache_[start_index]) < start
-    )
-    {
-      start_index++;
-    }
+    // Binary search for the first element >= start
+    auto start_it = std::lower_bound(
+      cache_.begin(), cache_.end(), start,
+      [this](const EventType & e, const rclcpp::Time & t) {
+        return getMessageTime(e) < t;
+      });
 
-    // Find the ending index. (Find the first index after the end of interval)
-    size_t end_index = start_index;
-    while (
-      end_index < cache_.size() &&
-      getMessageTime(cache_[end_index]) <= end
-    )
-    {
-      end_index++;
-    }
+    // Binary search for the first element > end
+    auto end_it = std::upper_bound(
+      start_it, cache_.end(), end,
+      [this](const rclcpp::Time & t, const EventType & e) {
+        return t < getMessageTime(e);
+      });
 
     std::vector<MConstPtr> interval_elems;
-    interval_elems.reserve(end_index - start_index);
-    for (size_t i = start_index; i < end_index; i++) {
-      interval_elems.push_back(cache_[i].getMessage());
+    interval_elems.reserve(static_cast<size_t>(std::distance(start_it, end_it)));
+    for (auto it = start_it; it != end_it; ++it) {
+      interval_elems.push_back(it->getMessage());
     }
 
     return interval_elems;
@@ -237,38 +221,35 @@ public:
   std::vector<MConstPtr> getSurroundingInterval(
     const rclcpp::Time & start, const rclcpp::Time & end) const
   {
-    namespace mt = message_filters::message_traits;
-
     std::lock_guard<std::mutex> lock(cache_lock_);
-    if (cache_.size() == 0) {
-      // Early return for empty cache
-      // Logic below is only valid for caches with at least one element
+    if (cache_.empty()) {
       return {};
     }
 
-    // Find the starting index. (Find the first index after [or at] the start of the interval)
-    int start_index = static_cast<int>(cache_.size()) - 1;
-    while (
-      start_index > 0 &&
-      getMessageTime(cache_[start_index]) > start
-    )
-    {
-      start_index--;
+    // Find the last element whose time <= start (i.e. one before lower_bound(start))
+    auto start_it = std::lower_bound(
+      cache_.begin(), cache_.end(), start,
+      [this](const EventType & e, const rclcpp::Time & t) {
+        return getMessageTime(e) < t;
+      });
+    if (start_it != cache_.begin()) {
+      --start_it;
     }
 
-    int end_index = start_index;
-    while (
-      end_index < static_cast<int>(cache_.size()) - 1 &&
-      getMessageTime(cache_[end_index]) < end
-    )
-    {
-      end_index++;
+    // Find the first element whose time >= end (i.e. lower_bound(end))
+    auto end_it = std::lower_bound(
+      start_it, cache_.end(), end,
+      [this](const EventType & e, const rclcpp::Time & t) {
+        return getMessageTime(e) < t;
+      });
+    if (end_it != cache_.end()) {
+      ++end_it;  // include the element at/after end
     }
 
     std::vector<MConstPtr> interval_elems;
-    interval_elems.reserve(end_index - start_index + 1);
-    for (int i = start_index; i <= end_index; i++) {
-      interval_elems.push_back(cache_[i].getMessage());
+    interval_elems.reserve(static_cast<size_t>(std::distance(start_it, end_it)));
+    for (auto it = start_it; it != end_it; ++it) {
+      interval_elems.push_back(it->getMessage());
     }
 
     return interval_elems;
@@ -281,28 +262,20 @@ public:
    */
   MConstPtr getElemBeforeTime(const rclcpp::Time & time) const
   {
-    namespace mt = message_filters::message_traits;
-
     std::lock_guard<std::mutex> lock(cache_lock_);
 
-    MConstPtr out;
+    // lower_bound finds the first element >= time; the element before it is < time
+    auto it = std::lower_bound(
+      cache_.begin(), cache_.end(), time,
+      [this](const EventType & e, const rclcpp::Time & t) {
+        return getMessageTime(e) < t;
+      });
 
-    unsigned int i = 0;
-    int elem_index = -1;
-    while (
-      i < cache_.size() &&
-      getMessageTime(cache_[i]) < time
-    )
-    {
-      elem_index = i;
-      i++;
+    if (it == cache_.begin()) {
+      return {};
     }
-
-    if (elem_index >= 0) {
-      out = cache_[elem_index].getMessage();
-    }
-
-    return out;
+    --it;
+    return it->getMessage();
   }
 
   /**
@@ -312,30 +285,19 @@ public:
    */
   MConstPtr getElemAfterTime(const rclcpp::Time & time) const
   {
-    namespace mt = message_filters::message_traits;
-
     std::lock_guard<std::mutex> lock(cache_lock_);
 
-    MConstPtr out;
+    // upper_bound finds the first element strictly > time
+    auto it = std::upper_bound(
+      cache_.begin(), cache_.end(), time,
+      [this](const rclcpp::Time & t, const EventType & e) {
+        return t < getMessageTime(e);
+      });
 
-    int i = static_cast<int>(cache_.size()) - 1;
-    int elem_index = -1;
-    while (
-      i >= 0 &&
-      getMessageTime(cache_[i]) > time
-    )
-    {
-      elem_index = i;
-      i--;
+    if (it == cache_.end()) {
+      return {};
     }
-
-    if (elem_index >= 0) {
-      out = cache_[elem_index].getMessage();
-    } else {
-      out.reset();
-    }
-
-    return out;
+    return it->getMessage();
   }
 
   /**
