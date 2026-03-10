@@ -159,7 +159,7 @@ Finally, create a main function and spin the node
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Now open the ``CMakeLists.txt`` add the executable and name it ``approximate_time_sync``, which you’ll use later with ``ros2 run``.
 
-.. code-block:: C++
+.. code-block:: CMake
 
    find_package(rclcpp REQUIRED)
    find_package(sensor_msgs REQUIRED)
@@ -170,7 +170,7 @@ Now open the ``CMakeLists.txt`` add the executable and name it ``approximate_tim
 
 Finally, add the ``install(TARGETS…)`` section so ``ros2 run`` can find your executable:
 
-.. code-block:: C++
+.. code-block:: CMake
 
     install(TARGETS
         approximate_time_sync
