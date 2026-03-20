@@ -12,7 +12,7 @@ To demonstrate the functionality of the ``Chain`` filter in a more clear manner,
 This is going to be the ``CounterFilter`` that will be counting the number of messages passing through it.
 This filter class will be a successor to the ``SimpleFilter`` class, but this is a topic for another tutorial.
 
-.. TODO: @EsipovPA: Add message_filters::SimpleFilter tutorial reference, when ready
+For more information on this succession mechanism, please refer to the `SimpleFilter for C++ tutorial <https://docs.ros.org/en/rolling/p/message_filters/doc/Tutorials/SimpleFilter-Cpp.html>`_.
 
 Prerequisites
 ~~~~~~~~~~~~~
@@ -246,8 +246,7 @@ The ``add`` method increases messages count, and passes message to the following
 The ``connectInput`` connects this filter to a previous filter's output.
 The ``getCounterValue`` grants access to the current messages count.
 
-.. More on this succession mechanism should be in the corresponding tutorial
-.. TODO: @EsipovPA Add link to the message_filters::SimpleFilter tutorial, when added.
+More on this succession mechanism may be found in the corresponding tutorial: `SimpleFilter for C++ tutorial <https://docs.ros.org/en/rolling/p/message_filters/doc/Tutorials/SimpleFilter-Cpp.html>`_.
 
 And now we can turn our attention to the main tutorial class, that is the ``ChainNode`` class.
 For starters, let's take a look at the ``private`` section of this class:
