@@ -27,4 +27,5 @@ Basic Tutorials
    Tutorials/Chain-Python
    Tutorials/SimpleFilter-Python
    Tutorials/SimpleFilter-Cpp
-   Tutorials/Approximate-Epsilon-Tyme-Synchronizer-Cpp.rst
+   Tutorials/Approximate-Epsilon-Time-Synchronizer-Cpp.rst
+   Tutorials/Latest-Time-Cpp.rst
