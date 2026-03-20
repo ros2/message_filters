@@ -166,7 +166,7 @@ Now open the ``CMakeLists.txt`` add the executable and name it ``approximate_tim
    find_package(message_filters REQUIRED)
 
    add_executable(approximate_time_sync src/approximate_time_synchronizer.cpp)
-   target_link_libraries(approximate_time_sync PUBLIC rclcpp::rclcpp ${sensor_msgs_TARGETS} message_filters::message_filters)
+   target_link_libraries(approximate_time_sync PUBLIC rclcpp::rclcpp sensor_msgs::sensor_msgs message_filters::message_filters)
 
 Finally, add the ``install(TARGETS…)`` section so ``ros2 run`` can find your executable:
 
