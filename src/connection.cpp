@@ -40,8 +40,6 @@ void Connection::disconnect()
 {
   if (void_disconnect_) {
     void_disconnect_();
-  } else if (connection_disconnect_) {
-    connection_disconnect_(*this);
   }
 }
 
