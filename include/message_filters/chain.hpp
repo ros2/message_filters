@@ -29,8 +29,10 @@
 #ifndef MESSAGE_FILTERS__CHAIN_HPP_
 #define MESSAGE_FILTERS__CHAIN_HPP_
 
-#include <vector>
+#include <mutex>
 #include <memory>
+#include <utility>
+#include <vector>
 
 #include "message_filters/simple_filter.hpp"
 #include "message_filters/pass_through.hpp"
@@ -44,7 +46,7 @@ namespace message_filters
 class ChainBase
 {
 public:
-  virtual ~ChainBase() {}
+  virtual ~ChainBase() = default;
 
   /**
    * \brief Retrieve a filter from this chain by index.  Returns an empty shared_ptr if the index is greater than
@@ -61,13 +63,13 @@ public:
       return std::static_pointer_cast<F>(filter);
     }
 
-    return std::shared_ptr<F>();
+    return {};
   }
 
 protected:
   virtual std::shared_ptr<void> getFilterForIndex(size_t index) const = 0;
 };
-typedef std::shared_ptr<ChainBase> ChainBasePtr;
+using ChainBasePtr = std::shared_ptr<ChainBase>;
 
 /**
  * \brief Chains a dynamic number of simple filters together.  Allows retrieval of filters by index after they are added.
@@ -104,15 +106,13 @@ template<typename M>
 class Chain : public ChainBase, public SimpleFilter<M>
 {
 public:
-  typedef std::shared_ptr<M const> MConstPtr;
-  typedef MessageEvent<M const> EventType;
+  using MConstPtr = std::shared_ptr<M const>;
+  using EventType = MessageEvent<M const>;
 
   /**
    * \brief Default constructor
    */
-  Chain()
-  {
-  }
+  Chain() = default;
 
   /**
    * \brief Constructor with filter.  Calls connectInput(f)
@@ -123,20 +123,14 @@ public:
     connectInput(f);
   }
 
-  struct NullDeleter
-  {
-    void operator()(void const *) const
-    {
-    }
-  };
-
   /**
    * \brief Add a filter to this chain, by bare pointer.  Returns the index of that filter in the chain.
+   * @warning The caller must ensure `filter` outlives this Chain.
    */
   template<class F>
   size_t addFilter(F * filter)
   {
-    std::shared_ptr<F> ptr(filter, NullDeleter());
+    std::shared_ptr<F> ptr(filter, [](F *) {});
     return addFilter(ptr);
   }
 
@@ -147,22 +141,23 @@ public:
   size_t addFilter(const std::shared_ptr<F> & filter)
   {
     FilterInfo info;
-    info.add_func = std::bind(
-      (void (F::*)(const EventType &)) & F::add, filter.get(), std::placeholders::_1);
+    info.add_func = [filter](const EventType & evt) {filter->add(evt);};
     info.filter = filter;
     info.passthrough = std::make_shared<PassThrough<M>>();
+
+    std::lock_guard<std::mutex> lock(mutex_);
 
     last_filter_connection_.disconnect();
     info.passthrough->connectInput(*filter);
     last_filter_connection_ = info.passthrough->registerCallback(
       typename SimpleFilter<M>::EventCallback(
-        std::bind(&Chain::lastFilterCB, this, std::placeholders::_1)));
+        [this](const EventType & evt) {lastFilterCB(evt);}));
     if (!filters_.empty()) {
       filter->connectInput(*filters_.back().passthrough);
     }
 
-    size_t count = filters_.size();
-    filters_.push_back(info);
+    const size_t count = filters_.size();
+    filters_.push_back(std::move(info));
     return count;
   }
 
@@ -176,8 +171,9 @@ public:
   template<typename F>
   std::shared_ptr<F> getFilter(size_t index) const
   {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (index >= filters_.size()) {
-      return std::shared_ptr<F>();
+      return {};
     }
 
     return std::static_pointer_cast<F>(filters_[index].filter);
@@ -189,10 +185,11 @@ public:
   template<class F>
   void connectInput(F & f)
   {
+    std::lock_guard<std::mutex> lock(mutex_);
     incoming_connection_.disconnect();
     incoming_connection_ = f.registerCallback(
       typename SimpleFilter<M>::EventCallback(
-        std::bind(&Chain::incomingCB, this, std::placeholders::_1)));
+        [this](const EventType & evt) {incomingCB(evt);}));
   }
 
   /**
@@ -205,16 +202,26 @@ public:
 
   void add(const EventType & evt)
   {
-    if (!filters_.empty()) {
-      filters_[0].add_func(evt);
+    // Snapshot add_func under the lock, then invoke outside it.
+    // This prevents a deadlock if a downstream callback calls addFilter()
+    // on another thread, while keeping filters_ protected against reallocation.
+    std::function<void(const EventType &)> func;
+    {
+      std::lock_guard<std::mutex> lock(mutex_);
+      if (filters_.empty()) {
+        return;
+      }
+      func = filters_[0].add_func;
     }
+    func(evt);
   }
 
 protected:
   virtual std::shared_ptr<void> getFilterForIndex(size_t index) const
   {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (index >= filters_.size()) {
-      return std::shared_ptr<void>();
+      return {};
     }
 
     return filters_[index].filter;
@@ -237,12 +244,12 @@ private:
     std::shared_ptr<void> filter;
     std::shared_ptr<PassThrough<M>> passthrough;
   };
-  typedef std::vector<FilterInfo> V_FilterInfo;
-
-  V_FilterInfo filters_;
+  std::vector<FilterInfo> filters_;
 
   Connection incoming_connection_;
   Connection last_filter_connection_;
+
+  mutable std::mutex mutex_;
 };
 }  // namespace message_filters
 
