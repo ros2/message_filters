@@ -416,7 +416,8 @@ protected:
   template<std::size_t N>
   std::size_t getFirstSampleIdx(const std::array<rclcpp::Time, N> & ts) const
   {
-    return static_cast<std::size_t>(std::ranges::min_element(ts) - ts.begin());
+    auto min_it = std::ranges::min_element(ts);
+    return static_cast<std::size_t>(std::distance(ts.begin(), min_it));
   }
 
   rclcpp::Duration timeout_;
