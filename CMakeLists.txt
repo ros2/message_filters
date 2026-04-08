@@ -137,6 +137,11 @@ if(BUILD_TESTING)
     target_link_libraries(${PROJECT_NAME}-test_input_aligner ${PROJECT_NAME})
   endif()
 
+  ament_add_gtest(${PROJECT_NAME}-test_message_filters_delta_filter test/test_message_filters_delta_filter.cpp)
+  if(TARGET ${PROJECT_NAME}-test_message_filters_delta_filter)
+    target_link_libraries(${PROJECT_NAME}-test_message_filters_delta_filter ${PROJECT_NAME})
+  endif()
+
   # python tests with python interfaces of message filters
   find_package(ament_cmake_pytest REQUIRED)
   ament_add_pytest_test(test_time_synchronizer.py "test/test_time_synchronizer.py")
