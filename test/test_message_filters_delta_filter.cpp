@@ -29,7 +29,6 @@
 #include <gtest/gtest.h>
 
 #include <memory>
-#include <optional>
 #include <string>
 
 #include <message_filters/cache.hpp>
@@ -77,14 +76,13 @@ class ComparisonHandlerMock : public message_filters::CachedComparisonHandler<M>
 {
 public:
   typedef std::shared_ptr<M const> MConstPtr;
-  typedef std::function<message_filters::MFieldType(const MConstPtr &)> FieldGetterFunctionType;
+  typedef std::function<bool(const MConstPtr &, const MConstPtr &)> FieldComparatorFunctionType;
 
-  ComparisonHandlerMock(
-    // Parameter not used but expected in a base class signature
-    [[maybe_unused]] std::forward_list<FieldGetterFunctionType> _ = {}
+  explicit ComparisonHandlerMock(
+    std::forward_list<FieldComparatorFunctionType> /* comparators */ = {}
   )
   : message_filters::CachedComparisonHandler<M>(
-      {[] (const MConstPtr & msg) {return msg->data;}}
+      {[] (const MConstPtr & a, const MConstPtr & b) { return a->data != b->data; }}
   ) {}
 
   void set_comparison_success(bool success)
@@ -93,9 +91,9 @@ public:
   }
 
   bool do_fields_fit(
-    // Parameters not used but expected in a base class signature
-    [[maybe_unused]] message_filters::MFieldType field_a,
-    [[maybe_unused]] message_filters::MFieldType field_b
+    const FieldComparatorFunctionType & /* comparator */,
+    const MConstPtr & /* cached */,
+    const MConstPtr & /* current */
   ) const
   {
     return comparison_success;
@@ -130,11 +128,11 @@ public:
 
   void callback(const EventType & evt)
   {
-    event_cache = evt;
+    event_cache.reset(new EventType(evt));
   }
 
 public:
-  std::optional<EventType> event_cache;
+  std::unique_ptr<EventType> event_cache;
 
 private:
   message_filters::Connection incoming_connection_;
@@ -193,7 +191,7 @@ TYPED_TEST(ParametrizedDeltaCompareTest, TestComparison)
   MsgType test_msg_1 = TestFixture::value_1;
 
   auto handler = message_filters::DeltaCompare<MsgType>(
-    {[] (const MConstPtr & msg) {return msg->data;}}
+    {[] (const MConstPtr & a, const MConstPtr & b) { return a->data != b->data; }}
   );
 
   // New message for empty comparison handler -> True
@@ -239,7 +237,7 @@ TYPED_TEST(ParametrizedComparisonFilterTest, TestComparison)
   auto simple_filter = message_filters::SimpleFilter<MsgType>();
   auto comparison_filter = message_filters::ComparisonFilter<MsgType, ComparisonHandlerMock>(
     simple_filter,
-    {[] (const MConstPtr & msg) {return msg->data;}}
+    {[] (const MConstPtr & a, const MConstPtr & b) { return a->data != b->data; }}
   );
   auto cache_filter = SimpleCachefilter<MsgType>(comparison_filter);
 
@@ -248,7 +246,7 @@ TYPED_TEST(ParametrizedComparisonFilterTest, TestComparison)
           std::make_shared<MsgType>(test_msg_0)
       )
   );
-  EXPECT_TRUE(cache_filter.event_cache.has_value());
+  EXPECT_TRUE(bool(cache_filter.event_cache));
   EXPECT_EQ(cache_filter.event_cache->getMessage()->data, test_msg_0.data);
 
   comparison_filter.add(
@@ -256,7 +254,7 @@ TYPED_TEST(ParametrizedComparisonFilterTest, TestComparison)
           std::make_shared<MsgType>(test_msg_1)
       )
   );
-  EXPECT_TRUE(cache_filter.event_cache.has_value());
+  EXPECT_TRUE(bool(cache_filter.event_cache));
   EXPECT_EQ(cache_filter.event_cache->getMessage()->data, test_msg_1.data);
 }
 
@@ -276,7 +274,7 @@ TYPED_TEST(ParametrizedDeltaFilterTest, TestComparison)
   auto simple_filter = message_filters::SimpleFilter<MsgType>();
   auto delta_filter = message_filters::DeltaFilter<MsgType>(
     simple_filter,
-    {[] (const MConstPtr & msg) {return msg->data;}}
+    {[] (const MConstPtr & a, const MConstPtr & b) { return a->data != b->data; }}
   );
   auto cache_filter = SimpleCachefilter<MsgType>(delta_filter);
 
@@ -286,7 +284,7 @@ TYPED_TEST(ParametrizedDeltaFilterTest, TestComparison)
           std::make_shared<MsgType>(test_msg_0)
       )
   );
-  EXPECT_TRUE(cache_filter.event_cache.has_value());
+  EXPECT_TRUE(bool(cache_filter.event_cache));
   EXPECT_EQ(cache_filter.event_cache->getMessage()->data, test_msg_0.data);
 
   // Same message received and not passed down the line
@@ -296,7 +294,7 @@ TYPED_TEST(ParametrizedDeltaFilterTest, TestComparison)
           std::make_shared<MsgType>(test_msg_0)
       )
   );
-  EXPECT_FALSE(cache_filter.event_cache.has_value());
+  EXPECT_FALSE(bool(cache_filter.event_cache));
 
   // New message received and passed down the line
   delta_filter.add(
@@ -304,7 +302,7 @@ TYPED_TEST(ParametrizedDeltaFilterTest, TestComparison)
           std::make_shared<MsgType>(test_msg_1)
       )
   );
-  EXPECT_TRUE(cache_filter.event_cache.has_value());
+  EXPECT_TRUE(bool(cache_filter.event_cache));
   EXPECT_EQ(cache_filter.event_cache->getMessage()->data, test_msg_1.data);
 }
 
