@@ -2,6 +2,11 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.1.8 (2026-04-09)
+------------------
+* DeltaFilter(C++): Add DeltaFilter class. Add tests (`#273 <https://github.com/ros2/message_filters/issues/273>`_) (`#273 <https://github.com/ros2/message_filters/issues/273>`_) (`#274 <https://github.com/ros2/message_filters/issues/274>`_)
+* Contributors: mergify[bot]
+
 7.1.7 (2026-03-24)
 ------------------
 * Tutorials minor fixers: Replace the TODOs with the actual links to other tutorials as required. Rename Approximate-Tyme tutorial to Approximate-Time (`#266 <https://github.com/ros2/message_filters/issues/266>`_)
