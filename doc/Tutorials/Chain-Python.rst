@@ -139,8 +139,8 @@ Now, let's break down this code and examine the details.
 
 We start with importing ``rclpy``, ``Node`` and ``QoSProfile`` classes
 that are required for constructing node and it's subscriptions and publishers,
-and for running the node itself. After that we import message filters:
-``Subscriber``, ``Chain`` and ``SimpleFilter``.
+and for running the node itself.
+After that we import message filters: ``Subscriber``, ``Chain`` and ``SimpleFilter``.
 And in the end we import the ``String`` message class that we are going to use for this example.
 In the end of this section we define a ``TUTORIAL_TOPIC`` constant.
 It will be convenient when defining publishers and subscribers later in this tutorial.
@@ -199,8 +199,8 @@ For starters, let's take a look at the ``__init__`` method of this class:
             self.chain_counter = 0
 
 First we declare a Quality of Service profile.
-After that we initialize a basic ``ros2`` ``publisher`` that will generate the input for our filters chain.
-The chain is giong to contain three filters.
+After that we initialize a basic ``ros2`` ``publisher`` that will generate the input for our filters chain. 
+The chain is going to contain three filters.
 A ``Subscriber`` filter and two instances of a ``CounterFilter`` that is defined earlier.
 We initialize all of those.
 In the end of this section we create the ``chain_counter`` field that is going to count all the messages that have passed through all the filters in the ``Chain``.
