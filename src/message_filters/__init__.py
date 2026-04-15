@@ -50,6 +50,8 @@ from rclpy.subscription_content_filter_options import ContentFilterOptions
 from rclpy.time import Time
 from rclpy.type_support import MsgT
 
+from .input_aligner import InputAligner, QueueStatus
+
 
 class SimpleFilter(object):
 
