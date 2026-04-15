@@ -199,13 +199,8 @@ For starters, let's take a look at the ``__init__`` method of this class:
             self.chain_counter = 0
 
 First we declare a Quality of Service profile.
-<<<<<<< HEAD
-After that we initialize a basic ``ros2`` ``publisher`` that will generate the input for our filters chain.
-The chain is giong to contain three filters.
-=======
 After that we initialize a basic ``ros2`` ``publisher`` that will generate the input for our filters chain. 
 The chain is going to contain three filters.
->>>>>>> b8a6cac ((#221) Tutorials: Add DeltaFilter Python tutorial (#277))
 A ``Subscriber`` filter and two instances of a ``CounterFilter`` that is defined earlier.
 We initialize all of those.
 In the end of this section we create the ``chain_counter`` field that is going to count all the messages that have passed through all the filters in the ``Chain``.
