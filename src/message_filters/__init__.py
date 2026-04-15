@@ -46,6 +46,8 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from rclpy.time import Time
 
+from .input_aligner import InputAligner, QueueStatus
+
 
 class SimpleFilter(object):
 

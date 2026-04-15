@@ -151,6 +151,8 @@ if(BUILD_TESTING)
     PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}")
   ament_add_pytest_test(test_message_filters_chain.py "test/test_message_filters_chain.py"
     PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}")
+  ament_add_pytest_test(test_input_aligner.py "test/test_input_aligner.py"
+    PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}")
 endif()
 
 ament_package()
