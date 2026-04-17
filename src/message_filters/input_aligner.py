@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import threading
 
 from builtin_interfaces.msg import Time as TimeMsg
+from message_filters import SimpleFilter
 from rclpy.duration import Duration
 from rclpy.time import Time
 
@@ -74,8 +75,9 @@ class _EventQueue:
         return QueueStatus(self.active, len(self.events), self.msgs_processed, self.msgs_dropped)
 
 
-class InputAligner:
+class InputAligner(SimpleFilter):
     def __init__(self, timeout, *filters):
+        SimpleFilter.__init__(self)
         self.timeout = timeout
         zero_time = _ros_zero_time()
         self.last_in_ts = zero_time

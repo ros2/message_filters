@@ -46,7 +46,6 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from rclpy.time import Time
 
-from .input_aligner import InputAligner, QueueStatus
 
 
 class SimpleFilter(object):
@@ -427,3 +426,5 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
                     del q[t.nanoseconds]
                 break  # fast finish after the synchronization
         self.lock.release()
+
+from message_filters.input_aligner import InputAligner, QueueStatus
