@@ -1,6 +1,6 @@
 from bisect import insort_right
 from dataclasses import dataclass
-from queue import PriorityQueue
+from queue import Queue
 import threading
 
 from builtin_interfaces.msg import Time as TimeMsg
@@ -42,7 +42,7 @@ def _ros_max_time():
 
 class _EventQueue:
     def __init__(self):
-        self.events = PriorityQueue()
+        self.events = Queue()
         self.next_ts = _ros_max_time()
         self.period = Duration(seconds=0)
         self.active = False
