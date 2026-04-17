@@ -1,5 +1,6 @@
 from bisect import insort_right
 from dataclasses import dataclass
+from queue import PriorityQueue
 import threading
 
 from builtin_interfaces.msg import Time as TimeMsg
@@ -41,7 +42,7 @@ def _ros_max_time():
 
 class _EventQueue:
     def __init__(self):
-        self.events = []
+        self.events = PriorityQueue()
         self.next_ts = _ros_max_time()
         self.period = Duration(seconds=0)
         self.active = False
@@ -49,8 +50,8 @@ class _EventQueue:
         self.msgs_dropped = 0
 
     def first_timestamp(self):
-        if self.events:
-            first_ts = self.events[0][0]
+        if not self.events.empty():
+            first_ts = self.events.queue[0][0]
             self.next_ts = first_ts + self.period
             self.active = True
             return first_ts
@@ -59,7 +60,7 @@ class _EventQueue:
         return _ros_max_time()
 
     def pop_first(self):
-        self.events.pop(0)
+        self.events.get_nowait()
         self.msgs_processed += 1
 
     def msg_dropped(self):
@@ -72,7 +73,7 @@ class _EventQueue:
         self.active = active
 
     def get_status(self):
-        return QueueStatus(self.active, len(self.events), self.msgs_processed, self.msgs_dropped)
+        return QueueStatus(self.active, self.events.qsize(), self.msgs_processed, self.msgs_dropped)
 
 
 class InputAligner(SimpleFilter):
@@ -118,7 +119,7 @@ class InputAligner(SimpleFilter):
                 return
             if msg_timestamp > self.last_in_ts:
                 self.last_in_ts = msg_timestamp
-            insort_right(queue.events, (msg_timestamp, msg), key=lambda x: x[0].nanoseconds)
+            insort_right(queue.events.queue, (msg_timestamp, msg), key=lambda x: x[0].nanoseconds)
 
     def setInputPeriod(self, index, period):
         self.event_queues[index].set_period(period)
@@ -131,7 +132,7 @@ class InputAligner(SimpleFilter):
 
     def dispatchMessages(self):
         with self.lock:
-            if not any(queue.events for queue in self.event_queues):
+            if not any(not queue.events.empty() for queue in self.event_queues):
                 return
             input_available = True
             while input_available:
@@ -141,8 +142,8 @@ class InputAligner(SimpleFilter):
         timestamps = [queue.first_timestamp() for queue in self.event_queues]
         idx = min(range(len(timestamps)), key=lambda i: timestamps[i].nanoseconds)
         queue = self.event_queues[idx]
-        if queue.events:
-            stamp, msg = queue.events[0]
+        if not queue.events.empty():
+            stamp, msg = queue.events.queue[0]
             self.last_out_ts = stamp
             self.signals[idx].signalMessage(msg)
             queue.pop_first()
