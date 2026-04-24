@@ -34,7 +34,7 @@ from dataclasses import dataclass
 from functools import reduce
 import itertools
 import threading
-from typing import Optional, Type, Union
+from typing import Optional, Type, TypeVar, Union
 
 from builtin_interfaces.msg import Time as TimeMsg
 import rclpy
@@ -46,11 +46,15 @@ from rclpy.logging import LoggingSeverity
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from rclpy.qos_overriding_options import QoSOverridingOptions
-from rclpy.subscription_content_filter_options import ContentFilterOptions
+try:
+    from rclpy.subscription_content_filter_options import ContentFilterOptions
+except ImportError:
+    ContentFilterOptions = None
 from rclpy.time import Time
-from rclpy.type_support import MsgT
-
-from message_filters.input_aligner import InputAligner, QueueStatus
+try:
+    from rclpy.type_support import MsgT
+except ImportError:
+    MsgT = TypeVar("MsgT")
 
 
 class SimpleFilter(object):
@@ -138,6 +142,9 @@ class Subscriber(SimpleFilter):
     def __getattr__(self, key):
         """Serve same API as rospy.Subscriber."""
         return self.sub.__getattribute__(key)
+
+
+from message_filters.input_aligner import InputAligner, QueueStatus
 
 
 class Cache(SimpleFilter):
