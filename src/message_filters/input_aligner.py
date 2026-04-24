@@ -62,7 +62,7 @@ class _EventQueue:
         return _ros_max_time()
 
     def pop_first(self):
-        self.events.get_nowait()
+        self.events.pop(0)
         self.msgs_processed += 1
 
     def msg_dropped(self):
