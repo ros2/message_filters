@@ -133,10 +133,11 @@ class InputAligner(SimpleFilter):
         self,
         *filters: SimpleFilter
     ) -> None:
-        self.disconnectAll()
-        self.event_queues = [_EventQueue() for _ in filters]
-        self.signals = [_Signal() for _ in filters]
-        self.input_connections = [(f, f.registerCallback(self.add, idx)) for idx, f in enumerate(filters)]
+        with self.lock:
+            self.disconnectAll()
+            self.event_queues = [_EventQueue() for _ in filters]
+            self.signals = [_Signal() for _ in filters]
+            self.input_connections = [(f, f.registerCallback(self.add, idx)) for idx, f in enumerate(filters)]
 
     def disconnectAll(self) -> None:
         for input_filter, conn in self.input_connections:
