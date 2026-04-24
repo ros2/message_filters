@@ -35,9 +35,11 @@ def _ros_zero_time():
     return Time.from_msg(TimeMsg())
 
 
-def _ros_max_time():
-    zero = _ros_zero_time()
-    return Time(nanoseconds=9223372036854775807, clock_type=zero.clock_type)
+def _ros_max_time() -> Time:
+    return Time(
+        nanoseconds=9223372036854775807,
+        clock_type=_ros_zero_time().clock_type,
+    )
 
 
 class _EventQueue:

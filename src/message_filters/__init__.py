@@ -50,6 +50,7 @@ from rclpy.subscription_content_filter_options import ContentFilterOptions
 from rclpy.time import Time
 from rclpy.type_support import MsgT
 
+from message_filters.input_aligner import InputAligner, QueueStatus
 
 
 class SimpleFilter(object):
@@ -581,4 +582,3 @@ class TimeSequencer(SimpleFilter):
         self.update_timer.cancel()
         self.node.destroy_timer(self.update_timer)
 
-from message_filters.input_aligner import InputAligner, QueueStatus
