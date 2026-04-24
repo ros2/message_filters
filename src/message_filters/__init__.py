@@ -34,7 +34,7 @@ from dataclasses import dataclass
 from functools import reduce
 import itertools
 import threading
-from typing import Optional, Type, TypeVar, Union
+from typing import Optional, Type, Union
 
 from builtin_interfaces.msg import Time as TimeMsg
 import rclpy
