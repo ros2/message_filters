@@ -80,6 +80,7 @@ class _EventQueue:
         self.active: bool = False
         self.msgs_processed: int = 0
         self.msgs_dropped: int = 0
+        self.seq_id: int = 0
 
     def first_timestamp(self) -> Time:
         if not self.events.empty():
@@ -122,7 +123,7 @@ class InputAligner(SimpleFilter):
         self.name: str = ''
         self.lock: threading.Lock = threading.Lock()
         self.event_queues: list[_EventQueue] = []
-        self.input_connections: list[int] = []
+        self.input_connections: list[tuple[SimpleFilter, int]] = []
         self.signals: list[_Signal] = []
         self.dispatch_timer: tp.Any = None
         if filters:
@@ -135,9 +136,11 @@ class InputAligner(SimpleFilter):
         self.disconnectAll()
         self.event_queues = [_EventQueue() for _ in filters]
         self.signals = [_Signal() for _ in filters]
-        self.input_connections = [f.registerCallback(self.add, idx) for idx, f in enumerate(filters)]
+        self.input_connections = [(f, f.registerCallback(self.add, idx)) for idx, f in enumerate(filters)]
 
     def disconnectAll(self) -> None:
+        for input_filter, conn in self.input_connections:
+            input_filter.unregisterCallback(conn)
         self.input_connections = []
 
     def registerCallback(
@@ -163,7 +166,9 @@ class InputAligner(SimpleFilter):
                 return
             if msg_timestamp > self.last_in_ts:
                 self.last_in_ts = msg_timestamp
-            queue.events.put_nowait((msg_timestamp, msg))
+            # Use seq_id as a tie-breaker so duplicate timestamps stay orderable.
+            queue.events.put_nowait((msg_timestamp, queue.seq_id, msg))
+            queue.seq_id += 1
 
     def setInputPeriod(self, index: int, period: Duration) -> None:
         self.event_queues[index].set_period(period)
@@ -187,7 +192,7 @@ class InputAligner(SimpleFilter):
         idx = min(range(len(timestamps)), key=lambda i: timestamps[i].nanoseconds)
         queue = self.event_queues[idx]
         if not queue.events.empty():
-            stamp, msg = queue.events.queue[0]
+            stamp, _, msg = queue.events.queue[0]
             self.last_out_ts = stamp
             self.signals[idx].signalMessage(msg)
             queue.pop_first()

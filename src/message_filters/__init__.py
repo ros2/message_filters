@@ -72,6 +72,9 @@ class SimpleFilter(object):
         for (cb, args) in self.callbacks.values():
             cb(*(msg + args))
 
+    def unregisterCallback(self, conn):
+        self.callbacks.pop(conn, None)
+
 
 class Subscriber(SimpleFilter):
     """

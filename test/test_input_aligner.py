@@ -73,6 +73,39 @@ class TestInputAligner(unittest.TestCase):
         aligner.dispatchMessages()
         self.assertEqual(self.cb_content, list(range(1, 10)))
 
+    def test_dispatch_inputs_with_duplicate_timestamps(self):
+        aligner = InputAligner(self.timeout)
+        aligner.connectInput(SimpleFilter(), SimpleFilter(), SimpleFilter(), SimpleFilter())
+        for i in range(4):
+            aligner.registerCallback(i, self.cb)
+            aligner.setInputPeriod(i, Duration(nanoseconds=int(4e6)))
+        aligner.add(self.create_msg(Msg1, 3, 3), 2)
+        aligner.add(self.create_msg(Msg1, 1, 1), 0)
+        aligner.add(self.create_msg(Msg1, 7, 7), 2)
+        aligner.add(self.create_msg(Msg1, 5, 5), 0)
+        aligner.add(self.create_msg(Msg2, 2, 2), 3)
+        aligner.add(self.create_msg(Msg1, 9, 9), 0)
+        aligner.add(self.create_msg(Msg2, 9, 9), 0)
+        aligner.add(self.create_msg(Msg2, 4, 4), 1)
+        aligner.add(self.create_msg(Msg2, 8, 8), 1)
+        aligner.add(self.create_msg(Msg2, 6, 6), 3)
+        aligner.dispatchMessages()
+        self.assertEqual(self.cb_content, [1, 2, 3, 4, 5, 6, 7, 8, 9, 9])
+
+    def test_reconnect_input_disconnects_old_callbacks(self):
+        f0, f1, f2 = SimpleFilter(), SimpleFilter(), SimpleFilter()
+        aligner = InputAligner(self.timeout)
+        aligner.connectInput(f0, f1, f2)
+        aligner.connectInput(f0, f1)
+        for i in range(2):
+            aligner.registerCallback(i, self.cb)
+            aligner.setInputPeriod(i, Duration(nanoseconds=int(2e6)))
+        f2.signalMessage(self.create_msg(Msg1, 1, 1))
+        f0.signalMessage(self.create_msg(Msg1, 2, 2))
+        f1.signalMessage(self.create_msg(Msg2, 3, 3))
+        aligner.dispatchMessages()
+        self.assertEqual(self.cb_content, [2, 3])
+
     def test_ignores_inactive_inputs(self):
         aligner = InputAligner(self.timeout)
         aligner.connectInput(SimpleFilter(), SimpleFilter(), SimpleFilter())
