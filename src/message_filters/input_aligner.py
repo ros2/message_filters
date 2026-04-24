@@ -79,7 +79,11 @@ class _EventQueue:
 
 
 class InputAligner(SimpleFilter):
-    def __init__(self, timeout: Duration, *filters: SimpleFilter) -> None:
+    def __init__(
+        self,
+        timeout: Duration,
+        *filters: SimpleFilter
+    ) -> None:
         SimpleFilter.__init__(self)
         self.timeout: Duration = timeout
         zero_time = _ros_zero_time()
@@ -94,7 +98,10 @@ class InputAligner(SimpleFilter):
         if filters:
             self.connectInput(*filters)
 
-    def connectInput(self, *filters: SimpleFilter) -> None:
+    def connectInput(
+        self,
+        *filters: SimpleFilter
+    ) -> None:
         self.disconnectAll()
         self.event_queues = [_EventQueue() for _ in filters]
         self.signals = [_Signal() for _ in filters]
