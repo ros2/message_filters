@@ -26,10 +26,10 @@ endif()
 target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
-ament_target_dependencies(${PROJECT_NAME} PUBLIC
-  rclcpp
-  rcutils
-  std_msgs
+target_link_libraries(${PROJECT_NAME} PUBLIC
+  rclcpp::rclcpp
+  rcutils::rcutils
+  std_msgs::std_msgs
 )
 
 install(
@@ -88,11 +88,8 @@ if(BUILD_TESTING)
 
   ament_add_gtest(${PROJECT_NAME}-test_subscriber test/test_subscriber.cpp)
   if(TARGET ${PROJECT_NAME}-test_subscriber)
-    target_link_libraries(${PROJECT_NAME}-test_subscriber ${PROJECT_NAME})
-    ament_target_dependencies(${PROJECT_NAME}-test_subscriber
-      rclcpp
-      rclcpp_lifecycle
-      sensor_msgs)
+    target_link_libraries(${PROJECT_NAME}-test_subscriber ${PROJECT_NAME} rclcpp::rclcpp
+    rclcpp_lifecycle::rclcpp_lifecycle sensor_msgs::sensor_msgs)
   endif()
 
   ament_add_gtest(${PROJECT_NAME}-test_synchronizer test/test_synchronizer.cpp)
@@ -127,18 +124,12 @@ if(BUILD_TESTING)
 
   ament_add_gtest(${PROJECT_NAME}-test_fuzz test/test_fuzz.cpp SKIP_TEST)
   if(TARGET ${PROJECT_NAME}-test_fuzz)
-    target_link_libraries(${PROJECT_NAME}-test_fuzz ${PROJECT_NAME})
-    ament_target_dependencies(${PROJECT_NAME}-test_fuzz
-      rclcpp
-      sensor_msgs)
+    target_link_libraries(${PROJECT_NAME}-test_fuzz ${PROJECT_NAME} rclcpp::rclcpp sensor_msgs::sensor_msgs)
   endif()
 
   ament_add_gtest(${PROJECT_NAME}-test_message_traits test/test_message_traits.cpp)
   if(TARGET ${PROJECT_NAME}-test_message_traits)
-    target_link_libraries(${PROJECT_NAME}-test_message_traits ${PROJECT_NAME})
-    ament_target_dependencies(${PROJECT_NAME}-test_message_traits
-      rclcpp
-      std_msgs)
+    target_link_libraries(${PROJECT_NAME}-test_message_traits ${PROJECT_NAME} rclcpp::rclcpp std_msgs::std_msgs)
   endif()
 
   ament_add_gtest(${PROJECT_NAME}-test_input_aligner test/test_input_aligner.cpp)

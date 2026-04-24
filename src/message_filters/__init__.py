@@ -46,15 +46,9 @@ from rclpy.logging import LoggingSeverity
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from rclpy.qos_overriding_options import QoSOverridingOptions
-try:
-    from rclpy.subscription_content_filter_options import ContentFilterOptions
-except ImportError:
-    ContentFilterOptions = None
+from rclpy.subscription_content_filter_options import ContentFilterOptions
 from rclpy.time import Time
-try:
-    from rclpy.type_support import MsgT
-except ImportError:
-    MsgT = TypeVar("MsgT")
+from rclpy.type_support import MsgT
 
 
 class SimpleFilter(object):
@@ -144,7 +138,7 @@ class Subscriber(SimpleFilter):
         return self.sub.__getattribute__(key)
 
 
-from message_filters.input_aligner import InputAligner, QueueStatus
+from message_filters.input_aligner import InputAligner
 
 
 class Cache(SimpleFilter):
@@ -588,4 +582,3 @@ class TimeSequencer(SimpleFilter):
         """Clean up the TimeSequencer."""
         self.update_timer.cancel()
         self.node.destroy_timer(self.update_timer)
-
