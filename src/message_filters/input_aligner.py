@@ -31,7 +31,7 @@ class _Signal:
             cb(*(msg + args))
 
 
-def _ros_zero_time():
+def _ros_zero_time() -> Time:
     return Time.from_msg(TimeMsg())
 
 
@@ -103,7 +103,12 @@ class InputAligner(SimpleFilter):
     def disconnectAll(self):
         self.input_connections = []
 
-    def registerCallback(self, index, cb, *args):
+    def registerCallback(
+        self,
+        index: int,
+        callback: tp.Callable[..., tp.Any],
+        *args: tp.Any,
+    ) -> None:
         return self.signals[index].registerCallback(cb, *args)
 
     def setName(self, name):
