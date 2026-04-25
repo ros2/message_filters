@@ -93,9 +93,11 @@ class InputAligner(SimpleFilter):
                 return self.next_ts
             return _ros_max_time()
 
-        def pop_first(self) -> None:
-            self.events.get_nowait()
+        def pop_first(self) -> tuple[Time, int, tp.Any] | None:
+            if self.events.empty():
+                return None
             self.msgs_processed += 1
+            return self.events.get_nowait()
 
         def msg_dropped(self) -> None:
             self.msgs_dropped += 1
