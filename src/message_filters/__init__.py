@@ -34,7 +34,7 @@ from dataclasses import dataclass
 from functools import reduce
 import itertools
 import threading
-from typing import Optional, Type, Union
+from typing import Optional, Type, TypeVar, Union
 
 from builtin_interfaces.msg import Time as TimeMsg
 import rclpy
@@ -46,34 +46,18 @@ from rclpy.logging import LoggingSeverity
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from rclpy.qos_overriding_options import QoSOverridingOptions
-from rclpy.subscription_content_filter_options import ContentFilterOptions
+try:
+    from rclpy.subscription_content_filter_options import ContentFilterOptions
+except ImportError:
+    ContentFilterOptions = None
 from rclpy.time import Time
-from rclpy.type_support import MsgT
+try:
+    from rclpy.type_support import MsgT
+except ImportError:
+    MsgT = TypeVar("MsgT")
 
-
-class SimpleFilter(object):
-
-    def __init__(self):
-        self.callbacks = {}
-
-    def registerCallback(self, cb, *args):
-        """
-        Register a callback `cb` to be called when this filter has output.
-
-        The filter calls the function ``cb`` with a filter-dependent.
-
-        list of arguments,followed by the call-supplied arguments ``args.``.
-        """
-        conn = len(self.callbacks)
-        self.callbacks[conn] = (cb, args)
-        return conn
-
-    def signalMessage(self, *msg):
-        for (cb, args) in self.callbacks.values():
-            cb(*(msg + args))
-
-    def unregisterCallback(self, conn):
-        self.callbacks.pop(conn, None)
+from .simple_filter import SimpleFilter
+from .input_aligner import InputAligner
 
 
 class Subscriber(SimpleFilter):
@@ -139,9 +123,6 @@ class Subscriber(SimpleFilter):
     def __getattr__(self, key):
         """Serve same API as rospy.Subscriber."""
         return self.sub.__getattribute__(key)
-
-
-from message_filters.input_aligner import InputAligner
 
 
 class Cache(SimpleFilter):

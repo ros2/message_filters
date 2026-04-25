@@ -34,9 +34,10 @@ import threading
 import typing as tp
 
 from builtin_interfaces.msg import Time as TimeMsg
-from message_filters import SimpleFilter
 from rclpy.duration import Duration
 from rclpy.time import Time
+
+from .simple_filter import SimpleFilter
 
 
 @dataclass
