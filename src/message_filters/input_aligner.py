@@ -48,20 +48,6 @@ class QueueStatus:
     msgs_dropped: int
 
 
-class _Signal:
-    def __init__(self):
-        self.callbacks = {}
-
-    def registerCallback(self, callback, *args):
-        conn = len(self.callbacks)
-        self.callbacks[conn] = (callback, args)
-        return conn
-
-    def signalMessage(self, *msg):
-        for (callback, args) in self.callbacks.values():
-            callback(*(msg + args))
-
-
 def _ros_zero_time() -> Time:
     return Time.from_msg(TimeMsg())
 
@@ -73,44 +59,56 @@ def _ros_max_time() -> Time:
     )
 
 
-class _EventQueue:
-    def __init__(self) -> None:
-        self.events: PriorityQueue = PriorityQueue()
-        self.next_ts: Time = _ros_max_time()
-        self.period: Duration = Duration(seconds=0)
-        self.active: bool = False
-        self.msgs_processed: int = 0
-        self.msgs_dropped: int = 0
-        self.seq_id: int = 0
-
-    def first_timestamp(self) -> Time:
-        if not self.events.empty():
-            first_ts = self.events.queue[0][0]
-            self.next_ts = first_ts + self.period
-            self.active = True
-            return first_ts
-        if self.active:
-            return self.next_ts
-        return _ros_max_time()
-
-    def pop_first(self) -> None:
-        self.events.get_nowait()
-        self.msgs_processed += 1
-
-    def msg_dropped(self) -> None:
-        self.msgs_dropped += 1
-
-    def set_period(self, period: Duration) -> None:
-        self.period = period
-
-    def set_active(self, active: bool) -> None:
-        self.active = active
-
-    def get_status(self) -> QueueStatus:
-        return QueueStatus(self.active, self.events.qsize(), self.msgs_processed, self.msgs_dropped)
-
-
 class InputAligner(SimpleFilter):
+    class _Signal:
+        def __init__(self):
+            self.callbacks = {}
+
+        def registerCallback(self, callback, *args):
+            conn = len(self.callbacks)
+            self.callbacks[conn] = (callback, args)
+            return conn
+
+        def signalMessage(self, *msg):
+            for (callback, args) in self.callbacks.values():
+                callback(*(msg + args))
+
+    class _EventQueue:
+        def __init__(self) -> None:
+            self.events: PriorityQueue = PriorityQueue()
+            self.next_ts: Time = _ros_max_time()
+            self.period: Duration = Duration(seconds=0)
+            self.active: bool = False
+            self.msgs_processed: int = 0
+            self.msgs_dropped: int = 0
+            self.seq_id: int = 0
+
+        def first_timestamp(self) -> Time:
+            if not self.events.empty():
+                first_ts = self.events.queue[0][0]
+                self.next_ts = first_ts + self.period
+                self.active = True
+                return first_ts
+            if self.active:
+                return self.next_ts
+            return _ros_max_time()
+
+        def pop_first(self) -> None:
+            self.events.get_nowait()
+            self.msgs_processed += 1
+
+        def msg_dropped(self) -> None:
+            self.msgs_dropped += 1
+
+        def set_period(self, period: Duration) -> None:
+            self.period = period
+
+        def set_active(self, active: bool) -> None:
+            self.active = active
+
+        def get_status(self) -> QueueStatus:
+            return QueueStatus(self.active, self.events.qsize(), self.msgs_processed, self.msgs_dropped)
+
     def __init__(
         self,
         timeout: Duration,
@@ -123,9 +121,9 @@ class InputAligner(SimpleFilter):
         self.last_out_ts: Time = zero_time
         self.name: str = ''
         self.lock: threading.Lock = threading.Lock()
-        self.event_queues: list[_EventQueue] = []
+        self.event_queues: list[InputAligner._EventQueue] = []
         self.input_connections: list[tuple[SimpleFilter, int]] = []
-        self.signals: list[_Signal] = []
+        self.signals: list[InputAligner._Signal] = []
         self.dispatch_timer: tp.Any = None
         if filters:
             self.connectInput(*filters)
@@ -136,8 +134,8 @@ class InputAligner(SimpleFilter):
     ) -> None:
         with self.lock:
             self.disconnectAll()
-            self.event_queues = [_EventQueue() for _ in filters]
-            self.signals = [_Signal() for _ in filters]
+            self.event_queues = [InputAligner._EventQueue() for _ in filters]
+            self.signals = [InputAligner._Signal() for _ in filters]
             self.input_connections = [(f, f.registerCallback(self.add, idx)) for idx, f in enumerate(filters)]
 
     def disconnectAll(self) -> None:
