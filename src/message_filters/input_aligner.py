@@ -29,7 +29,7 @@
 """Input aligner for synchronizing messages from multiple sources based on their timestamps."""
 
 from dataclasses import dataclass
-from queue import PriorityQueue as Queue
+from queue import PriorityQueue
 import threading
 import typing as tp
 
@@ -75,7 +75,7 @@ def _ros_max_time() -> Time:
 
 class _EventQueue:
     def __init__(self) -> None:
-        self.events: Queue = Queue()
+        self.events: PriorityQueue = PriorityQueue()
         self.next_ts: Time = _ros_max_time()
         self.period: Duration = Duration(seconds=0)
         self.active: bool = False
