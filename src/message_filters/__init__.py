@@ -34,7 +34,7 @@ from dataclasses import dataclass
 from functools import reduce
 import itertools
 import threading
-from typing import Optional, Type, TypeVar, Union
+from typing import Optional, Type, Union
 
 from builtin_interfaces.msg import Time as TimeMsg
 import rclpy
@@ -46,15 +46,9 @@ from rclpy.logging import LoggingSeverity
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from rclpy.qos_overriding_options import QoSOverridingOptions
-try:
-    from rclpy.subscription_content_filter_options import ContentFilterOptions
-except ImportError:
-    ContentFilterOptions = None
+from rclpy.subscription_content_filter_options import ContentFilterOptions
 from rclpy.time import Time
-try:
-    from rclpy.type_support import MsgT
-except ImportError:
-    MsgT = TypeVar("MsgT")
+from rclpy.type_support import MsgT
 
 from .simple_filter import SimpleFilter
 from .input_aligner import InputAligner
