@@ -52,14 +52,14 @@ class _Signal:
     def __init__(self):
         self.callbacks = {}
 
-    def registerCallback(self, cb, *args):
+    def registerCallback(self, callback, *args):
         conn = len(self.callbacks)
-        self.callbacks[conn] = (cb, args)
+        self.callbacks[conn] = (callback, args)
         return conn
 
     def signalMessage(self, *msg):
-        for (cb, args) in self.callbacks.values():
-            cb(*(msg + args))
+        for (callback, args) in self.callbacks.values():
+            callback(*(msg + args))
 
 
 def _ros_zero_time() -> Time:
