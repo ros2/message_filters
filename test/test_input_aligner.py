@@ -39,10 +39,10 @@ class TestInputAligner(unittest.TestCase):
     def setUp(self):
         self.timeout = Duration(seconds=1.0)
         self.update_rate = Duration(nanoseconds=10000000)
-        self.cb_content = []
+        self.callback_content = []
 
-    def cb(self, msg):
-        self.cb_content.append(msg.data)
+    def callback(self, msg):
+        self.callback_content.append(msg.data)
 
     def create_msg(self, cls, milliseconds, data):
         return cls(stamp=Time(nanoseconds=int(milliseconds * 1e6)).to_msg(), data=data)
@@ -59,7 +59,7 @@ class TestInputAligner(unittest.TestCase):
         aligner = InputAligner(self.timeout)
         aligner.connectInput(SimpleFilter(), SimpleFilter(), SimpleFilter(), SimpleFilter())
         for i in range(4):
-            aligner.registerCallback(i, self.cb)
+            aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(4e6)))
         aligner.add(self.create_msg(Msg1, 3, 3), 2)
         aligner.add(self.create_msg(Msg1, 1, 1), 0)
@@ -71,13 +71,13 @@ class TestInputAligner(unittest.TestCase):
         aligner.add(self.create_msg(Msg2, 8, 8), 1)
         aligner.add(self.create_msg(Msg2, 6, 6), 3)
         aligner.dispatchMessages()
-        self.assertEqual(self.cb_content, list(range(1, 10)))
+        self.assertEqual(self.callback_content, list(range(1, 10)))
 
     def test_dispatch_inputs_with_duplicate_timestamps(self):
         aligner = InputAligner(self.timeout)
         aligner.connectInput(SimpleFilter(), SimpleFilter(), SimpleFilter(), SimpleFilter())
         for i in range(4):
-            aligner.registerCallback(i, self.cb)
+            aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(4e6)))
         aligner.add(self.create_msg(Msg1, 3, 3), 2)
         aligner.add(self.create_msg(Msg1, 1, 1), 0)
@@ -90,7 +90,7 @@ class TestInputAligner(unittest.TestCase):
         aligner.add(self.create_msg(Msg2, 8, 8), 1)
         aligner.add(self.create_msg(Msg2, 6, 6), 3)
         aligner.dispatchMessages()
-        self.assertEqual(self.cb_content, [1, 2, 3, 4, 5, 6, 7, 8, 9, 9])
+        self.assertEqual(self.callback_content, [1, 2, 3, 4, 5, 6, 7, 8, 9, 9])
 
     def test_reconnect_input_disconnects_old_callbacks(self):
         f0, f1, f2 = SimpleFilter(), SimpleFilter(), SimpleFilter()
@@ -98,19 +98,19 @@ class TestInputAligner(unittest.TestCase):
         aligner.connectInput(f0, f1, f2)
         aligner.connectInput(f0, f1)
         for i in range(2):
-            aligner.registerCallback(i, self.cb)
+            aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(2e6)))
         f2.signalMessage(self.create_msg(Msg1, 1, 1))
         f0.signalMessage(self.create_msg(Msg1, 2, 2))
         f1.signalMessage(self.create_msg(Msg2, 3, 3))
         aligner.dispatchMessages()
-        self.assertEqual(self.cb_content, [2, 3])
+        self.assertEqual(self.callback_content, [2, 3])
 
     def test_ignores_inactive_inputs(self):
         aligner = InputAligner(self.timeout)
         aligner.connectInput(SimpleFilter(), SimpleFilter(), SimpleFilter())
         for i in range(3):
-            aligner.registerCallback(i, self.cb)
+            aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(2e6)))
         aligner.add(self.create_msg(Msg1, 2, 2), 2)
         aligner.add(self.create_msg(Msg2, 1, 1), 1)
@@ -118,62 +118,62 @@ class TestInputAligner(unittest.TestCase):
         aligner.add(self.create_msg(Msg2, 3, 3), 1)
         aligner.add(self.create_msg(Msg2, 5, 5), 1)
         aligner.dispatchMessages()
-        self.assertEqual(self.cb_content, [1, 2, 3, 4, 5])
+        self.assertEqual(self.callback_content, [1, 2, 3, 4, 5])
 
     def test_input_timeout(self):
         self.timeout = Duration(nanoseconds=int(1e7))
         aligner = InputAligner(self.timeout)
         aligner.connectInput(SimpleFilter(), SimpleFilter())
         for i in range(2):
-            aligner.registerCallback(i, self.cb)
+            aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(2e6)))
         for i in range(1, 17, 2):
             aligner.add(self.create_msg(Msg1, i, i), 0)
         aligner.add(self.create_msg(Msg2, 2, 2), 1)
         aligner.add(self.create_msg(Msg2, 4, 4), 1)
         aligner.dispatchMessages()
-        self.assertEqual(self.cb_content, [1, 2, 3, 4, 5])
+        self.assertEqual(self.callback_content, [1, 2, 3, 4, 5])
         aligner.add(self.create_msg(Msg1, 17, 17), 0)
         aligner.dispatchMessages()
-        self.assertEqual(self.cb_content, [1, 2, 3, 4, 5, 7, 9, 11, 13, 15, 17])
+        self.assertEqual(self.callback_content, [1, 2, 3, 4, 5, 7, 9, 11, 13, 15, 17])
 
     def test_drops_msgs(self):
         aligner = InputAligner(self.timeout)
         aligner.connectInput(SimpleFilter(), SimpleFilter())
         for i in range(2):
-            aligner.registerCallback(i, self.cb)
+            aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(2e6)))
         aligner.add(self.create_msg(Msg2, 4, 4), 1)
         aligner.add(self.create_msg(Msg1, 3, 3), 0)
         aligner.dispatchMessages()
-        self.assertEqual(self.cb_content, [3, 4])
+        self.assertEqual(self.callback_content, [3, 4])
         aligner.add(self.create_msg(Msg1, 1, 1), 0)
         aligner.add(self.create_msg(Msg1, 5, 5), 0)
         aligner.add(self.create_msg(Msg1, 7, 7), 0)
         aligner.add(self.create_msg(Msg2, 2, 2), 1)
         aligner.add(self.create_msg(Msg2, 6, 6), 1)
         aligner.dispatchMessages()
-        self.assertEqual(self.cb_content, [3, 4, 5, 6, 7])
+        self.assertEqual(self.callback_content, [3, 4, 5, 6, 7])
 
     def test_dispatch_by_timer(self):
         aligner = InputAligner(self.timeout)
         aligner.connectInput(SimpleFilter(), SimpleFilter())
         aligner.setupDispatchTimer(self.node, self.update_rate)
         for i in range(2):
-            aligner.registerCallback(i, self.cb)
+            aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(2e6)))
         aligner.add(self.create_msg(Msg2, 2, 2), 1)
         aligner.add(self.create_msg(Msg1, 1, 1), 0)
         time.sleep(0.05)
         rclpy.spin_once(self.node, timeout_sec=0.01)
-        self.assertEqual(self.cb_content, [1, 2])
+        self.assertEqual(self.callback_content, [1, 2])
 
     def test_no_period_information(self):
         self.timeout = Duration(nanoseconds=int(1e7))
         aligner = InputAligner(self.timeout)
         aligner.connectInput(SimpleFilter(), SimpleFilter(), SimpleFilter())
         for i in range(3):
-            aligner.registerCallback(i, self.cb)
+            aligner.registerCallback(i, self.callback)
         aligner.add(self.create_msg(Msg1, 6, 6), 0)
         aligner.add(self.create_msg(Msg1, 2, 2), 2)
         aligner.add(self.create_msg(Msg1, 4, 4), 2)
@@ -181,17 +181,17 @@ class TestInputAligner(unittest.TestCase):
         aligner.add(self.create_msg(Msg2, 3, 3), 1)
         aligner.add(self.create_msg(Msg2, 5, 5), 1)
         aligner.dispatchMessages()
-        self.assertEqual(self.cb_content, [1, 2, 3, 4])
+        self.assertEqual(self.callback_content, [1, 2, 3, 4])
         aligner.add(self.create_msg(Msg1, 16, 16), 0)
         aligner.dispatchMessages()
-        self.assertEqual(self.cb_content, [1, 2, 3, 4, 5, 6, 16])
+        self.assertEqual(self.callback_content, [1, 2, 3, 4, 5, 6, 16])
 
     def test_get_queue_status(self):
         self.timeout = Duration(nanoseconds=int(1e7))
         aligner = InputAligner(self.timeout)
         aligner.connectInput(SimpleFilter(), SimpleFilter())
         for i in range(2):
-            aligner.registerCallback(i, self.cb)
+            aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(2e6)))
         aligner.add(self.create_msg(Msg2, 2, 2), 1)
         aligner.add(self.create_msg(Msg1, 3, 3), 0)
