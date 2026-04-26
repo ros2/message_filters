@@ -35,6 +35,7 @@ import typing as tp
 
 from builtin_interfaces.msg import Time as TimeMsg
 from rclpy.duration import Duration
+from rclpy.node import Node
 from rclpy.time import Time
 
 from .simple_filter import SimpleFilter
@@ -61,15 +62,15 @@ def _ros_max_time() -> Time:
 
 class InputAligner(SimpleFilter):
     class _Signal:
-        def __init__(self):
+        def __init__(self) -> None:
             self.callbacks = {}
 
-        def registerCallback(self, callback, *args):
+        def registerCallback(self, callback, *args) -> int:
             conn = len(self.callbacks)
             self.callbacks[conn] = (callback, args)
             return conn
 
-        def signalMessage(self, *msg):
+        def signalMessage(self, *msg) -> None:
             for (callback, args) in self.callbacks.values():
                 callback(*(msg + args))
 
@@ -178,7 +179,7 @@ class InputAligner(SimpleFilter):
     def getQueueStatus(self, index: int) -> QueueStatus:
         return self.event_queues[index].get_status()
 
-    def setupDispatchTimer(self, node: tp.Any, update_rate: Duration) -> None:
+    def setupDispatchTimer(self, node: Node, update_rate: Duration) -> None:
         self.dispatch_timer = node.create_timer(update_rate.nanoseconds / 1e9, self.dispatchMessages)
 
     def dispatchMessages(self) -> None:
