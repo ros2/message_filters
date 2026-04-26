@@ -49,15 +49,15 @@ class TestInputAligner(unittest.TestCase):
 
     def test_init(self):
         f0, f1, f2, f3 = SimpleFilter(), SimpleFilter(), SimpleFilter(), SimpleFilter()
-        aligner1 = InputAligner(self.timeout, f0, f1, f2, f3)
+        aligner1 = InputAligner(self.timeout, filters=[f0, f1, f2, f3])
         self.assertEqual(len(aligner1.event_queues), 4)
         aligner2 = InputAligner(self.timeout)
-        aligner2.connectInput(f0, f2, f3)
+        aligner2.connectInput(filters=[f0, f2, f3])
         self.assertEqual(len(aligner2.event_queues), 3)
 
     def test_dispatch_inputs_in_order(self):
         aligner = InputAligner(self.timeout)
-        aligner.connectInput(SimpleFilter(), SimpleFilter(), SimpleFilter(), SimpleFilter())
+        aligner.connectInput(filters=[SimpleFilter(), SimpleFilter(), SimpleFilter(), SimpleFilter()])
         for i in range(4):
             aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(4e6)))
@@ -75,7 +75,7 @@ class TestInputAligner(unittest.TestCase):
 
     def test_dispatch_inputs_with_duplicate_timestamps(self):
         aligner = InputAligner(self.timeout)
-        aligner.connectInput(SimpleFilter(), SimpleFilter(), SimpleFilter(), SimpleFilter())
+        aligner.connectInput(filters=[SimpleFilter(), SimpleFilter(), SimpleFilter(), SimpleFilter()])
         for i in range(4):
             aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(4e6)))
@@ -95,8 +95,8 @@ class TestInputAligner(unittest.TestCase):
     def test_reconnect_input_disconnects_old_callbacks(self):
         f0, f1, f2 = SimpleFilter(), SimpleFilter(), SimpleFilter()
         aligner = InputAligner(self.timeout)
-        aligner.connectInput(f0, f1, f2)
-        aligner.connectInput(f0, f1)
+        aligner.connectInput(filters=[f0, f1, f2])
+        aligner.connectInput(filters=[f0, f1])
         for i in range(2):
             aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(2e6)))
@@ -108,7 +108,7 @@ class TestInputAligner(unittest.TestCase):
 
     def test_ignores_inactive_inputs(self):
         aligner = InputAligner(self.timeout)
-        aligner.connectInput(SimpleFilter(), SimpleFilter(), SimpleFilter())
+        aligner.connectInput(filters=[SimpleFilter(), SimpleFilter(), SimpleFilter()])
         for i in range(3):
             aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(2e6)))
@@ -123,7 +123,7 @@ class TestInputAligner(unittest.TestCase):
     def test_input_timeout(self):
         self.timeout = Duration(nanoseconds=int(1e7))
         aligner = InputAligner(self.timeout)
-        aligner.connectInput(SimpleFilter(), SimpleFilter())
+        aligner.connectInput(filters=[SimpleFilter(), SimpleFilter()])
         for i in range(2):
             aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(2e6)))
@@ -139,7 +139,7 @@ class TestInputAligner(unittest.TestCase):
 
     def test_drops_msgs(self):
         aligner = InputAligner(self.timeout)
-        aligner.connectInput(SimpleFilter(), SimpleFilter())
+        aligner.connectInput(filters=[SimpleFilter(), SimpleFilter()])
         for i in range(2):
             aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(2e6)))
@@ -157,7 +157,7 @@ class TestInputAligner(unittest.TestCase):
 
     def test_dispatch_by_timer(self):
         aligner = InputAligner(self.timeout)
-        aligner.connectInput(SimpleFilter(), SimpleFilter())
+        aligner.connectInput(filters=[SimpleFilter(), SimpleFilter()])
         aligner.setupDispatchTimer(self.node, self.update_rate)
         for i in range(2):
             aligner.registerCallback(i, self.callback)
@@ -171,7 +171,7 @@ class TestInputAligner(unittest.TestCase):
     def test_no_period_information(self):
         self.timeout = Duration(nanoseconds=int(1e7))
         aligner = InputAligner(self.timeout)
-        aligner.connectInput(SimpleFilter(), SimpleFilter(), SimpleFilter())
+        aligner.connectInput(filters=[SimpleFilter(), SimpleFilter(), SimpleFilter()])
         for i in range(3):
             aligner.registerCallback(i, self.callback)
         aligner.add(self.create_msg(Msg1, 6, 6), 0)
@@ -189,7 +189,7 @@ class TestInputAligner(unittest.TestCase):
     def test_get_queue_status(self):
         self.timeout = Duration(nanoseconds=int(1e7))
         aligner = InputAligner(self.timeout)
-        aligner.connectInput(SimpleFilter(), SimpleFilter())
+        aligner.connectInput(filters=[SimpleFilter(), SimpleFilter()])
         for i in range(2):
             aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(2e6)))

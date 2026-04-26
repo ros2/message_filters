@@ -114,7 +114,7 @@ class InputAligner(SimpleFilter):
     def __init__(
         self,
         timeout: Duration,
-        *filters: SimpleFilter
+        filters: tp.Sequence[SimpleFilter] | None = None,
     ) -> None:
         SimpleFilter.__init__(self)
         self.timeout: Duration = timeout
@@ -127,12 +127,12 @@ class InputAligner(SimpleFilter):
         self.input_connections: list[tuple[SimpleFilter, int]] = []
         self.signals: list[InputAligner._Signal] = []
         self.dispatch_timer: tp.Any = None
-        if filters:
-            self.connectInput(*filters)
+        if filters is not None:
+            self.connectInput(filters=filters)
 
     def connectInput(
         self,
-        *filters: SimpleFilter
+        filters: tp.Sequence[SimpleFilter],
     ) -> None:
         with self.lock:
             self.disconnectAll()
