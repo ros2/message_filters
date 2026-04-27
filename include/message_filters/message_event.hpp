@@ -235,12 +235,7 @@ private:
   rclcpp::Time receipt_time_;
   bool nonconst_need_copy_;
   CreateFunction create_;
-
-  static const std::string s_unknown_publisher_string_;
 };
-
-template<typename M> const std::string MessageEvent<M>::s_unknown_publisher_string_(
-  "unknown_publisher");
 
 }  // namespace message_filters
 
