@@ -29,7 +29,7 @@
 """Input aligner for synchronizing messages from multiple sources based on their timestamps."""
 
 from dataclasses import dataclass
-from queue import PriorityQueue
+import heapq
 import threading
 import typing as tp
 
@@ -60,23 +60,17 @@ def _ros_max_time() -> Time:
     )
 
 
-class InputAligner(SimpleFilter):
-    class _Signal:
-        def __init__(self) -> None:
-            self.callbacks = {}
+class InputAligner:
+    """Align N inputs by timestamp and forward each to its own output signal.
 
-        def registerCallback(self, callback, *args) -> int:
-            conn = len(self.callbacks)
-            self.callbacks[conn] = (callback, args)
-            return conn
-
-        def signalMessage(self, *msg) -> None:
-            for (callback, args) in self.callbacks.values():
-                callback(*(msg + args))
+    Unlike a single-output filter, ``InputAligner`` exposes one signal per
+    input, so it does not extend :class:`SimpleFilter`. Register downstream
+    callbacks via :meth:`registerCallback` with an explicit ``index``.
+    """
 
     class _EventQueue:
         def __init__(self) -> None:
-            self.events: PriorityQueue = PriorityQueue()
+            self.events: list[tuple[Time, int, tp.Any]] = []
             self.next_ts: Time = _ros_max_time()
             self.period: Duration = Duration(seconds=0)
             self.active: bool = False
@@ -84,9 +78,15 @@ class InputAligner(SimpleFilter):
             self.msgs_dropped: int = 0
             self.seq_id: int = 0
 
+        def push(self, stamp: Time, msg: tp.Any) -> None:
+            # seq_id is a strictly-increasing tie-breaker so messages with
+            # equal timestamps stay orderable (heap items are tuples).
+            heapq.heappush(self.events, (stamp, self.seq_id, msg))
+            self.seq_id += 1
+
         def first_timestamp(self) -> Time:
-            if not self.events.empty():
-                first_ts = self.events.queue[0][0]
+            if self.events:
+                first_ts = self.events[0][0]
                 self.next_ts = first_ts + self.period
                 self.active = True
                 return first_ts
@@ -94,11 +94,10 @@ class InputAligner(SimpleFilter):
                 return self.next_ts
             return _ros_max_time()
 
-        def pop_first(self) -> tuple[Time, int, tp.Any] | None:
-            if self.events.empty():
-                return None
+        def pop_first(self) -> tuple[Time, tp.Any]:
+            stamp, _, msg = heapq.heappop(self.events)
             self.msgs_processed += 1
-            return self.events.get_nowait()
+            return stamp, msg
 
         def msg_dropped(self) -> None:
             self.msgs_dropped += 1
@@ -110,23 +109,22 @@ class InputAligner(SimpleFilter):
             self.active = active
 
         def get_status(self) -> QueueStatus:
-            return QueueStatus(self.active, self.events.qsize(), self.msgs_processed, self.msgs_dropped)
+            return QueueStatus(self.active, len(self.events), self.msgs_processed, self.msgs_dropped)
 
     def __init__(
         self,
         timeout: Duration,
         filters: tp.Sequence[SimpleFilter] | None = None,
     ) -> None:
-        SimpleFilter.__init__(self)
         self.timeout: Duration = timeout
         zero_time = _ros_zero_time()
         self.last_in_ts: Time = zero_time
         self.last_out_ts: Time = zero_time
         self.name: str = ''
-        self.lock: threading.Lock = threading.Lock()
+        self.lock: threading.RLock = threading.RLock()
         self.event_queues: list[InputAligner._EventQueue] = []
         self.input_connections: list[tuple[SimpleFilter, int]] = []
-        self.signals: list[InputAligner._Signal] = []
+        self.signals: list[SimpleFilter] = []
         self.dispatch_timer: tp.Any = None
         if filters is not None:
             self.connectInput(filters=filters)
@@ -135,13 +133,26 @@ class InputAligner(SimpleFilter):
         self,
         filters: tp.Sequence[SimpleFilter],
     ) -> None:
+        """Connect ``filters`` as inputs, replacing any existing inputs.
+
+        Note: previously-registered downstream callbacks are also dropped,
+        since the per-input signals are recreated.
+        """
         with self.lock:
-            self.disconnectAll()
+            self._disconnect_all_locked()
             self.event_queues = [InputAligner._EventQueue() for _ in filters]
-            self.signals = [InputAligner._Signal() for _ in filters]
-            self.input_connections = [(f, f.registerCallback(self.add, idx)) for idx, f in enumerate(filters)]
+            self.signals = [SimpleFilter() for _ in filters]
+            # SimpleFilter.registerCallback appends extra args after the message,
+            # so registering ``self.add`` with ``idx`` invokes ``add(msg, idx)``.
+            self.input_connections = [
+                (f, f.registerCallback(self.add, idx)) for idx, f in enumerate(filters)
+            ]
 
     def disconnectAll(self) -> None:
+        with self.lock:
+            self._disconnect_all_locked()
+
+    def _disconnect_all_locked(self) -> None:
         for input_filter, conn in self.input_connections:
             input_filter.unregisterCallback(conn)
         self.input_connections = []
@@ -169,9 +180,7 @@ class InputAligner(SimpleFilter):
                 return
             if msg_timestamp > self.last_in_ts:
                 self.last_in_ts = msg_timestamp
-            # Use seq_id as a tie-breaker so duplicate timestamps stay orderable.
-            queue.events.put_nowait((msg_timestamp, queue.seq_id, msg))
-            queue.seq_id += 1
+            queue.push(msg_timestamp, msg)
 
     def setInputPeriod(self, index: int, period: Duration) -> None:
         self.event_queues[index].set_period(period)
@@ -180,25 +189,24 @@ class InputAligner(SimpleFilter):
         return self.event_queues[index].get_status()
 
     def setupDispatchTimer(self, node: Node, update_rate: Duration) -> None:
-        self.dispatch_timer = node.create_timer(update_rate.nanoseconds / 1e9, self.dispatchMessages)
+        self.dispatch_timer = node.create_timer(
+            update_rate.nanoseconds / 1e9, self.dispatchMessages)
 
     def dispatchMessages(self) -> None:
         with self.lock:
-            if not any(not queue.events.empty() for queue in self.event_queues):
+            if not any(queue.events for queue in self.event_queues):
                 return
-            input_available = True
-            while input_available:
-                input_available = self._dispatch_first_message()
+            while self._dispatch_first_message():
+                pass
 
     def _dispatch_first_message(self) -> bool:
         timestamps = [queue.first_timestamp() for queue in self.event_queues]
         idx = min(range(len(timestamps)), key=lambda i: timestamps[i].nanoseconds)
         queue = self.event_queues[idx]
-        if not queue.events.empty():
-            stamp, _, msg = queue.events.queue[0]
+        if queue.events:
+            stamp, msg = queue.pop_first()
             self.last_out_ts = stamp
             self.signals[idx].signalMessage(msg)
-            queue.pop_first()
             return True
         if (self.last_in_ts - queue.first_timestamp()) >= self.timeout:
             queue.set_active(False)

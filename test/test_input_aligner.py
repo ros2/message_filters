@@ -1,3 +1,32 @@
+# Copyright 2026, Open Source Robotics Foundation, Inc. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#    * Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
+#
+#    * Redistributions in binary form must reproduce the above copyright
+#      notice, this list of conditions and the following disclaimer in the
+#      documentation and/or other materials provided with the distribution.
+#
+#    * Neither the name of the Willow Garage nor the names of its
+#      contributors may be used to endorse or promote products derived from
+#      this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+
 import time
 import unittest
 
@@ -55,9 +84,16 @@ class TestInputAligner(unittest.TestCase):
         aligner2.connectInput(filters=[f0, f2, f3])
         self.assertEqual(len(aligner2.event_queues), 3)
 
+    def test_set_and_get_name(self):
+        aligner = InputAligner(self.timeout)
+        self.assertEqual(aligner.getName(), '')
+        aligner.setName('camera_aligner')
+        self.assertEqual(aligner.getName(), 'camera_aligner')
+
     def test_dispatch_inputs_in_order(self):
         aligner = InputAligner(self.timeout)
-        aligner.connectInput(filters=[SimpleFilter(), SimpleFilter(), SimpleFilter(), SimpleFilter()])
+        aligner.connectInput(
+            filters=[SimpleFilter(), SimpleFilter(), SimpleFilter(), SimpleFilter()])
         for i in range(4):
             aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(4e6)))
@@ -75,7 +111,8 @@ class TestInputAligner(unittest.TestCase):
 
     def test_dispatch_inputs_with_duplicate_timestamps(self):
         aligner = InputAligner(self.timeout)
-        aligner.connectInput(filters=[SimpleFilter(), SimpleFilter(), SimpleFilter(), SimpleFilter()])
+        aligner.connectInput(
+            filters=[SimpleFilter(), SimpleFilter(), SimpleFilter(), SimpleFilter()])
         for i in range(4):
             aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(4e6)))
@@ -85,14 +122,16 @@ class TestInputAligner(unittest.TestCase):
         aligner.add(self.create_msg(Msg1, 5, 5), 0)
         aligner.add(self.create_msg(Msg2, 2, 2), 3)
         aligner.add(self.create_msg(Msg1, 9, 9), 0)
-        aligner.add(self.create_msg(Msg2, 9, 9), 0)
+        # Two messages with identical timestamp on the same queue should
+        # dispatch in insertion order via the seq_id tie-breaker.
+        aligner.add(self.create_msg(Msg1, 9, 9), 0)
         aligner.add(self.create_msg(Msg2, 4, 4), 1)
         aligner.add(self.create_msg(Msg2, 8, 8), 1)
         aligner.add(self.create_msg(Msg2, 6, 6), 3)
         aligner.dispatchMessages()
         self.assertEqual(self.callback_content, [1, 2, 3, 4, 5, 6, 7, 8, 9, 9])
 
-    def test_reconnect_input_disconnects_old_callbacks(self):
+    def test_reconnect_input_disconnects_old_upstream(self):
         f0, f1, f2 = SimpleFilter(), SimpleFilter(), SimpleFilter()
         aligner = InputAligner(self.timeout)
         aligner.connectInput(filters=[f0, f1, f2])
@@ -100,11 +139,62 @@ class TestInputAligner(unittest.TestCase):
         for i in range(2):
             aligner.registerCallback(i, self.callback)
             aligner.setInputPeriod(i, Duration(nanoseconds=int(2e6)))
+        # f2 was dropped on reconnect; messages from it must be ignored.
         f2.signalMessage(self.create_msg(Msg1, 1, 1))
         f0.signalMessage(self.create_msg(Msg1, 2, 2))
         f1.signalMessage(self.create_msg(Msg2, 3, 3))
         aligner.dispatchMessages()
         self.assertEqual(self.callback_content, [2, 3])
+
+    def test_reconnect_input_drops_old_downstream_callbacks(self):
+        # Callbacks registered before reconnect should be discarded along with
+        # the per-input signals they were attached to.
+        stale = []
+        fresh = []
+        f0, f1 = SimpleFilter(), SimpleFilter()
+        aligner = InputAligner(self.timeout)
+        aligner.connectInput(filters=[f0, f1])
+        aligner.registerCallback(0, lambda m: stale.append(m.data))
+        aligner.registerCallback(1, lambda m: stale.append(m.data))
+        aligner.connectInput(filters=[f0, f1])
+        aligner.registerCallback(0, lambda m: fresh.append(m.data))
+        aligner.registerCallback(1, lambda m: fresh.append(m.data))
+        for i in range(2):
+            aligner.setInputPeriod(i, Duration(nanoseconds=int(2e6)))
+        aligner.add(self.create_msg(Msg1, 1, 1), 0)
+        aligner.add(self.create_msg(Msg2, 2, 2), 1)
+        aligner.dispatchMessages()
+        self.assertEqual(stale, [])
+        self.assertEqual(fresh, [1, 2])
+
+    def test_disconnect_all_stops_upstream_delivery(self):
+        f0, f1 = SimpleFilter(), SimpleFilter()
+        aligner = InputAligner(self.timeout)
+        aligner.connectInput(filters=[f0, f1])
+        for i in range(2):
+            aligner.registerCallback(i, self.callback)
+            aligner.setInputPeriod(i, Duration(nanoseconds=int(2e6)))
+        aligner.disconnectAll()
+        f0.signalMessage(self.create_msg(Msg1, 1, 1))
+        f1.signalMessage(self.create_msg(Msg2, 2, 2))
+        aligner.dispatchMessages()
+        self.assertEqual(self.callback_content, [])
+
+    def test_simple_filter_unregister_callback(self):
+        received = []
+        f = SimpleFilter()
+        conn_a = f.registerCallback(lambda m: received.append(('a', m)))
+        conn_b = f.registerCallback(lambda m: received.append(('b', m)))
+        f.signalMessage(1)
+        self.assertEqual(received, [('a', 1), ('b', 1)])
+        f.unregisterCallback(conn_a)
+        f.signalMessage(2)
+        self.assertEqual(received, [('a', 1), ('b', 1), ('b', 2)])
+        # Unregistering an unknown id must be a no-op.
+        f.unregisterCallback(conn_a)
+        f.unregisterCallback(9999)
+        f.signalMessage(3)
+        self.assertEqual(received, [('a', 1), ('b', 1), ('b', 2), ('b', 3)])
 
     def test_ignores_inactive_inputs(self):
         aligner = InputAligner(self.timeout)
@@ -164,8 +254,11 @@ class TestInputAligner(unittest.TestCase):
             aligner.setInputPeriod(i, Duration(nanoseconds=int(2e6)))
         aligner.add(self.create_msg(Msg2, 2, 2), 1)
         aligner.add(self.create_msg(Msg1, 1, 1), 0)
-        time.sleep(0.05)
-        rclpy.spin_once(self.node, timeout_sec=0.01)
+        # Spin until the timer fires and both messages flow through, with a
+        # generous deadline so this is not flaky on slow CI runners.
+        deadline = time.monotonic() + 2.0
+        while len(self.callback_content) < 2 and time.monotonic() < deadline:
+            rclpy.spin_once(self.node, timeout_sec=0.05)
         self.assertEqual(self.callback_content, [1, 2])
 
     def test_no_period_information(self):
