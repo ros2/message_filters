@@ -2,8 +2,8 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+7.3.9 (2026-04-30)
+------------------
 * C++20 style (`#272 <https://github.com/ros2/message_filters/issues/272>`_)
 * (`#221 <https://github.com/ros2/message_filters/issues/221>`_) Tutorials: Add DeltaFilter Python tutorial (`#277 <https://github.com/ros2/message_filters/issues/277>`_)
 * Contributors: Alejandro Hernández Cordero, Pavel Esipov
