@@ -1,4 +1,4 @@
-# Copyright 2009, Willow Garage, Inc. All rights reserved.
+# Copyright 2026, Open Source Robotics Foundation, Inc. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -160,7 +160,7 @@ class InputAligner:
     def registerCallback(
         self,
         index: int,
-        callback: tp.Callable[..., tp.Any],
+        callback: tp.Callable, #TODO: @EsipovPA Fix typing for callable
         *args: tp.Any,
     ) -> int:
         return self.signals[index].registerCallback(callback, *args)
