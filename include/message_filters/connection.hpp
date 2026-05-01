@@ -30,7 +30,6 @@
 #define MESSAGE_FILTERS__CONNECTION_HPP_
 
 #include <functional>
-#include <memory>
 
 #include "message_filters/visibility_control.hpp"
 

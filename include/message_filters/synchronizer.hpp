@@ -29,13 +29,11 @@
 #ifndef MESSAGE_FILTERS__SYNCHRONIZER_HPP_
 #define MESSAGE_FILTERS__SYNCHRONIZER_HPP_
 
-#include <deque>
 #include <functional>
 #include <memory>
 #include <string>
 #include <tuple>
 #include <type_traits>
-#include <vector>
 
 #include "message_filters/connection.hpp"
 #include "message_filters/null_types.hpp"
@@ -172,8 +170,6 @@ private:
   {
     this->template add<i>(evt);
   }
-
-  uint32_t queue_size_;
 
   Signal signal_;
 
