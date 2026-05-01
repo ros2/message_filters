@@ -109,7 +109,12 @@ class InputAligner:
             self.active = active
 
         def get_status(self) -> QueueStatus:
-            return QueueStatus(self.active, len(self.events), self.msgs_processed, self.msgs_dropped)
+            return QueueStatus(
+                active=self.active,
+                queue_size=len(self.events),
+                msgs_processed=self.msgs_processed,
+                msgs_dropped=self.msgs_dropped
+            )
 
     def __init__(
         self,
