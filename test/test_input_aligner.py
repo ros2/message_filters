@@ -189,7 +189,7 @@ class TestInputAligner(unittest.TestCase):
         received = []
         f = SimpleFilter()
         conn_a = f.registerCallback(lambda m: received.append(('a', m)))
-        conn_b = f.registerCallback(lambda m: received.append(('b', m)))
+        f.registerCallback(lambda m: received.append(('b', m)))
         f.signalMessage(1)
         self.assertEqual(received, [('a', 1), ('b', 1)])
         f.unregisterCallback(conn_a)
