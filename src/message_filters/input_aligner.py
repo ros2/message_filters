@@ -61,7 +61,8 @@ def _ros_max_time() -> Time:
 
 
 class InputAligner:
-    """Align N inputs by timestamp and forward each to its own output signal.
+    """
+    Align N inputs by timestamp and forward each to its own output signal.
 
     Unlike a single-output filter, ``InputAligner`` exposes one signal per
     input, so it does not extend :class:`SimpleFilter`. Register downstream
@@ -69,6 +70,7 @@ class InputAligner:
     """
 
     class _EventQueue:
+
         def __init__(self) -> None:
             self.events: list[tuple[Time, int, tp.Any]] = []
             self.next_ts: Time = _ros_max_time()
@@ -138,7 +140,8 @@ class InputAligner:
         self,
         filters: tp.Sequence[SimpleFilter],
     ) -> None:
-        """Connect ``filters`` as inputs, replacing any existing inputs.
+        """
+        Connect ``filters`` as inputs, replacing any existing inputs.
 
         Note: previously-registered downstream callbacks are also dropped,
         since the per-input signals are recreated.
@@ -165,7 +168,7 @@ class InputAligner:
     def registerCallback(
         self,
         index: int,
-        callback: tp.Callable, #TODO: @EsipovPA Fix typing for callable
+        callback: tp.Callable,  # TODO: @EsipovPA Fix typing for callable
         *args: tp.Any,
     ) -> int:
         return self.signals[index].registerCallback(callback, *args)

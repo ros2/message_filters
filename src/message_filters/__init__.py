@@ -51,7 +51,6 @@ from rclpy.time import Time
 from rclpy.type_support import MsgT
 
 from .simple_filter import SimpleFilter
-from .input_aligner import InputAligner
 
 
 class Subscriber(SimpleFilter):

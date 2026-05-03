@@ -31,30 +31,35 @@ import time
 import unittest
 
 from builtin_interfaces.msg import Time as TimeMsg
-from message_filters import InputAligner, SimpleFilter
+from message_filters import SimpleFilter
+from message_filters.input_aligner import InputAligner
 import rclpy
 from rclpy.duration import Duration
 from rclpy.time import Time
 
 
 class Header:
+
     def __init__(self, stamp=None):
         self.stamp = stamp if stamp is not None else TimeMsg()
 
 
 class Msg1:
+
     def __init__(self, stamp=None, data=None):
         self.header = Header(stamp)
         self.data = data
 
 
 class Msg2:
+
     def __init__(self, stamp=None, data=None):
         self.header = Header(stamp)
         self.data = data
 
 
 class TestInputAligner(unittest.TestCase):
+
     @classmethod
     def setUpClass(cls):
         rclpy.init()
