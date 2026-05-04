@@ -31,7 +31,7 @@ from abc import ABC
 from functools import partial
 from typing import Any, Callable
 
-from message_filters import SimpleFilter
+from message_filters.simple_filter import SimpleFilter
 from rclpy.type_support import MsgT
 
 
