@@ -48,6 +48,7 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from rclpy.time import Time
 
+<<<<<<< HEAD
 
 class SimpleFilter(object):
 
@@ -69,6 +70,9 @@ class SimpleFilter(object):
     def signalMessage(self, *msg):
         for (cb, args) in self.callbacks.values():
             cb(*(msg + args))
+=======
+from .simple_filter import SimpleFilter
+>>>>>>> e8277a6 (feat(python): add python implementation of InputAligner  (#283))
 
 class Subscriber(SimpleFilter):
 
