@@ -30,8 +30,6 @@
 #define MESSAGE_FILTERS__PASS_THROUGH_HPP_
 
 #include <memory>
-#include <utility>
-#include <vector>
 
 #include "message_filters/simple_filter.hpp"
 
