@@ -2,6 +2,12 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.4.0 (2026-05-06)
+------------------
+* Cleanup headers and removed deadcode (`#284 <https://github.com/ros2/message_filters/issues/284>`_) (`#291 <https://github.com/ros2/message_filters/issues/291>`_)
+* feat(python): add python implementation of InputAligner  (backport `#283 <https://github.com/ros2/message_filters/issues/283>`_) (`#286 <https://github.com/ros2/message_filters/issues/286>`_)
+* Contributors: mergify[bot]
+
 7.3.9 (2026-04-30)
 ------------------
 * C++20 style (`#272 <https://github.com/ros2/message_filters/issues/272>`_)
