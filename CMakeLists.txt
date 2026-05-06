@@ -148,6 +148,7 @@ if(BUILD_TESTING)
   ament_add_pytest_test(test_approxsync.py "test/test_approxsync.py")
   ament_add_pytest_test(test_message_filters_cache.py "test/test_message_filters_cache.py")
   ament_add_pytest_test(test_message_filters_chain.py "test/test_message_filters_chain.py")
+  ament_add_pytest_test(test_input_aligner.py "test/test_input_aligner.py")
 endif()
 
 ament_package()
