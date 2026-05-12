@@ -46,31 +46,7 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from rclpy.time import Time
 
-<<<<<<< HEAD
-
-class SimpleFilter(object):
-
-    def __init__(self):
-        self.callbacks = {}
-
-    def registerCallback(self, cb, *args):
-        """
-        Register a callback function `cb` to be called when this filter
-        has output.
-        The filter calls the function ``cb`` with a filter-dependent
-        list of arguments,followed by the call-supplied arguments ``args``.
-        """
-
-        conn = len(self.callbacks)
-        self.callbacks[conn] = (cb, args)
-        return conn
-
-    def signalMessage(self, *msg):
-        for (cb, args) in self.callbacks.values():
-            cb(*(msg + args))
-=======
 from .simple_filter import SimpleFilter
->>>>>>> e8277a6 (feat(python): add python implementation of InputAligner  (#283))
 
 class Subscriber(SimpleFilter):
 

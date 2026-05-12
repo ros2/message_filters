@@ -143,7 +143,6 @@ if(BUILD_TESTING)
 
   # python tests with python interfaces of message filters
   find_package(ament_cmake_pytest REQUIRED)
-<<<<<<< HEAD
   ament_add_pytest_test(test_time_synchronizer.py "test/test_time_synchronizer.py"
     PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}")
   ament_add_pytest_test(test_approxsync.py "test/test_approxsync.py"
@@ -152,13 +151,8 @@ if(BUILD_TESTING)
     PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}")
   ament_add_pytest_test(test_message_filters_chain.py "test/test_message_filters_chain.py"
     PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}")
-=======
-  ament_add_pytest_test(test_time_synchronizer.py "test/test_time_synchronizer.py")
-  ament_add_pytest_test(test_approxsync.py "test/test_approxsync.py")
-  ament_add_pytest_test(test_message_filters_cache.py "test/test_message_filters_cache.py")
-  ament_add_pytest_test(test_message_filters_chain.py "test/test_message_filters_chain.py")
-  ament_add_pytest_test(test_input_aligner.py "test/test_input_aligner.py")
->>>>>>> e8277a6 (feat(python): add python implementation of InputAligner  (#283))
+  ament_add_pytest_test(test_input_aligner.py "test/test_input_aligner.py"
+    PYTHON_EXECUTABLE "${_PYTHON_EXECUTABLE}")
 endif()
 
 ament_package()
