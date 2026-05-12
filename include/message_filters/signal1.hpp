@@ -106,7 +106,10 @@ public:
     V_CallbackHelper1 local_callbacks;
     {
       std::lock_guard<std::mutex> lock(mutex_);
-      local_callbacks = callbacks_;
+      local_callbacks.reserve(callbacks_.size());
+      for (const auto & callback : callbacks_) {
+        local_callbacks.push_back(callback);
+      }
     }
     bool nonconst_force_copy = local_callbacks.size() > 1;
     for (const CallbackHelper1Ptr & helper : local_callbacks) {
