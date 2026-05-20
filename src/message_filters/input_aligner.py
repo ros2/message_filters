@@ -28,7 +28,6 @@
 
 """Input aligner for synchronizing messages from multiple sources based on their timestamps."""
 
-from dataclasses import dataclass
 import heapq
 import threading
 import typing as tp
@@ -41,12 +40,18 @@ from rclpy.time import Time
 from .simple_filter import SimpleFilter
 
 
-@dataclass
 class QueueStatus:
-    active: bool
-    queue_size: int
-    msgs_processed: int
-    msgs_dropped: int
+    def __init__(
+        self,
+        active: bool,
+        queue_size: int,
+        msgs_processed: int,
+        msgs_dropped: int,
+    ) -> None:
+        self.active = active
+        self.queue_size = queue_size
+        self.msgs_processed = msgs_processed
+        self.msgs_dropped = msgs_dropped
 
 
 def _ros_zero_time() -> Time:
