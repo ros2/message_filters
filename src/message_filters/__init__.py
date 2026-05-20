@@ -49,27 +49,7 @@ from rclpy.type_support import MsgT
 
 from typing_extensions import deprecated
 
-
-class SimpleFilter(object):
-
-    def __init__(self):
-        self.callbacks = {}
-
-    def registerCallback(self, cb, *args):
-        """
-        Register a callback `cb` to be called when this filter has output.
-
-        The filter calls the function ``cb`` with a filter-dependent.
-
-        list of arguments,followed by the call-supplied arguments ``args.``.
-        """
-        conn = len(self.callbacks)
-        self.callbacks[conn] = (cb, args)
-        return conn
-
-    def signalMessage(self, *msg):
-        for (cb, args) in self.callbacks.values():
-            cb(*(msg + args))
+from .simple_filter import SimpleFilter
 
 
 class Subscriber(SimpleFilter):
