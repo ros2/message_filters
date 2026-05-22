@@ -2,6 +2,11 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.11.15 (2026-05-22)
+--------------------
+* fix tutorials table of contents fix input aligner type hint (backport `#290 <https://github.com/ros2/message_filters/issues/290>`_) (`#299 <https://github.com/ros2/message_filters/issues/299>`_)
+* Contributors: mergify[bot]
+
 4.11.14 (2026-05-20)
 --------------------
 * feat(python): add python implementation of InputAligner  (backport `#283 <https://github.com/ros2/message_filters/issues/283>`_) (`#288 <https://github.com/ros2/message_filters/issues/288>`_)
