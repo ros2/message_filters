@@ -41,6 +41,9 @@ from rclpy.node import MsgType
 from .simple_filter import SimpleFilter
 
 
+P = tp.ParamSpec('P')
+
+
 class QueueStatus:
     def __init__(
         self,
@@ -174,7 +177,7 @@ class InputAligner:
     def registerCallback(
         self,
         index: int,
-        callback: tp.Callable[tp.Concatenate[MsgType, ...], None],
+        callback: tp.Callable[tp.Concatenate[MsgType, P], None],
         *args: tp.Any,
     ) -> int:
         return self.signals[index].registerCallback(callback, *args)

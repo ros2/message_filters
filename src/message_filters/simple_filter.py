@@ -30,6 +30,9 @@ import typing as tp
 from rclpy.node import MsgType
 
 
+P = tp.ParamSpec('P')
+
+
 class SimpleFilter:
 
     def __init__(self):
@@ -37,7 +40,7 @@ class SimpleFilter:
 
     def registerCallback(
         self,
-        callback: tp.Callable[tp.Concatenate[MsgType, ...], None],
+        callback: tp.Callable[tp.Concatenate[MsgType, P], None],
         *args
     ):
         """
