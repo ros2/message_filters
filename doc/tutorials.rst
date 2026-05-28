@@ -30,3 +30,4 @@ Basic Tutorials
    Tutorials/Approximate-Epsilon-Time-Synchronizer-Cpp.rst
    Tutorials/Latest-Time-Cpp.rst
    Tutorials/Delta-Filter-Python.rst
+   Tutorials/Delta-Filter-Cpp.rst
