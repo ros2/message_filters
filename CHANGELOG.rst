@@ -2,8 +2,8 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.11.16 (2026-06-09)
+--------------------
 * (`#221 <https://github.com/ros2/message_filters/issues/221>`_) Tutorials: Add DeltaFilter C++ tutorial (`#304 <https://github.com/ros2/message_filters/issues/304>`_) (`#307 <https://github.com/ros2/message_filters/issues/307>`_)
   (cherry picked from commit cebde72066bb3b181246cc05497231bcce8b4d2c)
   Co-authored-by: Pavel Esipov <38457822+EsipovPA@users.noreply.github.com>
