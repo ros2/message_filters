@@ -2,6 +2,14 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* (`#221 <https://github.com/ros2/message_filters/issues/221>`_) Tutorials: Add DeltaFilter C++ tutorial (`#304 <https://github.com/ros2/message_filters/issues/304>`_) (`#307 <https://github.com/ros2/message_filters/issues/307>`_)
+  (cherry picked from commit cebde72066bb3b181246cc05497231bcce8b4d2c)
+  Co-authored-by: Pavel Esipov <38457822+EsipovPA@users.noreply.github.com>
+  Co-authored-by: Alejandro Hernandez Cordero <ahcorde@gmail.com>
+* Contributors: mergify[bot]
+
 4.11.15 (2026-05-22)
 --------------------
 * fix tutorials table of contents fix input aligner type hint (backport `#290 <https://github.com/ros2/message_filters/issues/290>`_) (`#299 <https://github.com/ros2/message_filters/issues/299>`_)
