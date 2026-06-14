@@ -2,6 +2,12 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#309 <https://github.com/ros2/message_filters/issues/309>`_ from ros2/marcoag/fix-message-filters-py39-concatenate
+* Defer annotation evaluation to fix RHEL import.
+* Contributors: Marco A. Gutierrez
+
 4.11.16 (2026-06-09)
 --------------------
 * (`#221 <https://github.com/ros2/message_filters/issues/221>`_) Tutorials: Add DeltaFilter C++ tutorial (`#304 <https://github.com/ros2/message_filters/issues/304>`_) (`#307 <https://github.com/ros2/message_filters/issues/307>`_)
