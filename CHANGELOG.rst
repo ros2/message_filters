@@ -2,8 +2,8 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.11.17 (2026-06-14)
+--------------------
 * Merge pull request `#309 <https://github.com/ros2/message_filters/issues/309>`_ from ros2/marcoag/fix-message-filters-py39-concatenate
 * Defer annotation evaluation to fix RHEL import.
 * Contributors: Marco A. Gutierrez
