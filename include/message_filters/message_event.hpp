@@ -159,7 +159,23 @@ public:
    */
   std::shared_ptr<M> getMessage() const
   {
-    return copyMessageIfNecessary<M>();
+    if constexpr (std::is_void_v<M>) {
+      return std::const_pointer_cast<Message>(message_);
+    } else {
+      if (std::is_const_v<M>|| !nonconst_need_copy_) {
+        return std::const_pointer_cast<Message>(message_);
+      }
+
+      if (message_copy_) {
+        return message_copy_;
+      }
+
+      assert(create_);
+      message_copy_ = create_();
+      *message_copy_ = *message_;
+
+      return message_copy_;
+    }
   }
 
   /**
@@ -200,32 +216,6 @@ public:
   const CreateFunction & getMessageFactory() const {return create_;}
 
 private:
-  template<typename M2>
-  typename std::enable_if<!std::is_void<M2>::value,
-    std::shared_ptr<M>>::type copyMessageIfNecessary() const
-  {
-    if (std::is_const<M>::value || !nonconst_need_copy_) {
-      return std::const_pointer_cast<Message>(message_);
-    }
-
-    if (message_copy_) {
-      return message_copy_;
-    }
-
-    assert(create_);
-    message_copy_ = create_();
-    *message_copy_ = *message_;
-
-    return message_copy_;
-  }
-
-  template<typename M2>
-  typename std::enable_if<std::is_void<M2>::value,
-    std::shared_ptr<M>>::type copyMessageIfNecessary() const
-  {
-    return std::const_pointer_cast<Message>(message_);
-  }
-
   ConstMessagePtr message_;
   // Kind of ugly to make this mutable, but it means we can pass a const MessageEvent
   // to a callback and not worry about other things being modified
