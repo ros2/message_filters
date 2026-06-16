@@ -52,7 +52,7 @@ public:
 
   virtual void call(bool nonconst_force_copy, const MessageEvent<Ms const> & ... es) = 0;
 
-  typedef std::shared_ptr<CallbackHelper9> Ptr;
+  using Ptr = std::shared_ptr<CallbackHelper9>;
 };
 
 template<typename ... Ps>
@@ -60,7 +60,7 @@ class CallbackHelper9T
   : public CallbackHelper9<typename ParameterAdapter<Ps>::Message...>
 {
 public:
-  typedef std::function<void (typename ParameterAdapter<Ps>::Parameter...)> Callback;
+  using Callback = std::function<void (typename ParameterAdapter<Ps>::Parameter...)>;
 
   CallbackHelper9T(const Callback & cb)  // NOLINT(runtime/explicit)
   : callback_(cb)
@@ -84,11 +84,11 @@ private:
 template<typename ... Ms>
 class Signal9
 {
-  typedef std::shared_ptr<CallbackHelper9<Ms...>> CallbackHelper9Ptr;
-  typedef std::vector<CallbackHelper9Ptr> V_CallbackHelper9;
+  using CallbackHelper9Ptr = std::shared_ptr<CallbackHelper9<Ms...>>;
+  using V_CallbackHelper9 = std::vector<CallbackHelper9Ptr>;
 
 public:
-  typedef const std::shared_ptr<NullType const> & NullP;
+  using NullP = const std::shared_ptr<NullType const> &;
 
   template<typename ... Ps>
   Connection addCallback(const std::function<void(Ps...)> & callback)
@@ -97,7 +97,7 @@ public:
 
     std::lock_guard<std::mutex> lock(mutex_);
     callbacks_.push_back(CallbackHelper9Ptr(helper));
-    return Connection(std::bind(&Signal9::removeCallback, this, callbacks_.back()));
+    return Connection([this, cb = callbacks_.back()]() {removeCallback(cb);});
   }
 
   template<typename ... Ps>

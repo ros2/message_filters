@@ -77,8 +77,8 @@ template<class ... Ms>
 class TimeSynchronizer : public Synchronizer<sync_policies::ExactTime<Ms...>>
 {
 public:
-  typedef sync_policies::ExactTime<Ms...> Policy;
-  typedef Synchronizer<Policy> Base;
+  using Policy = sync_policies::ExactTime<Ms...>;
+  using Base = Synchronizer<Policy>;
 
   using Base::add;
   using Base::connectInput;

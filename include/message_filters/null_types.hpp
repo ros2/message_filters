@@ -42,7 +42,7 @@ namespace message_filters
 struct NullType
 {
 };
-typedef std::shared_ptr<NullType const> NullTypeConstPtr;
+using NullTypeConstPtr = std::shared_ptr<NullType const>;
 
 template<class M>
 struct NullFilter

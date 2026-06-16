@@ -139,8 +139,8 @@ class Subscriber
   public SimpleFilter<message_type_t<M>>
 {
 public:
-  typedef message_type_t<M> MessageType;
-  typedef MessageEvent<MessageType const> EventType;
+  using MessageType = message_type_t<M>;
+  using EventType = MessageEvent<MessageType const>;
 
   /**
    * \brief Constructor

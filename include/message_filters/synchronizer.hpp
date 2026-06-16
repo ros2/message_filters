@@ -47,9 +47,9 @@ template<class Policy>
 class Synchronizer : public noncopyable, public Policy
 {
 public:
-  typedef typename Policy::Messages Messages;
-  typedef typename Policy::Events Events;
-  typedef typename Policy::Signal Signal;
+  using Messages = typename Policy::Messages;
+  using Events = typename Policy::Events;
+  using Signal = typename Policy::Signal;
 
   template<class F0, class F1, class ... Fs>
   Synchronizer(F0 & f0, F1 & f1, Fs &... fs)
@@ -94,8 +94,7 @@ public:
     input_connections_[I] =
       std::get<I>(ftuple).registerCallback(
       std::function<void(const MEvent &)>(
-        std::bind(
-          &Synchronizer::template cb<I>, this, std::placeholders::_1)));
+        [this](const MEvent & evt) {this->template cb<I>(evt);}));
   }
 
   template<class FTuple, std::size_t... Is>
@@ -182,10 +181,10 @@ template<typename ... Ms>
 struct PolicyBase
 {
   static constexpr std::size_t N_MESSAGES = sizeof...(Ms);
-  typedef std::integral_constant<int, N_MESSAGES> RealTypeCount;
-  typedef std::tuple<Ms...> Messages;
-  typedef Signal9<Ms...> Signal;
-  typedef std::tuple<MessageEvent<Ms const>...> Events;
+  using RealTypeCount = std::integral_constant<int, N_MESSAGES>;
+  using Messages = std::tuple<Ms...>;
+  using Signal = Signal9<Ms...>;
+  using Events = std::tuple<MessageEvent<Ms const>...>;
 };
 
 }  // namespace message_filters

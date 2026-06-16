@@ -42,8 +42,8 @@
 
 namespace message_filters
 {
-typedef std::map<std::string, std::string> M_string;
-typedef std::shared_ptr<M_string> M_stringPtr;
+using M_string = std::map<std::string, std::string>;
+using M_stringPtr = std::shared_ptr<M_string>;
 
 template<typename M>
 struct DefaultMessageCreator
@@ -64,11 +64,11 @@ template<typename M>
 class MessageEvent
 {
 public:
-  typedef typename std::add_const<M>::type ConstMessage;
-  typedef typename std::remove_const<M>::type Message;
-  typedef std::shared_ptr<Message> MessagePtr;
-  typedef std::shared_ptr<ConstMessage> ConstMessagePtr;
-  typedef std::function<MessagePtr()> CreateFunction;
+  using ConstMessage = typename std::add_const<M>::type;
+  using Message = typename std::remove_const<M>::type;
+  using MessagePtr = std::shared_ptr<Message>;
+  using ConstMessagePtr = std::shared_ptr<ConstMessage>;
+  using CreateFunction = std::function<MessagePtr()>;
 
   MessageEvent()
   : nonconst_need_copy_(true)

@@ -51,13 +51,13 @@ namespace sync_policies
 template<typename ... Ms>
 struct ExactTime : public PolicyBase<Ms...>
 {
-  typedef Synchronizer<ExactTime> Sync;
-  typedef PolicyBase<Ms...> Super;
-  typedef typename Super::Messages Messages;
-  typedef typename Super::Signal Signal;
-  typedef typename Super::Events Events;
-  typedef typename Super::RealTypeCount RealTypeCount;
-  typedef Events Tuple;
+  using Sync = Synchronizer<ExactTime>;
+  using Super = PolicyBase<Ms...>;
+  using Messages = typename Super::Messages;
+  using Signal = typename Super::Signal;
+  using Events = typename Super::Events;
+  using RealTypeCount = typename Super::RealTypeCount;
+  using Tuple = Events;
 
   ExactTime(uint32_t queue_size)  // NOLINT(runtime/explicit)
   : parent_(0)

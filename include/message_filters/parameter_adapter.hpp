@@ -69,9 +69,9 @@ void callback(const MessageEvent<M> &);
 template<typename M>
 struct ParameterAdapter
 {
-  typedef typename std::remove_reference<typename std::remove_const<M>::type>::type Message;
-  typedef MessageEvent<Message const> Event;
-  typedef M Parameter;
+  using Message = typename std::remove_reference<typename std::remove_const<M>::type>::type;
+  using Event = MessageEvent<Message const>;
+  using Parameter = M;
   static const bool is_const = true;
 
   static Parameter getParameter(const Event & event)
@@ -83,9 +83,9 @@ struct ParameterAdapter
 template<typename M>
 struct ParameterAdapter<const std::shared_ptr<M const> &>
 {
-  typedef typename std::remove_reference<typename std::remove_const<M>::type>::type Message;
-  typedef MessageEvent<Message const> Event;
-  typedef const std::shared_ptr<Message const> Parameter;
+  using Message = typename std::remove_reference<typename std::remove_const<M>::type>::type;
+  using Event = MessageEvent<Message const>;
+  using Parameter = const std::shared_ptr<Message const>;
   static const bool is_const = true;
 
   static Parameter getParameter(const Event & event)
@@ -97,9 +97,9 @@ struct ParameterAdapter<const std::shared_ptr<M const> &>
 template<typename M>
 struct ParameterAdapter<const std::shared_ptr<M> &>
 {
-  typedef typename std::remove_reference<typename std::remove_const<M>::type>::type Message;
-  typedef MessageEvent<Message const> Event;
-  typedef std::shared_ptr<Message> Parameter;
+  using Message = typename std::remove_reference<typename std::remove_const<M>::type>::type;
+  using Event = MessageEvent<Message const>;
+  using Parameter = std::shared_ptr<Message>;
   static const bool is_const = false;
 
   static Parameter getParameter(const Event & event)
@@ -111,9 +111,9 @@ struct ParameterAdapter<const std::shared_ptr<M> &>
 template<typename M>
 struct ParameterAdapter<const M &>
 {
-  typedef typename std::remove_reference<typename std::remove_const<M>::type>::type Message;
-  typedef MessageEvent<Message const> Event;
-  typedef const M & Parameter;
+  using Message = typename std::remove_reference<typename std::remove_const<M>::type>::type;
+  using Event = MessageEvent<Message const>;
+  using Parameter = const M &;
   static const bool is_const = true;
 
   static Parameter getParameter(const Event & event)
@@ -125,9 +125,9 @@ struct ParameterAdapter<const M &>
 template<typename M>
 struct ParameterAdapter<std::shared_ptr<M const>>
 {
-  typedef typename std::remove_reference<typename std::remove_const<M>::type>::type Message;
-  typedef MessageEvent<Message const> Event;
-  typedef std::shared_ptr<Message const> Parameter;
+  using Message = typename std::remove_reference<typename std::remove_const<M>::type>::type;
+  using Event = MessageEvent<Message const>;
+  using Parameter = std::shared_ptr<Message const>;
   static const bool is_const = true;
 
   static Parameter getParameter(const Event & event)
@@ -139,9 +139,9 @@ struct ParameterAdapter<std::shared_ptr<M const>>
 template<typename M>
 struct ParameterAdapter<std::shared_ptr<M>>
 {
-  typedef typename std::remove_reference<typename std::remove_const<M>::type>::type Message;
-  typedef MessageEvent<Message const> Event;
-  typedef std::shared_ptr<Message> Parameter;
+  using Message = typename std::remove_reference<typename std::remove_const<M>::type>::type;
+  using Event = MessageEvent<Message const>;
+  using Parameter = std::shared_ptr<Message>;
   static const bool is_const = false;
 
   static Parameter getParameter(const Event & event)
@@ -153,9 +153,9 @@ struct ParameterAdapter<std::shared_ptr<M>>
 template<typename M>
 struct ParameterAdapter<const MessageEvent<M const> &>
 {
-  typedef typename std::remove_reference<typename std::remove_const<M>::type>::type Message;
-  typedef MessageEvent<Message const> Event;
-  typedef const MessageEvent<Message const> & Parameter;
+  using Message = typename std::remove_reference<typename std::remove_const<M>::type>::type;
+  using Event = MessageEvent<Message const>;
+  using Parameter = const MessageEvent<Message const> &;
   static const bool is_const = true;
 
   static Parameter getParameter(const Event & event)
@@ -167,9 +167,9 @@ struct ParameterAdapter<const MessageEvent<M const> &>
 template<typename M>
 struct ParameterAdapter<const MessageEvent<M> &>
 {
-  typedef typename std::remove_reference<typename std::remove_const<M>::type>::type Message;
-  typedef MessageEvent<Message const> Event;
-  typedef MessageEvent<Message> Parameter;
+  using Message = typename std::remove_reference<typename std::remove_const<M>::type>::type;
+  using Event = MessageEvent<Message const>;
+  using Parameter = MessageEvent<Message>;
   static const bool is_const = false;
 
   static Parameter getParameter(const Event & event)

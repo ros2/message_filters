@@ -64,8 +64,8 @@ template<class M>
 class Cache : public SimpleFilter<M>
 {
 public:
-  typedef std::shared_ptr<M const> MConstPtr;
-  typedef MessageEvent<M const> EventType;
+  using MConstPtr = std::shared_ptr<M const>;
+  using EventType = MessageEvent<M const>;
 
   template<class F>
   explicit Cache(F & f, unsigned int cache_size = 1)
@@ -117,7 +117,7 @@ public:
   {
     incoming_connection_ = f.registerCallback(
       typename SimpleFilter<M>::EventCallback(
-        std::bind(&Cache::callback, this, std::placeholders::_1)));
+        [this](const EventType & evt) {callback(evt);}));
   }
 
   ~Cache()

@@ -48,16 +48,16 @@ public:
 
   virtual void call(const MessageEvent<M const> & event, bool nonconst_need_copy) = 0;
 
-  typedef std::shared_ptr<CallbackHelper1<M>> Ptr;
+  using Ptr = std::shared_ptr<CallbackHelper1<M>>;
 };
 
 template<typename P, typename M>
 class CallbackHelper1T : public CallbackHelper1<M>
 {
 public:
-  typedef ParameterAdapter<P> Adapter;
-  typedef std::function<void (typename Adapter::Parameter)> Callback;
-  typedef typename Adapter::Event Event;
+  using Adapter = ParameterAdapter<P>;
+  using Callback = std::function<void (typename Adapter::Parameter)>;
+  using Event = typename Adapter::Event;
 
   CallbackHelper1T(const Callback & cb)  // NOLINT(runtime/explicit)
   : callback_(cb)
@@ -77,8 +77,8 @@ private:
 template<class M>
 class Signal1
 {
-  typedef std::shared_ptr<CallbackHelper1<M>> CallbackHelper1Ptr;
-  typedef std::vector<CallbackHelper1Ptr> V_CallbackHelper1;
+  using CallbackHelper1Ptr = std::shared_ptr<CallbackHelper1<M>>;
+  using V_CallbackHelper1 = std::vector<CallbackHelper1Ptr>;
 
 public:
   template<typename P>

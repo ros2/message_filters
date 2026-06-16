@@ -55,13 +55,13 @@ template<typename ... Ms>
 class ApproximateEpsilonTime : public PolicyBase<Ms...>
 {
 public:
-  typedef Synchronizer<ApproximateEpsilonTime> Sync;
-  typedef PolicyBase<Ms...> Super;
-  typedef typename Super::Messages Messages;
-  typedef typename Super::Signal Signal;
-  typedef typename Super::Events Events;
-  typedef typename Super::RealTypeCount RealTypeCount;
-  typedef Events Tuple;
+  using Sync = Synchronizer<ApproximateEpsilonTime>;
+  using Super = PolicyBase<Ms...>;
+  using Messages = typename Super::Messages;
+  using Signal = typename Super::Signal;
+  using Events = typename Super::Events;
+  using RealTypeCount = typename Super::RealTypeCount;
+  using Tuple = Events;
 
   using Super::N_MESSAGES;
 

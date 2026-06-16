@@ -38,7 +38,7 @@
  * \section usage USAGE
  * Example usage would be:
 \verbatim
-typedef LatestTime<sensor_msgs::CameraInfo, sensor_msgs::Image, sensor_msgs::Image> latest_policy;
+using latest_policy = LatestTime<sensor_msgs::CameraInfo, sensor_msgs::Image, sensor_msgs::Image>;
 Synchronizer<latest_policy> sync_policies(latest_policy(), caminfo_sub, limage_sub, rimage_sub);
 sync_policies.registerCallback(callback);
 \endverbatim
@@ -46,7 +46,7 @@ sync_policies.registerCallback(callback);
  * May also take an instance of a `rclcpp::Clock::SharedPtr` from `rclpp::Node::get_clock()`
  * to use the node's time source (e.g. sim time) as in:
 \verbatim
-typedef LatestTime<sensor_msgs::CameraInfo, sensor_msgs::Image, sensor_msgs::Image> latest_policy;
+using latest_policy = LatestTime<sensor_msgs::CameraInfo, sensor_msgs::Image, sensor_msgs::Image>;
 Synchronizer<latest_policy> sync_policies(latest_policy(node->get_clock()), caminfo_sub, limage_sub, rimage_sub);
 sync_policies.registerCallback(callback);
 \endverbatim
@@ -84,16 +84,16 @@ namespace sync_policies
 template<typename ... M>
 struct LatestTime : public PolicyBase<M...>
 {
-  typedef Synchronizer<LatestTime> Sync;
-  typedef PolicyBase<M...> Super;
-  typedef typename Super::Messages Messages;
-  typedef typename Super::Signal Signal;
-  typedef typename Super::Events Events;
-  typedef typename Super::RealTypeCount RealTypeCount;
+  using Sync = Synchronizer<LatestTime>;
+  using Super = PolicyBase<M...>;
+  using Messages = typename Super::Messages;
+  using Signal = typename Super::Signal;
+  using Events = typename Super::Events;
+  using RealTypeCount = typename Super::RealTypeCount;
 
   /// \brief filter coeffs and error margin factor:
   /// <rate_ema_alpha, error_ema_alpha, rate_step_change_margin_factor>
-  typedef std::tuple<double, double, double> RateConfig;
+  using RateConfig = std::tuple<double, double, double>;
 
   LatestTime()
   : LatestTime(rclcpp::Clock::SharedPtr(new rclcpp::Clock(RCL_ROS_TIME)))

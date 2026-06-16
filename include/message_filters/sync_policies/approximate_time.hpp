@@ -56,14 +56,14 @@ namespace sync_policies
 template<typename ... Ms>
 struct ApproximateTime : public PolicyBase<Ms...>
 {
-  typedef Synchronizer<ApproximateTime> Sync;
-  typedef PolicyBase<Ms...> Super;
-  typedef typename Super::Messages Messages;
-  typedef typename Super::Signal Signal;
-  typedef typename Super::Events Events;
-  typedef Events Tuple;
-  typedef std::tuple<std::deque<MessageEvent<Ms const>>...> DequeTuple;
-  typedef std::tuple<std::vector<MessageEvent<Ms const>>...> VectorTuple;
+  using Sync = Synchronizer<ApproximateTime>;
+  using Super = PolicyBase<Ms...>;
+  using Messages = typename Super::Messages;
+  using Signal = typename Super::Signal;
+  using Events = typename Super::Events;
+  using Tuple = Events;
+  using DequeTuple = std::tuple<std::deque<MessageEvent<Ms const>>...>;
+  using VectorTuple = std::tuple<std::vector<MessageEvent<Ms const>>...>;
 
   using Super::N_MESSAGES;
 
