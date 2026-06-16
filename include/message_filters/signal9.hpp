@@ -93,10 +93,10 @@ public:
   template<typename ... Ps>
   Connection addCallback(const std::function<void(Ps...)> & callback)
   {
-    CallbackHelper9T<Ps...> * helper = new CallbackHelper9T<Ps...>(callback);
+    auto helper = std::make_shared<CallbackHelper9T<Ps...>>(callback);
 
     std::lock_guard<std::mutex> lock(mutex_);
-    callbacks_.push_back(CallbackHelper9Ptr(helper));
+    callbacks_.push_back(helper);
     return Connection([this, cb = callbacks_.back()]() {removeCallback(cb);});
   }
 
