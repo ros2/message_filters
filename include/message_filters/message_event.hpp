@@ -175,7 +175,9 @@ public:
   bool nonConstWillCopy() const {return nonconst_need_copy_;}
   bool getMessageWillCopy() const {return !std::is_const<M>::value && nonconst_need_copy_;}
 
-  bool operator<(const MessageEvent<M> & rhs)
+  // Note: not noexcept. rclcpp::Time relational operators throw std::runtime_error
+  // when the two times have different clock sources.
+  bool operator<(const MessageEvent<M> & rhs) const
   {
     if (message_ != rhs.message_) {
       return message_ < rhs.message_;
@@ -188,15 +190,11 @@ public:
     return nonconst_need_copy_ < rhs.nonconst_need_copy_;
   }
 
-  bool operator==(const MessageEvent<M> & rhs)
+  // operator!= is synthesized from operator== by C++20's rewritten candidates.
+  bool operator==(const MessageEvent<M> & rhs) const
   {
     return message_ == rhs.message_ && receipt_time_ == rhs.receipt_time_ &&
            nonconst_need_copy_ == rhs.nonconst_need_copy_;
-  }
-
-  bool operator!=(const MessageEvent<M> & rhs)
-  {
-    return !(*this == rhs);
   }
 
   const CreateFunction & getMessageFactory() const {return create_;}
