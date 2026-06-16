@@ -217,7 +217,7 @@ public:
   }
 
 protected:
-  virtual std::shared_ptr<void> getFilterForIndex(size_t index) const
+  std::shared_ptr<void> getFilterForIndex(size_t index) const override
   {
     std::lock_guard<std::mutex> lock(mutex_);
     if (index >= filters_.size()) {

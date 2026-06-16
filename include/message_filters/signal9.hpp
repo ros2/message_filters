@@ -67,7 +67,7 @@ public:
   {
   }
 
-  virtual void call(bool nonconst_force_copy, const typename ParameterAdapter<Ps>::Event &... es)
+  void call(bool nonconst_force_copy, const typename ParameterAdapter<Ps>::Event &... es) override
   {
     std::tuple<typename ParameterAdapter<Ps>::Event...> my_es{
       typename ParameterAdapter<Ps>::Event(es, nonconst_force_copy || es.nonConstWillCopy())...};

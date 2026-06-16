@@ -64,7 +64,7 @@ public:
   {
   }
 
-  virtual void call(const MessageEvent<M const> & event, bool nonconst_force_copy)
+  void call(const MessageEvent<M const> & event, bool nonconst_force_copy) override
   {
     Event my_event(event, nonconst_force_copy || event.nonConstWillCopy());
     callback_(Adapter::getParameter(my_event));

@@ -96,7 +96,7 @@ struct LatestTime : public PolicyBase<M...>
   using RateConfig = std::tuple<double, double, double>;
 
   LatestTime()
-  : LatestTime(rclcpp::Clock::SharedPtr(new rclcpp::Clock(RCL_ROS_TIME)))
+  : LatestTime(std::make_shared<rclcpp::Clock>(RCL_ROS_TIME))
   {
   }
 

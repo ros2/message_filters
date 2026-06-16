@@ -116,7 +116,7 @@ public:
 
   virtual ~CachedComparisonHandler() = default;
 
-  bool message_fits(const EventType & message)
+  bool message_fits(const EventType & message) override
   {
     std::lock_guard<std::mutex> lock(message_cache_mutex_);
 
@@ -143,7 +143,7 @@ public:
     return any_field_fits;
   }
 
-  virtual bool do_fields_fit(MFieldType field_a, MFieldType field_b) const = 0;
+  bool do_fields_fit(MFieldType field_a, MFieldType field_b) const override = 0;
 
 private:
   std::mutex message_cache_mutex_;
@@ -183,7 +183,7 @@ public:
 
   virtual ~DeltaCompare() = default;
 
-  bool do_fields_fit(MFieldType field_a, MFieldType field_b) const
+  bool do_fields_fit(MFieldType field_a, MFieldType field_b) const override
   {
     return field_a != field_b;
   }
