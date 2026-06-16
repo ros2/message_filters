@@ -48,7 +48,7 @@ template<typename ... Ms>
 class CallbackHelper9
 {
 public:
-  virtual ~CallbackHelper9() {}
+  virtual ~CallbackHelper9() = default;
 
   virtual void call(bool nonconst_force_copy, const MessageEvent<Ms const> & ... es) = 0;
 

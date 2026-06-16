@@ -86,12 +86,12 @@ struct ExactTime : public PolicyBase<Ms...>
   }
 
   template<int i>
-  void add(const typename std::tuple_element<i, Events>::type & evt)
+  void add(const std::tuple_element_t<i, Events> & evt)
   {
     assert(parent_);
 
     namespace mt = message_filters::message_traits;
-    using Message = typename std::tuple_element<i, Messages>::type;
+    using Message = std::tuple_element_t<i, Messages>;
 
     std::lock_guard<std::mutex> lock(mutex_);
 

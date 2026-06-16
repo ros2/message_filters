@@ -64,8 +64,8 @@ template<typename M>
 class MessageEvent
 {
 public:
-  using ConstMessage = typename std::add_const<M>::type;
-  using Message = typename std::remove_const<M>::type;
+  using ConstMessage = std::add_const_t<M>;
+  using Message = std::remove_const_t<M>;
   using MessagePtr = std::shared_ptr<Message>;
   using ConstMessagePtr = std::shared_ptr<ConstMessage>;
   using CreateFunction = std::function<MessagePtr()>;
@@ -181,15 +181,15 @@ public:
   /**
    * \brief Retrieve a const version of the message
    */
-  const std::shared_ptr<ConstMessage> & getConstMessage() const {return message_;}
+  [[nodiscard]] const std::shared_ptr<ConstMessage> & getConstMessage() const {return message_;}
 
   /**
    * \brief Returns the time at which this message was received
    */
-  rclcpp::Time getReceiptTime() const {return receipt_time_;}
+  [[nodiscard]] rclcpp::Time getReceiptTime() const {return receipt_time_;}
 
-  bool nonConstWillCopy() const {return nonconst_need_copy_;}
-  bool getMessageWillCopy() const {return !std::is_const<M>::value && nonconst_need_copy_;}
+  [[nodiscard]] bool nonConstWillCopy() const {return nonconst_need_copy_;}
+  [[nodiscard]] bool getMessageWillCopy() const {return !std::is_const_v<M>&& nonconst_need_copy_;}
 
   // Note: not noexcept. rclcpp::Time relational operators throw std::runtime_error
   // when the two times have different clock sources.
@@ -213,7 +213,7 @@ public:
            nonconst_need_copy_ == rhs.nonconst_need_copy_;
   }
 
-  const CreateFunction & getMessageFactory() const {return create_;}
+  [[nodiscard]] const CreateFunction & getMessageFactory() const {return create_;}
 
 private:
   ConstMessagePtr message_;

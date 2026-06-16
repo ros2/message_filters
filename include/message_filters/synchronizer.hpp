@@ -90,7 +90,7 @@ public:
   template<std::size_t I, class FTuple>
   void connect(FTuple & ftuple)
   {
-    using MEvent = typename std::tuple_element<I, Events>::type;
+    using MEvent = std::tuple_element_t<I, Events>;
     input_connections_[I] =
       std::get<I>(ftuple).registerCallback(
       std::function<void(const MEvent &)>(
@@ -151,9 +151,9 @@ public:
   using Policy::add;
 
   template<int i>
-  void add(const std::shared_ptr<typename std::tuple_element<i, Messages>::type const> & msg)
+  void add(const std::shared_ptr<std::tuple_element_t<i, Messages> const> & msg)
   {
-    this->template add<i>(typename std::tuple_element<i, Events>::type(msg));
+    this->template add<i>(std::tuple_element_t<i, Events>(msg));
   }
 
 private:
@@ -165,7 +165,7 @@ private:
   }
 
   template<int i>
-  void cb(const typename std::tuple_element<i, Events>::type & evt)
+  void cb(const std::tuple_element_t<i, Events> & evt)
   {
     this->template add<i>(evt);
   }

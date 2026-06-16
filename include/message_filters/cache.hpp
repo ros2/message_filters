@@ -184,7 +184,8 @@ public:
    * \param start The start of the requested interval
    * \param end The end of the requested interval
    */
-  std::vector<MConstPtr> getInterval(const rclcpp::Time & start, const rclcpp::Time & end) const
+  [[nodiscard]] std::vector<MConstPtr> getInterval(
+    const rclcpp::Time & start, const rclcpp::Time & end) const
   {
     std::lock_guard<std::mutex> lock(cache_lock_);
 
@@ -218,7 +219,7 @@ public:
    * If the messages in the cache do not surround (start,end), then this will return the interval
    * that gets closest to surrounding (start,end)
    */
-  std::vector<MConstPtr> getSurroundingInterval(
+  [[nodiscard]] std::vector<MConstPtr> getSurroundingInterval(
     const rclcpp::Time & start, const rclcpp::Time & end) const
   {
     std::lock_guard<std::mutex> lock(cache_lock_);
@@ -260,7 +261,7 @@ public:
    * \param time Time that must occur right after the returned elem
    * \returns shared_ptr to the newest elem that occurs before 'time'. NULL if doesn't exist
    */
-  MConstPtr getElemBeforeTime(const rclcpp::Time & time) const
+  [[nodiscard]] MConstPtr getElemBeforeTime(const rclcpp::Time & time) const
   {
     std::lock_guard<std::mutex> lock(cache_lock_);
 
@@ -283,7 +284,7 @@ public:
    * \param time Time that must occur right before the returned elem
    * \returns shared_ptr to the oldest elem that occurs after 'time'. NULL if doesn't exist
    */
-  MConstPtr getElemAfterTime(const rclcpp::Time & time) const
+  [[nodiscard]] MConstPtr getElemAfterTime(const rclcpp::Time & time) const
   {
     std::lock_guard<std::mutex> lock(cache_lock_);
 
@@ -303,7 +304,7 @@ public:
   /**
    * \brief Returns the timestamp associated with the newest packet cache
    */
-  rclcpp::Time getLatestTime() const
+  [[nodiscard]] rclcpp::Time getLatestTime() const
   {
     namespace mt = message_filters::message_traits;
 
@@ -311,7 +312,7 @@ public:
 
     rclcpp::Time latest_time;
 
-    if (cache_.size() > 0) {
+    if (!cache_.empty()) {
       latest_time = getMessageTime(cache_.back());
     }
 
@@ -321,7 +322,7 @@ public:
   /**
    * \brief Returns the timestamp associated with the oldest packet cache
    */
-  rclcpp::Time getOldestTime() const
+  [[nodiscard]] rclcpp::Time getOldestTime() const
   {
     namespace mt = message_filters::message_traits;
 
@@ -329,7 +330,7 @@ public:
 
     rclcpp::Time oldest_time;
 
-    if (cache_.size() > 0) {
+    if (!cache_.empty()) {
       oldest_time = getMessageTime(cache_.front());
     }
 

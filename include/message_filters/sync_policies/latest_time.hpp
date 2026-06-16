@@ -142,7 +142,7 @@ struct LatestTime : public PolicyBase<M...>
   }
 
   template<int i>
-  void add(const typename std::tuple_element<i, Events>::type & evt)
+  void add(const std::tuple_element_t<i, Events> & evt)
   {
     assert(parent_);
 
@@ -172,7 +172,7 @@ private:
   template<int i>
   void initialize_rate()
   {
-    if (rate_configs_.size() > 0U) {
+    if (!rate_configs_.empty()) {
       double rate_ema_alpha{Rate::DEFAULT_RATE_EMA_ALPHA};
       double error_ema_alpha{Rate::DEFAULT_ERROR_EMA_ALPHA};
       double rate_step_change_margin_factor{Rate::DEFAULT_MARGIN_FACTOR};
@@ -187,14 +187,13 @@ private:
           error_ema_alpha,
           rate_step_change_margin_factor) = rate_configs_[0U];
       }
-      rates_.push_back(
-        Rate(
-          ros_clock_->now(),
-          rate_ema_alpha,
-          error_ema_alpha,
-          rate_step_change_margin_factor));
+      rates_.emplace_back(
+        ros_clock_->now(),
+        rate_ema_alpha,
+        error_ema_alpha,
+        rate_step_change_margin_factor);
     } else {
-      rates_.push_back(Rate(ros_clock_->now()));
+      rates_.emplace_back(ros_clock_->now());
     }
   }
 
@@ -264,11 +263,11 @@ private:
           step_change_detected = false;
         } else {
           if (do_error_init) {
-            error = fabs(hz - 1.0 / period);
+            error = std::abs(hz - 1.0 / period);
             do_error_init = false;
           } else {
             // check if rate is some multiple of mean error from mean
-            if (fabs(hz - 1.0 / period) > rate_step_change_margin_factor * error) {
+            if (std::abs(hz - 1.0 / period) > rate_step_change_margin_factor * error) {
               // detected step change in rate so reset
               do_hz_init = true;
               do_error_init = true;
@@ -276,7 +275,7 @@ private:
               continue;
             }
             // on-line mean error from mean
-            error = error_ema_alpha * fabs(hz - 1.0 / period) + (1.0 - error_ema_alpha) * error;
+            error = error_ema_alpha * std::abs(hz - 1.0 / period) + (1.0 - error_ema_alpha) * error;
           }
           hz = rate_ema_alpha / period + (1.0 - rate_ema_alpha) * hz;
         }

@@ -44,7 +44,7 @@ template<class M>
 class CallbackHelper1
 {
 public:
-  virtual ~CallbackHelper1() {}
+  virtual ~CallbackHelper1() = default;
 
   virtual void call(const MessageEvent<M const> & event, bool nonconst_need_copy) = 0;
 
