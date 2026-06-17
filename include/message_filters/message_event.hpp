@@ -190,7 +190,6 @@ public:
     return nonconst_need_copy_ < rhs.nonconst_need_copy_;
   }
 
-  // operator!= is synthesized from operator== by C++20's rewritten candidates.
   bool operator==(const MessageEvent<M> & rhs) const
   {
     return message_ == rhs.message_ && receipt_time_ == rhs.receipt_time_ &&
