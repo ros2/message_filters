@@ -35,7 +35,7 @@
 #include <string>
 #include <type_traits>
 
-#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/time.hpp>
 #include <std_msgs/msg/header.hpp>
 
 namespace message_filters

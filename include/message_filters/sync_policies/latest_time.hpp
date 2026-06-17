@@ -68,7 +68,8 @@ void callback(const sensor_msgs::CameraInfo::ConstPtr &, const sensor_msgs::Imag
 #include <tuple>
 #include <vector>
 
-#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/clock.hpp>
+#include <rclcpp/time.hpp>
 
 #include "message_filters/message_traits.hpp"
 #include "message_filters/null_types.hpp"

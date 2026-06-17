@@ -52,7 +52,7 @@ class Connection
 {
 public:
   using VoidDisconnectFunction = std::function<void (void)>;
-  MESSAGE_FILTERS_PUBLIC Connection() {}
+  MESSAGE_FILTERS_PUBLIC Connection();
   MESSAGE_FILTERS_PUBLIC Connection(const VoidDisconnectFunction & func);
 
   /**

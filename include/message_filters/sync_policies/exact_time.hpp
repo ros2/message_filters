@@ -35,7 +35,7 @@
 #include <string>
 #include <tuple>
 
-#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/time.hpp>
 
 #include "message_filters/connection.hpp"
 #include "message_filters/message_traits.hpp"
