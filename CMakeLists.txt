@@ -18,7 +18,9 @@ find_package(rclcpp REQUIRED)
 find_package(rcutils REQUIRED)
 find_package(std_msgs REQUIRED)
 
-add_library(${PROJECT_NAME} src/connection.cpp)
+add_library(${PROJECT_NAME}
+  src/connection.cpp
+  src/message_event.cpp)
 if(WIN32)
   target_compile_definitions(${PROJECT_NAME}
     PRIVATE "MESSAGE_FILTERS_BUILDING_DLL")
