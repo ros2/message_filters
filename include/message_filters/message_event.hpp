@@ -45,7 +45,6 @@
 
 namespace message_filters
 {
-/// Returns the current system time.
 /**
  * Defined in message_event.cpp so that this widely-included header does not need
  * rclcpp/clock.hpp, which transitively pulls in the entire rcl/rmw C API.
