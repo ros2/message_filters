@@ -36,7 +36,6 @@
 
 #include <rclcpp/create_subscription.hpp>
 #include <rclcpp/node_interfaces/node_interfaces.hpp>
-#include <rclcpp/rclcpp.hpp>
 
 #include "message_filters/connection.hpp"
 #include "message_filters/simple_filter.hpp"
