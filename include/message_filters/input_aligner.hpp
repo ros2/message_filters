@@ -29,6 +29,8 @@
 #ifndef MESSAGE_FILTERS__INPUT_ALIGNER_HPP_
 #define MESSAGE_FILTERS__INPUT_ALIGNER_HPP_
 
+#include <rcutils/logging_macros.h>
+
 #include <algorithm>
 #include <array>
 #include <chrono>
@@ -39,8 +41,6 @@
 #include <set>
 #include <string>
 #include <tuple>
-
-#include <rcutils/logging_macros.h>
 
 #include <rclcpp/duration.hpp>
 #include <rclcpp/time.hpp>
