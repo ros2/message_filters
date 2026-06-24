@@ -33,15 +33,24 @@
 #define MESSAGE_FILTERS__MESSAGE_EVENT_HPP_
 
 #include <cassert>
+#include <functional>
 #include <map>
 #include <memory>
 #include <string>
 #include <type_traits>
 
-#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/time.hpp>
+
+#include "message_filters/visibility_control.hpp"
 
 namespace message_filters
 {
+/**
+ * Defined in message_event.cpp so that this widely-included header does not need
+ * rclcpp/clock.hpp, which transitively pulls in the entire rcl/rmw C API.
+ */
+MESSAGE_FILTERS_PUBLIC rclcpp::Time systemClockNow();
+
 using M_string = std::map<std::string, std::string>;
 using M_stringPtr = std::shared_ptr<M_string>;
 
@@ -109,7 +118,9 @@ public:
    */
   MessageEvent(const ConstMessagePtr & message)  // NOLINT(runtime/explicit)
   {
-    init(message, rclcpp::Clock().now(), true, message_filters::DefaultMessageCreator<Message>());
+    init(
+      message, message_filters::systemClockNow(), true,
+      message_filters::DefaultMessageCreator<Message>());
   }
 
   MessageEvent(const ConstMessagePtr & message, rclcpp::Time receipt_time)

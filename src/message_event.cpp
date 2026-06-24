@@ -1,4 +1,4 @@
-// Copyright 2010, Willow Garage, Inc. All rights reserved.
+// Copyright 2009, Willow Garage, Inc. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -26,51 +26,16 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MESSAGE_FILTERS__NULL_TYPES_HPP_
-#define MESSAGE_FILTERS__NULL_TYPES_HPP_
+#include "message_filters/message_event.hpp"
 
-#include <memory>
-
-#include <rclcpp/time.hpp>
-
-#include "message_filters/connection.hpp"
-#include "message_filters/message_traits.hpp"
+#include <rclcpp/clock.hpp>
 
 namespace message_filters
 {
 
-struct NullType
+rclcpp::Time systemClockNow()
 {
-};
-using NullTypeConstPtr = std::shared_ptr<NullType const>;
+  return rclcpp::Clock().now();
+}
 
-template<class M>
-struct NullFilter
-{
-  template<typename C>
-  Connection registerCallback(const C &)
-  {
-    return Connection();
-  }
-
-  template<typename P>
-  Connection registerCallback(const std::function<void(P)> &)
-  {
-    return Connection();
-  }
-};
-
-namespace message_traits
-{
-template<>
-struct TimeStamp<message_filters::NullType>
-{
-  static rclcpp::Time value(const message_filters::NullType &)
-  {
-    return rclcpp::Time();
-  }
-};
-}  // namespace message_traits
 }  // namespace message_filters
-
-#endif  // MESSAGE_FILTERS__NULL_TYPES_HPP_

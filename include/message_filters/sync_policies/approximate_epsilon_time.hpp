@@ -38,7 +38,8 @@
 #include <utility>
 #include <vector>
 
-#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/duration.hpp>
+#include <rclcpp/time.hpp>
 
 #include "message_filters/connection.hpp"
 #include "message_filters/message_traits.hpp"

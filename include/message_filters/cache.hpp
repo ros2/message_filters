@@ -37,7 +37,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/time.hpp>
 
 #include "message_filters/connection.hpp"
 #include "message_filters/simple_filter.hpp"
