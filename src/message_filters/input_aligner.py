@@ -28,6 +28,8 @@
 
 """Input aligner for synchronizing messages from multiple sources based on their timestamps."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 import heapq
 import threading
