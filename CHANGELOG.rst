@@ -2,6 +2,11 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.4.2 (2026-06-29)
+------------------
+* Tutorials: Add DeltaFilter C++ tutorial (`#304 <https://github.com/ros2/message_filters/issues/304>`_) (`#305 <https://github.com/ros2/message_filters/issues/305>`_)
+* Contributors: mergify[bot]
+
 7.4.1 (2026-05-13)
 ------------------
 * Avoid vector assignment in message_filters signal callback (`#292 <https://github.com/ros2/message_filters/issues/292>`_) (`#293 <https://github.com/ros2/message_filters/issues/293>`_)
