@@ -2,6 +2,12 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.1.11 (2026-06-29)
+-------------------
+* Defer annotation evaluation to fix RHEL import. (`#317 <https://github.com/ros2/message_filters/issues/317>`_)
+* Tutorials: Add DeltaFilter C++ tutorial (`#304 <https://github.com/ros2/message_filters/issues/304>`_) (`#306 <https://github.com/ros2/message_filters/issues/306>`_)
+* Contributors: mergify[bot]
+
 7.1.10 (2026-05-22)
 -------------------
 * 285 282 fix tutorials table of contents fix input aligner type hint (`#290 <https://github.com/ros2/message_filters/issues/290>`_) (`#298 <https://github.com/ros2/message_filters/issues/298>`_)
