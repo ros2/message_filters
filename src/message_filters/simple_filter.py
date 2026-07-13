@@ -28,9 +28,6 @@
 import typing as tp
 
 
-P = tp.ParamSpec('P')
-
-
 class SimpleFilter:
 
     def __init__(self):

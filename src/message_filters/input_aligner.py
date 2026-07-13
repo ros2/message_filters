@@ -39,9 +39,6 @@ from rclpy.time import Time
 from .simple_filter import SimpleFilter
 
 
-P = tp.ParamSpec('P')
-
-
 class QueueStatus:
     def __init__(
         self,
@@ -103,7 +100,7 @@ class InputAligner:
                 return self.next_ts
             return _ros_max_time()
 
-        def pop_first(self) -> tuple[Time, tp.Any]:
+        def pop_first(self) -> tp.Tuple[Time, tp.Any]:
             stamp, _, msg = heapq.heappop(self.events)
             self.msgs_processed += 1
             return stamp, msg
@@ -128,7 +125,7 @@ class InputAligner:
     def __init__(
         self,
         timeout: Duration,
-        filters: tp.Sequence[SimpleFilter] | None = None,
+        filters: tp.Optional[tp.Sequence[SimpleFilter]] = None,
     ) -> None:
         self.timeout: Duration = timeout
         zero_time = _ros_zero_time()
