@@ -1,4 +1,4 @@
-// Copyright 2022, Kenji Brameld All rights reserved.
+// Copyright 2026, Open Source Robotics Foundation, Inc. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -28,30 +28,13 @@
 
 #include <gtest/gtest.h>
 
-#include "message_filters/message_traits.hpp"
-#include "rclcpp/time.hpp"
-#include "std_msgs/msg/header.hpp"
+#include <rclcpp/utilities.hpp>
 
-namespace
+int main(int argc, char ** argv)
 {
-
-struct Msg
-{
-  std_msgs::msg::Header header;
-};
-
-// Test that message_filters::message_traits::TimeStamp<Msg>::value returns RCL_ROS_TIME.
-TEST(MessageTraits, timeSource)
-{
-  Msg msg;
-  rclcpp::Time time = message_filters::message_traits::TimeStamp<Msg>::value(msg);
-
-  EXPECT_EQ(time.get_clock_type(), RCL_ROS_TIME);
-
-  // Ensure an exception isn't thrown when compared with a RCL_ROS_TIME time.
-  bool unused;
-  EXPECT_NO_THROW(unused = (time == rclcpp::Time{msg.header.stamp, RCL_ROS_TIME}));
-  (void)unused;
+  testing::InitGoogleTest(&argc, argv);
+  rclcpp::init(argc, argv);
+  auto ret = RUN_ALL_TESTS();
+  rclcpp::shutdown();
+  return ret;
 }
-
-}  // namespace

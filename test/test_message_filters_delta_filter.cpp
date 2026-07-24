@@ -37,6 +37,9 @@
 #include <message_filters/delta_filter.hpp>
 #include <message_filters/simple_filter.hpp>
 
+namespace
+{
+
 
 namespace test_messages
 {
@@ -307,11 +310,4 @@ TYPED_TEST(ParametrizedDeltaFilterTest, TestComparison)
   EXPECT_TRUE(cache_filter.event_cache.has_value());
   EXPECT_EQ(cache_filter.event_cache->getMessage()->data, test_msg_1.data);
 }
-
-
-int main(int argc, char ** argv)
-{
-  testing::InitGoogleTest(&argc, argv);
-  auto ret = RUN_ALL_TESTS();
-  return ret;
-}
+}  // namespace

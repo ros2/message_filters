@@ -34,6 +34,9 @@
 #include <rclcpp/rclcpp.hpp>
 #include "message_filters/synchronizer.hpp"
 
+namespace
+{
+
 struct Header
 {
   rclcpp::Time stamp;
@@ -465,11 +468,4 @@ TEST(Synchronizer, add9)
   sync.add<8>(m);
   ASSERT_EQ(sync.added_[8], 1);
 }
-
-int main(int argc, char ** argv)
-{
-  testing::InitGoogleTest(&argc, argv);
-  auto ret = RUN_ALL_TESTS();
-  rclcpp::shutdown();
-  return ret;
-}
+}  // namespace

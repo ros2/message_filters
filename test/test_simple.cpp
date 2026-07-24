@@ -36,6 +36,9 @@
 
 #include "message_filters/simple_filter.hpp"
 
+namespace
+{
+
 struct Msg
 {
 };
@@ -147,12 +150,4 @@ TEST(SimpleFilter, oldRegisterWithNewFilter)
   Helper h;
   f.registerCallback(std::bind(&Helper::cb3, &h, std::placeholders::_1));
 }
-
-int main(int argc, char ** argv)
-{
-  testing::InitGoogleTest(&argc, argv);
-  rclcpp::init(argc, argv);
-  auto ret = RUN_ALL_TESTS();
-  rclcpp::shutdown();
-  return ret;
-}
+}  // namespace

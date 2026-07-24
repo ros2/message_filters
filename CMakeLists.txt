@@ -68,24 +68,35 @@ if(BUILD_TESTING)
 
   find_package(ament_cmake_gtest)
 
-  ament_add_gtest(${PROJECT_NAME}-test_simple test/test_simple.cpp)
-  if(TARGET ${PROJECT_NAME}-test_simple)
-    target_link_libraries(${PROJECT_NAME}-test_simple ${PROJECT_NAME})
+  ament_add_gtest(${PROJECT_NAME}-test_policies
+    test/test_main.cpp
+    test/test_exact_time_policy.cpp
+    test/test_approximate_time_policy.cpp
+    test/test_approximate_epsilon_time_policy.cpp
+    test/test_latest_time_policy.cpp)
+  if(TARGET ${PROJECT_NAME}-test_policies)
+    target_link_libraries(${PROJECT_NAME}-test_policies ${PROJECT_NAME})
   endif()
 
-  ament_add_gtest(${PROJECT_NAME}-msg_cache_unittest test/msg_cache_unittest.cpp)
-  if(TARGET ${PROJECT_NAME}-msg_cache_unittest)
-    target_link_libraries(${PROJECT_NAME}-msg_cache_unittest ${PROJECT_NAME})
+  ament_add_gtest(${PROJECT_NAME}-test_sync
+    test/test_main.cpp
+    test/test_synchronizer.cpp
+    test/time_synchronizer_unittest.cpp
+    test/test_input_aligner.cpp)
+  if(TARGET ${PROJECT_NAME}-test_sync)
+    target_link_libraries(${PROJECT_NAME}-test_sync ${PROJECT_NAME})
   endif()
 
-  ament_add_gtest(${PROJECT_NAME}-test_chain test/test_chain.cpp)
-  if(TARGET ${PROJECT_NAME}-test_chain)
-    target_link_libraries(${PROJECT_NAME}-test_chain ${PROJECT_NAME})
-  endif()
-
-  ament_add_gtest(${PROJECT_NAME}-test_time_sequencer test/time_sequencer_unittest.cpp)
-  if(TARGET ${PROJECT_NAME}-test_time_sequencer)
-    target_link_libraries(${PROJECT_NAME}-test_time_sequencer ${PROJECT_NAME})
+  ament_add_gtest(${PROJECT_NAME}-test_filters
+    test/test_main.cpp
+    test/test_simple.cpp
+    test/test_chain.cpp
+    test/msg_cache_unittest.cpp
+    test/time_sequencer_unittest.cpp
+    test/test_message_traits.cpp
+    test/test_message_filters_delta_filter.cpp)
+  if(TARGET ${PROJECT_NAME}-test_filters)
+    target_link_libraries(${PROJECT_NAME}-test_filters ${PROJECT_NAME})
   endif()
 
   ament_add_gtest(${PROJECT_NAME}-test_subscriber test/test_subscriber.cpp)
@@ -94,54 +105,9 @@ if(BUILD_TESTING)
     rclcpp_lifecycle::rclcpp_lifecycle sensor_msgs::sensor_msgs)
   endif()
 
-  ament_add_gtest(${PROJECT_NAME}-test_synchronizer test/test_synchronizer.cpp)
-  if(TARGET ${PROJECT_NAME}-test_synchronizer)
-    target_link_libraries(${PROJECT_NAME}-test_synchronizer ${PROJECT_NAME})
-  endif()
-
-  ament_add_gtest(${PROJECT_NAME}-time_synchronizer_unittest test/time_synchronizer_unittest.cpp)
-  if(TARGET ${PROJECT_NAME}-time_synchronizer_unittest)
-    target_link_libraries(${PROJECT_NAME}-time_synchronizer_unittest ${PROJECT_NAME})
-  endif()
-
-  ament_add_gtest(${PROJECT_NAME}-test_exact_time_policy test/test_exact_time_policy.cpp)
-  if(TARGET ${PROJECT_NAME}-test_exact_time_policy)
-    target_link_libraries(${PROJECT_NAME}-test_exact_time_policy ${PROJECT_NAME})
-  endif()
-
-  ament_add_gtest(${PROJECT_NAME}-test_approximate_time_policy test/test_approximate_time_policy.cpp)
-  if(TARGET ${PROJECT_NAME}-test_approximate_time_policy)
-    target_link_libraries(${PROJECT_NAME}-test_approximate_time_policy ${PROJECT_NAME})
-  endif()
-
-  ament_add_gtest(${PROJECT_NAME}-test_approximate_epsilon_time_policy test/test_approximate_epsilon_time_policy.cpp)
-  if(TARGET ${PROJECT_NAME}-test_approximate_epsilon_time_policy)
-    target_link_libraries(${PROJECT_NAME}-test_approximate_epsilon_time_policy ${PROJECT_NAME})
-  endif()
-
-  ament_add_gtest(${PROJECT_NAME}-test_latest_time_policy test/test_latest_time_policy.cpp)
-  if(TARGET ${PROJECT_NAME}-test_latest_time_policy)
-    target_link_libraries(${PROJECT_NAME}-test_latest_time_policy ${PROJECT_NAME})
-  endif()
-
   ament_add_gtest(${PROJECT_NAME}-test_fuzz test/test_fuzz.cpp SKIP_TEST)
   if(TARGET ${PROJECT_NAME}-test_fuzz)
     target_link_libraries(${PROJECT_NAME}-test_fuzz ${PROJECT_NAME} rclcpp::rclcpp sensor_msgs::sensor_msgs)
-  endif()
-
-  ament_add_gtest(${PROJECT_NAME}-test_message_traits test/test_message_traits.cpp)
-  if(TARGET ${PROJECT_NAME}-test_message_traits)
-    target_link_libraries(${PROJECT_NAME}-test_message_traits ${PROJECT_NAME} rclcpp::rclcpp std_msgs::std_msgs)
-  endif()
-
-  ament_add_gtest(${PROJECT_NAME}-test_input_aligner test/test_input_aligner.cpp)
-  if(TARGET ${PROJECT_NAME}-test_input_aligner)
-    target_link_libraries(${PROJECT_NAME}-test_input_aligner ${PROJECT_NAME})
-  endif()
-
-  ament_add_gtest(${PROJECT_NAME}-test_message_filters_delta_filter test/test_message_filters_delta_filter.cpp)
-  if(TARGET ${PROJECT_NAME}-test_message_filters_delta_filter)
-    target_link_libraries(${PROJECT_NAME}-test_message_filters_delta_filter ${PROJECT_NAME})
   endif()
 
   # python tests with python interfaces of message filters

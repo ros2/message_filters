@@ -42,6 +42,9 @@
 
 #include "rosgraph_msgs/msg/clock.hpp"
 
+namespace
+{
+
 struct Header
 {
   rclcpp::Time stamp;
@@ -327,12 +330,4 @@ TEST_F(LatestTimePolicy, ChangeRateTrailing)
     }
   }
 }
-
-int main(int argc, char ** argv)
-{
-  testing::InitGoogleTest(&argc, argv);
-  rclcpp::init(argc, argv);
-  auto ret = RUN_ALL_TESTS();
-  rclcpp::shutdown();
-  return ret;
-}
+}  // namespace

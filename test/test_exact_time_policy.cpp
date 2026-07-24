@@ -35,6 +35,9 @@
 #include "message_filters/synchronizer.hpp"
 #include "message_filters/sync_policies/exact_time.hpp"
 
+namespace
+{
+
 struct Header
 {
   rclcpp::Time stamp;
@@ -47,6 +50,7 @@ struct Msg
 };
 typedef std::shared_ptr<Msg> MsgPtr;
 typedef std::shared_ptr<Msg const> MsgConstPtr;
+}  // namespace
 
 namespace message_filters
 {
@@ -84,6 +88,9 @@ public:
   int32_t count_;
   int32_t drop_count_;
 };
+
+namespace
+{
 
 typedef message_filters::sync_policies::ExactTime<Msg, Msg> Policy2;
 typedef message_filters::sync_policies::ExactTime<Msg, Msg, Msg> Policy3;
@@ -187,12 +194,4 @@ TEST(ExactTime, eventInEventOut)
   ASSERT_EQ(h.e1_.getReceiptTime(), evt.getReceiptTime());
   ASSERT_EQ(h.e2_.getReceiptTime(), evt.getReceiptTime());
 }
-
-int main(int argc, char ** argv)
-{
-  testing::InitGoogleTest(&argc, argv);
-  rclcpp::init(argc, argv);
-  auto ret = RUN_ALL_TESTS();
-  rclcpp::shutdown();
-  return ret;
-}
+}  // namespace
