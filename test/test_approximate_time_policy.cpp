@@ -33,7 +33,9 @@
 #include <memory>
 #include <vector>
 
-#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/duration.hpp>
+#include <rclcpp/time.hpp>
+#include <rclcpp/utilities.hpp>
 #include "message_filters/synchronizer.hpp"
 #include "message_filters/sync_policies/approximate_time.hpp"
 #include "message_filters/message_traits.hpp"

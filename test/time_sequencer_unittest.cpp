@@ -32,7 +32,13 @@
 #include <memory>
 #include <vector>
 
-#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/clock.hpp>
+#include <rclcpp/duration.hpp>
+#include <rclcpp/executors.hpp>
+#include <rclcpp/node.hpp>
+#include <rclcpp/rate.hpp>
+#include <rclcpp/time.hpp>
+#include <rclcpp/utilities.hpp>
 #include "message_filters/time_sequencer.hpp"
 
 struct Header

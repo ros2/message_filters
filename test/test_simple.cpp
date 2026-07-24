@@ -32,7 +32,7 @@
 #include <functional>
 #include <memory>
 
-#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/utilities.hpp>
 
 #include "message_filters/simple_filter.hpp"
 

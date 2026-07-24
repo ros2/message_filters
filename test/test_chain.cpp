@@ -30,7 +30,7 @@
 
 #include <memory>
 
-#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/utilities.hpp>
 #include "message_filters/chain.hpp"
 
 struct Msg

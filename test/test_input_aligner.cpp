@@ -35,7 +35,12 @@
 #include <type_traits>
 #include <vector>
 
-#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/duration.hpp>
+#include <rclcpp/executors.hpp>
+#include <rclcpp/node.hpp>
+#include <rclcpp/rate.hpp>
+#include <rclcpp/time.hpp>
+#include <rclcpp/utilities.hpp>
 #include "message_filters/input_aligner.hpp"
 
 class InputAligner;
