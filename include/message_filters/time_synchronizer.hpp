@@ -49,6 +49,11 @@ namespace message_filters
  * The required queue size parameter when constructing the TimeSynchronizer tells it how many sets of messages it should
  * store (by timestamp) while waiting for messages to arrive and complete their "set"
  *
+ * The timestamp is extracted by the TimeGetter template parameter, which defaults to
+ * message_traits::DefaultTimeGetter (header.stamp via the TimeStamp trait).  Use the
+ * TimeSynchronizerBase spelling to supply a custom getter, e.g.
+ * TimeSynchronizerBase<MyTimeGetter, M0, M1>.
+ *
  * \section connections CONNECTIONS
  *
  * The input connections for the TimeSynchronizer object is the same signature as for rclcpp subscription callbacks, ie.
@@ -73,11 +78,12 @@ void callback(const sensor_msgs::msg::CameraInfo::SharedPtr, const sensor_msgs::
 \endverbatim
  *
  */
-template<class ... Ms>
-class TimeSynchronizer : public Synchronizer<sync_policies::ExactTime<Ms...>>
+template<template<typename> typename TimeGetter, class ... Ms>
+requires (message_traits::TimeGetterFor<TimeGetter, Ms>&& ...)
+class TimeSynchronizerBase : public Synchronizer<sync_policies::ExactTimeBase<TimeGetter, Ms...>>
 {
 public:
-  using Policy = sync_policies::ExactTime<Ms...>;
+  using Policy = sync_policies::ExactTimeBase<TimeGetter, Ms...>;
   using Base = Synchronizer<Policy>;
 
   using Base::add;
@@ -88,12 +94,16 @@ public:
   using Policy::registerDropCallback;
 
   template<class ... Fs>
-  TimeSynchronizer(uint32_t queue_size, Fs &... fs)
+  TimeSynchronizerBase(uint32_t queue_size, Fs &... fs)
   : Base(Policy(queue_size))
   {
     connectInput(fs ...);
   }
 };
+
+template<class ... Ms>
+using TimeSynchronizer = TimeSynchronizerBase<message_traits::DefaultTimeGetter, Ms...>;
+
 }  // namespace message_filters
 
 #endif  // MESSAGE_FILTERS__TIME_SYNCHRONIZER_HPP_

@@ -40,6 +40,69 @@ struct Msg
   std_msgs::msg::Header header;
 };
 
+struct HeaderlessMsg
+{
+  int32_t seconds;
+  int32_t nanoseconds;
+};
+
+struct SpecializedMsg
+{
+  int32_t seconds;
+  int32_t nanoseconds;
+};
+}  // namespace
+
+namespace message_filters
+{
+namespace message_traits
+{
+// The historical customization point: a full TimeStamp specialization.
+template<>
+struct TimeStamp<SpecializedMsg>
+{
+  static rclcpp::Time value(const SpecializedMsg & m)
+  {
+    return rclcpp::Time(m.seconds, m.nanoseconds, RCL_ROS_TIME);
+  }
+};
+}  // namespace message_traits
+}  // namespace message_filters
+
+namespace
+{
+
+template<typename MessageType>
+struct TimeGetterNoHeaderCustom
+{
+  static rclcpp::Time getTime(const MessageType & message)
+  {
+    return rclcpp::Time(message.seconds, message.nanoseconds, RCL_ROS_TIME);
+  }
+};
+
+template<typename MessageType>
+struct TimeGetterZeroTimestampCustom
+{
+  static rclcpp::Time getTime(const MessageType & message)
+  {
+    (void)message;
+    return rclcpp::Time(0, 0, RCL_ROS_TIME);
+  }
+};
+
+template<typename MessageType>
+struct NotATimeGetter {};
+
+// The TimeGetterFor concept accepts valid getters and rejects everything else.
+static_assert(
+  message_filters::message_traits::TimeGetterFor<
+    message_filters::message_traits::DefaultTimeGetter, Msg>);
+static_assert(
+  message_filters::message_traits::TimeGetterFor<TimeGetterNoHeaderCustom, HeaderlessMsg>);
+static_assert(
+  !message_filters::message_traits::TimeGetterFor<NotATimeGetter, Msg>);
+
 // Test that message_filters::message_traits::TimeStamp<Msg>::value returns RCL_ROS_TIME.
 TEST(MessageTraits, timeSource)
 {
@@ -54,4 +117,74 @@ TEST(MessageTraits, timeSource)
   (void)unused;
 }
 
-}  // namespace
+TEST(MessageTraits, defaultTimeGetterHasHeader)
+{
+  Msg msg;
+  msg.header.stamp.sec = 1;
+  msg.header.stamp.nanosec = 2u;
+  rclcpp::Time time = message_filters::message_traits::DefaultTimeGetter<Msg>::getTime(msg);
+
+  EXPECT_EQ(time.get_clock_type(), RCL_ROS_TIME);
+  EXPECT_EQ(time.nanoseconds(), 1000000002);
+
+  msg.header.stamp.nanosec = 3u;
+  time = message_filters::message_traits::DefaultTimeGetter<Msg>::getTime(msg);
+
+  EXPECT_EQ(time.nanoseconds(), 1000000003);
+}
+
+TEST(MessageTraits, defaultTimeGetterNoHeader)
+{
+  HeaderlessMsg msg;
+  msg.seconds = 1;
+  msg.nanoseconds = 2;
+
+  rclcpp::Time time =
+    message_filters::message_traits::DefaultTimeGetter<HeaderlessMsg>::getTime(msg);
+
+  EXPECT_EQ(time.get_clock_type(), RCL_ROS_TIME);
+  EXPECT_EQ(time.nanoseconds(), 0);
+}
+
+TEST(MessageTraits, defaultTimeGetterHonorsTimeStampSpecialization)
+{
+  SpecializedMsg msg;
+  msg.seconds = 1;
+  msg.nanoseconds = 2;
+
+  rclcpp::Time time =
+    message_filters::message_traits::DefaultTimeGetter<SpecializedMsg>::getTime(msg);
+
+  EXPECT_EQ(time.get_clock_type(), RCL_ROS_TIME);
+  EXPECT_EQ(time.nanoseconds(), 1000000002);
+}
+
+TEST(MessageTraits, customTimeGetterOverridesHeader)
+{
+  Msg msg;
+  msg.header.stamp.sec = 1;
+  msg.header.stamp.nanosec = 2u;
+
+  rclcpp::Time time = TimeGetterZeroTimestampCustom<Msg>::getTime(msg);
+
+  EXPECT_EQ(time.get_clock_type(), RCL_ROS_TIME);
+  EXPECT_EQ(time.nanoseconds(), 0);
+}
+
+TEST(MessageTraits, customTimeGetterHeaderless)
+{
+  HeaderlessMsg msg;
+  msg.seconds = 1;
+  msg.nanoseconds = 2;
+
+  rclcpp::Time time = TimeGetterNoHeaderCustom<HeaderlessMsg>::getTime(msg);
+
+  EXPECT_EQ(time.get_clock_type(), RCL_ROS_TIME);
+  EXPECT_EQ(time.nanoseconds(), 1000000002);
+
+  msg.nanoseconds = 3;
+  time = TimeGetterNoHeaderCustom<HeaderlessMsg>::getTime(msg);
+
+  EXPECT_EQ(time.nanoseconds(), 1000000003);
+}
+}   // namespace

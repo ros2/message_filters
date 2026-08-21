@@ -94,7 +94,8 @@ if(BUILD_TESTING)
     test/msg_cache_unittest.cpp
     test/time_sequencer_unittest.cpp
     test/test_message_traits.cpp
-    test/test_message_filters_delta_filter.cpp)
+    test/test_message_filters_delta_filter.cpp
+    test/test_custom_time_getter.cpp)
   if(TARGET ${PROJECT_NAME}-test_filters)
     target_link_libraries(${PROJECT_NAME}-test_filters ${PROJECT_NAME})
   endif()
@@ -117,6 +118,7 @@ if(BUILD_TESTING)
   ament_add_pytest_test(test_message_filters_cache.py "test/test_message_filters_cache.py")
   ament_add_pytest_test(test_message_filters_chain.py "test/test_message_filters_chain.py")
   ament_add_pytest_test(test_input_aligner.py "test/test_input_aligner.py")
+  ament_add_pytest_test(test_custom_time_getter.py "test/test_custom_time_getter.py")
 endif()
 
 ament_package()

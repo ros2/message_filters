@@ -52,11 +52,12 @@ namespace message_filters
 namespace sync_policies
 {
 
-template<typename ... Ms>
-class ApproximateEpsilonTime : public PolicyBase<Ms...>
+template<template<typename> typename TimeGetter, typename ... Ms>
+requires (message_traits::TimeGetterFor<TimeGetter, Ms>&& ...)
+class ApproximateEpsilonTimeBase : public PolicyBase<Ms...>
 {
 public:
-  using Sync = Synchronizer<ApproximateEpsilonTime>;
+  using Sync = Synchronizer<ApproximateEpsilonTimeBase>;
   using Super = PolicyBase<Ms...>;
   using Messages = typename Super::Messages;
   using Signal = typename Super::Signal;
@@ -66,20 +67,20 @@ public:
 
   using Super::N_MESSAGES;
 
-  ApproximateEpsilonTime(uint32_t queue_size, rclcpp::Duration epsilon)
+  ApproximateEpsilonTimeBase(uint32_t queue_size, rclcpp::Duration epsilon)
   : parent_(nullptr)
     , queue_size_(queue_size)
     , epsilon_{epsilon}
   {
   }
 
-  ApproximateEpsilonTime(const ApproximateEpsilonTime & e)
+  ApproximateEpsilonTimeBase(const ApproximateEpsilonTimeBase & e)
   : epsilon_{e.epsilon_}
   {
     *this = e;
   }
 
-  ApproximateEpsilonTime & operator=(const ApproximateEpsilonTime & rhs)
+  ApproximateEpsilonTimeBase & operator=(const ApproximateEpsilonTimeBase & rhs)
   {
     parent_ = rhs.parent_;
     queue_size_ = rhs.queue_size_;
@@ -120,14 +121,13 @@ private:
   TimeIndexPair
   get_older_timestamp_between(const TimeIndexPair & current)
   {
-    namespace mt = message_filters::message_traits;
     using ThisEventType = std::tuple_element_t<Is, Events>;
     const auto & events_of_this_type = std::get<Is>(events_);
     if (0u == events_of_this_type.size()) {
       // this condition should not happen
       return current;
     }
-    auto candidate = mt::TimeStamp<typename ThisEventType::Message>::value(
+    auto candidate = TimeGetter<typename ThisEventType::Message>::getTime(
       *events_of_this_type.at(
         0).getMessage());
     if (current.first > candidate) {
@@ -157,7 +157,6 @@ private:
   bool
   check_timestamp_within_epsilon(const TimeIndexPair & older)
   {
-    namespace mt = message_filters::message_traits;
     using ThisEventType = std::tuple_element_t<Is, Events>;
     if (Is == older.second) {
       return true;
@@ -167,7 +166,7 @@ private:
       // this condition should not happen
       return false;
     }
-    auto ts = mt::TimeStamp<typename ThisEventType::Message>::value(
+    auto ts = TimeGetter<typename ThisEventType::Message>::getTime(
       *events_of_this_type.at(
         0).getMessage());
     if (older.first + epsilon_ >= ts) {
@@ -222,13 +221,12 @@ private:
   void
   erase_beginning_of_vector_if_on_sync_with_ts(rclcpp::Time timestamp)
   {
-    namespace mt = message_filters::message_traits;
     using ThisEventType = std::tuple_element_t<Is, Events>;
     auto & this_vector = std::get<Is>(events_);
     if (this_vector.begin() == this_vector.end()) {
       return;
     }
-    auto event_ts = mt::TimeStamp<typename ThisEventType::Message>::value(
+    auto event_ts = TimeGetter<typename ThisEventType::Message>::getTime(
       *this_vector.at(0).getMessage());
     if (timestamp + epsilon_ < event_ts) {
       return;
@@ -290,6 +288,10 @@ private:
 
   std::mutex mutex_;
 };
+
+template<typename ... Ms>
+using ApproximateEpsilonTime =
+  ApproximateEpsilonTimeBase<message_traits::DefaultTimeGetter, Ms...>;
 
 }  // namespace sync_policies
 }  // namespace message_filters

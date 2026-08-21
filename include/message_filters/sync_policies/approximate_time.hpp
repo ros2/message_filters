@@ -54,10 +54,11 @@ namespace message_filters
 namespace sync_policies
 {
 
-template<typename ... Ms>
-struct ApproximateTime : public PolicyBase<Ms...>
+template<template<typename> typename TimeGetter, typename ... Ms>
+requires (message_traits::TimeGetterFor<TimeGetter, Ms>&& ...)
+struct ApproximateTimeBase : public PolicyBase<Ms...>
 {
-  using Sync = Synchronizer<ApproximateTime>;
+  using Sync = Synchronizer<ApproximateTimeBase>;
   using Super = PolicyBase<Ms...>;
   using Messages = typename Super::Messages;
   using Signal = typename Super::Signal;
@@ -68,7 +69,7 @@ struct ApproximateTime : public PolicyBase<Ms...>
 
   using Super::N_MESSAGES;
 
-  ApproximateTime(uint32_t queue_size)  // NOLINT(runtime/explicit)
+  ApproximateTimeBase(uint32_t queue_size)  // NOLINT(runtime/explicit)
   : parent_(0)
     , queue_size_(queue_size)
     , num_non_empty_deques_(0)
@@ -84,13 +85,13 @@ struct ApproximateTime : public PolicyBase<Ms...>
     assert(queue_size_ > 0);
   }
 
-  ApproximateTime(const ApproximateTime & e)
+  ApproximateTimeBase(const ApproximateTimeBase & e)
   : max_interval_duration_(rclcpp::Duration(std::numeric_limits<int32_t>::max(), 999999999))
   {
     *this = e;
   }
 
-  ApproximateTime & operator=(const ApproximateTime & rhs)
+  ApproximateTimeBase & operator=(const ApproximateTimeBase & rhs)
   {
     parent_ = rhs.parent_;
     queue_size_ = rhs.queue_size_;
@@ -118,7 +119,6 @@ struct ApproximateTime : public PolicyBase<Ms...>
   template<int i>
   void checkInterMessageBound()
   {
-    namespace mt = message_filters::message_traits;
     if (warned_about_incorrect_bound_[i]) {
       return;
     }
@@ -127,7 +127,7 @@ struct ApproximateTime : public PolicyBase<Ms...>
     assert(!deque.empty());
     const std::tuple_element_t<i, Messages> & msg = *(deque.back()).getMessage();
     rclcpp::Time msg_time =
-      mt::TimeStamp<std::tuple_element_t<i, Messages>>::value(msg);
+      TimeGetter<std::tuple_element_t<i, Messages>>::getTime(msg);
     rclcpp::Time previous_msg_time;
     if (deque.size() == static_cast<size_t>(1)) {
       if (v.empty()) {
@@ -136,14 +136,14 @@ struct ApproximateTime : public PolicyBase<Ms...>
         return;
       }
       const std::tuple_element_t<i, Messages> & previous_msg = *(v.back()).getMessage();
-      previous_msg_time = mt::TimeStamp<std::tuple_element_t<i, Messages>>::value(
+      previous_msg_time = TimeGetter<std::tuple_element_t<i, Messages>>::getTime(
         previous_msg);
     } else {
       // There are at least 2 elements in the deque.
       // Check that the gap respects the bound if it was provided.
       const std::tuple_element_t<i,
         Messages> & previous_msg = *(deque[deque.size() - 2]).getMessage();
-      previous_msg_time = mt::TimeStamp<std::tuple_element_t<i, Messages>>::value(
+      previous_msg_time = TimeGetter<std::tuple_element_t<i, Messages>>::getTime(
         previous_msg);
     }
     if (msg_time < previous_msg_time) {
@@ -414,12 +414,11 @@ private:
   template<std::size_t I>
   void checkBoundary(uint32_t & index, rclcpp::Time & time, bool end)
   {
-    namespace mt = message_filters::message_traits;
     using MEvent = std::tuple_element_t<I, Events>;
     MEvent & m = std::get<I>(deques_).front();
     using M = typename MEvent::Message;
-    if ((I == 0) || ((mt::TimeStamp<M>::value(*m.getMessage()) < time) ^ end)) {
-      time = mt::TimeStamp<M>::value(*m.getMessage());
+    if ((I == 0) || ((TimeGetter<M>::getTime(*m.getMessage()) < time) ^ end)) {
+      time = TimeGetter<M>::getTime(*m.getMessage());
       index = I;
     }
   }
@@ -444,8 +443,6 @@ private:
   template<int i>
   rclcpp::Time getVirtualTime()
   {
-    namespace mt = message_filters::message_traits;
-
     assert(pivot_ != NO_PIVOT);
 
     std::vector<std::tuple_element_t<i, Events>> & v = std::get<i>(past_);
@@ -453,7 +450,7 @@ private:
     if (q.empty()) {
       assert(!v.empty());  // Because we have a candidate
       rclcpp::Time last_msg_time =
-        mt::TimeStamp<std::tuple_element_t<i, Messages>>::value(
+        TimeGetter<std::tuple_element_t<i, Messages>>::getTime(
         *(v.back()).getMessage());
       rclcpp::Time msg_time_lower_bound = last_msg_time + inter_message_lower_bounds_[i];
       if (msg_time_lower_bound > pivot_time_) {  // Take the max
@@ -462,7 +459,7 @@ private:
       return pivot_time_;
     }
     rclcpp::Time current_msg_time =
-      mt::TimeStamp<std::tuple_element_t<i, Messages>>::value(
+      TimeGetter<std::tuple_element_t<i, Messages>>::getTime(
       *(q.front()).getMessage());
     return current_msg_time;
   }
@@ -640,6 +637,9 @@ private:
   std::vector<rclcpp::Duration> inter_message_lower_bounds_;
   std::vector<bool> warned_about_incorrect_bound_;
 };
+
+template<typename ... Ms>
+using ApproximateTime = ApproximateTimeBase<message_traits::DefaultTimeGetter, Ms...>;
 
 }  // namespace sync_policies
 }  // namespace message_filters

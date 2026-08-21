@@ -32,6 +32,7 @@
 #ifndef MESSAGE_FILTERS__MESSAGE_TRAITS_HPP_
 #define MESSAGE_FILTERS__MESSAGE_TRAITS_HPP_
 
+#include <concepts>
 #include <string>
 #include <type_traits>
 
@@ -100,6 +101,43 @@ struct TimeStamp<M, typename std::enable_if<HasHeader<M>::value>::type>
     return rclcpp::Time(m.header.stamp, RCL_ROS_TIME);
   }
 };
+
+/**
+ * \brief Default TimeGetter used by all filters.
+ *
+ * Delegates to the TimeStamp trait, so messages with a std_msgs::msg::Header
+ * use header.stamp, headerless messages get a zero time, and existing user
+ * specializations of TimeStamp keep working unchanged.
+ */
+template<typename M>
+struct DefaultTimeGetter
+{
+  static rclcpp::Time getTime(const M & m)
+  {
+    return TimeStamp<M>::value(m);
+  }
+};
+
+/**
+ * \brief Constraint for user-provided time getters.
+ *
+ * A TimeGetter must expose a static getTime() accepting a const reference to
+ * the message and returning something convertible to rclcpp::Time, e.g.:
+ * \verbatim
+ * template<typename M>
+ * struct MyTimeGetter
+ * {
+ *   static rclcpp::Time getTime(const M & m)
+ *   {
+ *     return rclcpp::Time(m.sec, m.nanosec, RCL_ROS_TIME);
+ *   }
+ * };
+ * \endverbatim
+ */
+template<template<typename> typename TimeGetter, typename M>
+concept TimeGetterFor = requires(const M & m) {
+  {TimeGetter<M>::getTime(m)}->std::convertible_to<rclcpp::Time>;
+};  // NOLINT(readability/braces) -- cpplint misreads the compound requirement
 
 }  // namespace message_traits
 }  // namespace message_filters
