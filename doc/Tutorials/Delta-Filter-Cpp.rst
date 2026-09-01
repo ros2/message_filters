@@ -32,9 +32,16 @@ The next step is to create a new C++ file inside your package, e.g., ``delta_tut
 
   #include <chrono>
   #include <functional>
+  #include <memory>
   #include <string>
 
-  #include <rclcpp/rclcpp.hpp>
+  #include <rclcpp/executors.hpp>
+  #include <rclcpp/logging.hpp>
+  #include <rclcpp/node.hpp>
+  #include <rclcpp/publisher.hpp>
+  #include <rclcpp/qos.hpp>
+  #include <rclcpp/timer.hpp>
+  #include <rclcpp/utilities.hpp>
 
   #include <message_filters/delta_filter.hpp>
   #include <message_filters/subscriber.hpp>
@@ -164,9 +171,16 @@ Now, let's break down this code and examine the details.
 
   #include <chrono>
   #include <functional>
+  #include <memory>
   #include <string>
 
-  #include <rclcpp/rclcpp.hpp>
+  #include <rclcpp/executors.hpp>
+  #include <rclcpp/logging.hpp>
+  #include <rclcpp/node.hpp>
+  #include <rclcpp/publisher.hpp>
+  #include <rclcpp/qos.hpp>
+  #include <rclcpp/timer.hpp>
+  #include <rclcpp/utilities.hpp>
 
   #include <message_filters/delta_filter.hpp>
   #include <message_filters/subscriber.hpp>
@@ -183,7 +197,8 @@ The ``chrono`` header is required for the ``chrono_literals`` namespace, necessa
 The ``string`` header provides us with ``std::to_string`` function required for the main functionality demonstration.
 The ``functional`` header is also required to use ``std::bind`` function to bind timer callbacks to timers.
 
-After that we include the ``rclcpp.hpp`` header that provides us with classes from ``rclcpp`` namespace.
+After that we include only the ``rclcpp`` headers that declare the classes we actually use, instead of the umbrella ``rclcpp.hpp`` header.
+Including them one by one keeps the compilation time down.
 To use filters in our code we need corresponding headers as well.
 In this case we include ``delta_filter.hpp`` for ``DeltaFilter`` and ``subscriber.hpp`` for ``Subscriber`` filter respectively.
 And finally we add ``std_msgs/msg/string.hpp`` to get access to ``String`` message class from the ROS standard messages library.
