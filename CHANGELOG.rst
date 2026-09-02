@@ -2,6 +2,14 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+8.0.3 (2026-09-02)
+------------------
+* MessageTraits: Add support for custom TimeStamp (`#319 <https://github.com/ros2/message_filters/issues/319>`_)
+* Reduce compile time in time sequencer (`#323 <https://github.com/ros2/message_filters/issues/323>`_)
+* Optimize header include in tests (`#322 <https://github.com/ros2/message_filters/issues/322>`_)
+* Improve tests compile time (`#324 <https://github.com/ros2/message_filters/issues/324>`_)
+* Contributors: Alejandro Hernández Cordero, Pavel Esipov
+
 8.0.2 (2026-06-29)
 ------------------
 * hygiene sweep: fabs→std::abs, empty {} ctors/dtors → = default, etc (`#315 <https://github.com/ros2/message_filters/issues/315>`_)
