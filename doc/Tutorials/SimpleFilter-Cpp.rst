@@ -26,9 +26,17 @@ The next step is to create a new C++ file inside your package, e.g., ``simple_fi
 
     #include <chrono>
     #include <cstddef>
+    #include <functional>
+    #include <memory>
     #include <string>
 
-    #include <rclcpp/rclcpp.hpp>
+    #include <rclcpp/executors.hpp>
+    #include <rclcpp/logging.hpp>
+    #include <rclcpp/node.hpp>
+    #include <rclcpp/publisher.hpp>
+    #include <rclcpp/qos.hpp>
+    #include <rclcpp/timer.hpp>
+    #include <rclcpp/utilities.hpp>
 
     #include <message_filters/simple_filter.hpp>
     #include <message_filters/subscriber.hpp>
@@ -178,9 +186,17 @@ Now, let's break down this code and examine the details.
 
     #include <chrono>
     #include <cstddef>
+    #include <functional>
+    #include <memory>
     #include <string>
 
-    #include <rclcpp/rclcpp.hpp>
+    #include <rclcpp/executors.hpp>
+    #include <rclcpp/logging.hpp>
+    #include <rclcpp/node.hpp>
+    #include <rclcpp/publisher.hpp>
+    #include <rclcpp/qos.hpp>
+    #include <rclcpp/timer.hpp>
+    #include <rclcpp/utilities.hpp>
 
     #include <message_filters/simple_filter.hpp>
     #include <message_filters/subscriber.hpp>
@@ -192,11 +208,14 @@ Now, let's break down this code and examine the details.
 
     const std::string TUTORIAL_TOPIC_NAME = "tutorial_topic";
 
-We start by including ``C++`` standard library headers such as ``chrono``, ``cstddef`` and ``string``.
+We start by including ``C++`` standard library headers such as ``chrono``, ``cstddef``, ``functional``, ``memory`` and ``string``.
 The ``chrono`` header is required for the ``chrono_literals`` namespace, necessary for creating timers.
 The ``cstddef`` header provides us with some basic types such as ``size_t``.
+The ``functional`` header is needed for ``std::bind`` and ``std::placeholders``, used to register callbacks.
+The ``memory`` header gives us ``std::make_shared``.
 The ``string`` header gives us access to the ``std::string`` class and ``std::to_string`` function.
-After that we include the ``rclcpp.hpp`` header that provides us with classes from ``rclcpp`` namespace.
+After that we include only the ``rclcpp`` headers that declare the classes we actually use, instead of the umbrella ``rclcpp.hpp`` header.
+Including them one by one keeps the compilation time down.
 To use message filters and some other classes from ``message_filters`` library we need to include corresponding headers.
 In this case we include ``simple_filter.hpp``, ``subscriber.hpp`` and ``connection.hpp``.
 

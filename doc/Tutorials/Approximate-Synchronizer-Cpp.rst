@@ -12,7 +12,14 @@ If you have not done so already `create a workspace <https://docs.ros.org/en/rol
 
 .. code-block:: C++
 
-  #include "rclcpp/rclcpp.hpp"
+  #include "rclcpp/clock.hpp"
+  #include "rclcpp/executors.hpp"
+  #include "rclcpp/logging.hpp"
+  #include "rclcpp/node.hpp"
+  #include "rclcpp/publisher.hpp"
+  #include "rclcpp/qos.hpp"
+  #include "rclcpp/timer.hpp"
+  #include "rclcpp/utilities.hpp"
 
   #include <chrono>
   #include <functional>

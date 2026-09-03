@@ -37,7 +37,9 @@
 #include <utility>
 #include <vector>
 
-#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/duration.hpp>
+#include <rclcpp/node.hpp>
+#include <rclcpp/time.hpp>
 
 #include "message_filters/cache.hpp"
 #include "message_filters/input_aligner.hpp"

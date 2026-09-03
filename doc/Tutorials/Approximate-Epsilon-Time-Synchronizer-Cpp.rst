@@ -20,7 +20,15 @@ The next step is to create a new C++ file inside your package, e.g., ``approxima
   #include <functional>
   #include <memory>
 
-  #include "rclcpp/rclcpp.hpp"
+  #include "rclcpp/clock.hpp"
+  #include "rclcpp/duration.hpp"
+  #include "rclcpp/executors.hpp"
+  #include "rclcpp/logging.hpp"
+  #include "rclcpp/node.hpp"
+  #include "rclcpp/publisher.hpp"
+  #include "rclcpp/qos.hpp"
+  #include "rclcpp/timer.hpp"
+  #include "rclcpp/utilities.hpp"
 
   #include <sensor_msgs/msg/temperature.hpp>
   #include <sensor_msgs/msg/fluid_pressure.hpp>
@@ -145,7 +153,15 @@ Now, let's break down this code and examine the details.
   #include <functional>
   #include <memory>
 
-  #include "rclcpp/rclcpp.hpp"
+  #include "rclcpp/clock.hpp"
+  #include "rclcpp/duration.hpp"
+  #include "rclcpp/executors.hpp"
+  #include "rclcpp/logging.hpp"
+  #include "rclcpp/node.hpp"
+  #include "rclcpp/publisher.hpp"
+  #include "rclcpp/qos.hpp"
+  #include "rclcpp/timer.hpp"
+  #include "rclcpp/utilities.hpp"
 
   #include <sensor_msgs/msg/temperature.hpp>
   #include <sensor_msgs/msg/fluid_pressure.hpp>
