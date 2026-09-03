@@ -48,7 +48,7 @@ class CachedComparisonHandler(ComparisonHandler):
     """
     Implements cached messages comparison field by field.
 
-    :class: CachedComparisonHandler implements messages comparison field by field.
+    CachedComparisonHandler implements messages comparison field by field.
     A successor to this class should implement ``do_fields_fit`` method.
     If any of the fields provided to the ``do_fields_fit`` method do satisfy
     a comparison conditions the message is accepted. That means that the message

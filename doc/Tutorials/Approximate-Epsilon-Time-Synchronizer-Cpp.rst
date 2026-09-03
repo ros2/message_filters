@@ -1,5 +1,5 @@
 Approximate Epsilon Time Synchronizer (C++):
----------------------------------------
+--------------------------------------------
 
 Prerequisites
 ~~~~~~~~~~~~~
@@ -424,6 +424,7 @@ The console output should look something like this:
 Let's take a look at a timestamp difference between values from the first line.
 
 .. code-block:: console
+
   1773177603.600124849 sec - 1773177603.550153015 sec = 0.04997181892 sec
 
 The resulting ``0.04997181892`` seconds difference is definitely within the specified ``Epsilon``.

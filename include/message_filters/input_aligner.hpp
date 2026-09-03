@@ -158,6 +158,7 @@ public:
   /**
    * \brief Register a callback for the I-th input.
    * \param callback The callback to call
+   * \param t The instance the member function is called on
    */
   template<std::size_t I, typename T, typename P>
   Connection registerCallback(void (T::* callback)(P), T * t)

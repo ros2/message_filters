@@ -54,7 +54,7 @@ namespace message_filters
  *
  * The TimeSequencer object is templated on the type of message being sequenced.
  *
- * \section behavior BEHAVIOR
+ * \section time_sequencer_behavior BEHAVIOR
 
  * At construction, the TimeSequencer takes a rclcpp::Duration
  * "delay" which specifies how long to queue up messages to
@@ -67,7 +67,7 @@ namespace message_filters
  * to a message which has already had its callback invoked, it is
  * thrown away.
  *
- * \section connections CONNECTIONS
+ * \section time_sequencer_connections CONNECTIONS
  *
  * TimeSequencer's input and output connections are both of the same signature as rclcpp subscription callbacks, ie.
 \verbatim

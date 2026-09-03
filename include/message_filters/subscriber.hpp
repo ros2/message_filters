@@ -104,7 +104,7 @@ public:
  *
  * The Subscriber object is templated on the type of message being subscribed to.
  *
- * \section connections CONNECTIONS
+ * \section subscriber_connections CONNECTIONS
  *
  * Subscriber has no input connection.
  *
@@ -146,7 +146,7 @@ public:
    *
    * See the rclcpp::Node::subscribe() variants for more information on the parameters
    *
-   * \param node The NodeInterfaces to use to subscribe.
+   * \param node_interfaces The NodeInterfaces to use to subscribe.
    * \param topic The topic to subscribe to.
    * \param qos (optional) The rmw qos profile to use to subscribe
    */
@@ -176,7 +176,7 @@ public:
    *
    * See the rclcpp::Node::subscribe() variants for more information on the parameters
    *
-   * \param node The NodeInterfaces to use to subscribe.
+   * \param node_interfaces The NodeInterfaces to use to subscribe.
    * \param topic The topic to subscribe to.
    * \param qos The rmw qos profile to use to subscribe.
    * \param options The subscription options to use to subscribe.
@@ -222,7 +222,7 @@ public:
    *
    * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
    *
-   * \param node The NodeInterfaces to use to subscribe.
+   * \param node_interfaces The NodeInterfaces to use to subscribe.
    * \param topic The topic to subscribe to.
    * \param qos (optional) The rmw qos profile to use to subscribe
    */
@@ -254,7 +254,7 @@ public:
    *
    * If this Subscriber is already subscribed to a topic, this function will first unsubscribe.
    *
-   * \param node The NodeInterfaces to use to subscribe.
+   * \param node_interfaces The NodeInterfaces to use to subscribe.
    * \param topic The topic to subscribe to.
    * \param qos The rmw qos profile to use to subscribe.
    * \param options The subscription options to use to subscribe.

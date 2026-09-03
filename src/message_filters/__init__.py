@@ -482,19 +482,23 @@ class TimeSequencer(SimpleFilter):
         Construct a TimeSequencer filter for a subscriber.
 
         Args:
-        ----
-        input_filter (SimpleFilter): The input filter to connect to.
-            Typically a Subscriber.
-        delay (Duration | float): The delay (in seconds) to wait for
-            messages to arrive before dispatching them.
-        update_rate (Duration | float): The rate at which to check for
-            messages that are ready to be dispatched.
-        queue_size (int): The maximum number of messages to store. Set 0
-            for no limit.
-        node (Node): The node to create the timer on.
-        msg_stamp_attr (str, optional): The attribute to use for retrieving
-            the timestamp from the message. Should point to a
-            builtin_interfaces.msg.Time field. Defaults to "header.stamp".
+        -----
+        input_filter (SimpleFilter)
+            The input filter to connect to. Typically a Subscriber.
+        delay (Duration | float)
+            The delay (in seconds) to wait for messages to arrive before
+            dispatching them.
+        update_rate (Duration | float)
+            The rate at which to check for messages that are ready to be
+            dispatched.
+        queue_size (int)
+            The maximum number of messages to store. Set 0 for no limit.
+        node (Node)
+            The node to create the timer on.
+        msg_stamp_attr (str, optional)
+            The attribute to use for retrieving the timestamp from the message.
+            Should point to a builtin_interfaces.msg.Time field.
+            Defaults to "header.stamp".
 
         """
         super().__init__()

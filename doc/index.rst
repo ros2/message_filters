@@ -36,7 +36,7 @@ Filter Construction (Python)::
 
 1.1 registerCallback()
 ~~~~~~~~~~~~~~~~~~~~~~
-You can register multiple callbacks with the ``registerCallbacks()`` method. They will get called in the order they are registered. The signature of the callback depends on the definition of the filter
+You can register multiple callbacks with the ``registerCallback()`` method. They will get called in the order they are registered. The signature of the callback depends on the definition of the filter
 
 In C++ ``registerCallback()`` returns a ``message_filters::Connection`` object that allows you to disconnect the callback by calling its ``disconnect()``  method. You do not need to store this connection object if you do not need to manually disconnect the callback.
 
@@ -294,6 +294,7 @@ If they don't match, the callback won't be executed (without any warning) and yo
     self
     tutorials
     references
+    Standard Documents </standards>
 
 Indices and tables
 ==================

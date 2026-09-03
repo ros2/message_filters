@@ -246,7 +246,7 @@ Now let's take a look at the ``public`` section of the class.
       {
       connectInput(filter);
       }
-``
+
 It starts with a default destructor and constructor for the class, and one constructor that receives a reference to another filter.
 The latter gives an option to create an instance of the ``CounterWithLastMessageCache`` filter that is already connected to another filter's output.
 Following the last constructor is the ``connectInput`` method, which removes the previous connection with another filter, if there was any.
