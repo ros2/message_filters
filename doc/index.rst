@@ -40,6 +40,96 @@ You can register multiple callbacks with the ``registerCallbacks()`` method. The
 
 In C++ ``registerCallback()`` returns a ``message_filters::Connection`` object that allows you to disconnect the callback by calling its ``disconnect()``  method. You do not need to store this connection object if you do not need to manually disconnect the callback.
 
+The base ``SimpleFilter`` class has four distinct overloads of a ``registerCallback`` method.
+These overloads allow you to pass different types of callable objects depending on your architectural needs such as lambdas, standard functions, free functions or member functions.
+
+1.1.1 Lambda or generic function as a callback
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The first overload is ``template<typename C> Connection registerCallback(const C & callback)``.
+It accepts any callable type, including lambdas and the result of ``std::bind``.
+The callable must accept the message as a constant reference, since it is invoked through a
+``std::function<void(const std::shared_ptr<M const> &)>``
+
+.. code-block:: C++
+
+    class ExampleNode
+    {
+    public:
+      explicit ExampleNode(rclcpp::Node * node)
+      : sub_(node, "my_topic", 1)
+      {
+        connection_1_ = sub_.registerCallback(
+          [](const example_interfaces::msg::UInt32::ConstSharedPtr & msg) {
+            // Some work done here on a message
+          }
+        );
+        connection_2_ = sub_.registerCallback(
+          std::bind(
+            &ExampleNode::callback,
+            this,
+            std::placeholders::_1
+          )
+        );
+      }
+    private:
+      void callback(example_interfaces::msg::UInt32::ConstSharedPtr msg);
+      message_filters::Subscriber<example_interfaces::msg::UInt32> sub_;
+      message_filters::Connection connection_1_;
+      message_filters::Connection connection_2_;
+    };
+
+1.1.2 std::function as a callback
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The second overload is ``template<typename P> Connection registerCallback(const std::function<void(P)> & callback)``.
+It explicitly takes a standard library ``std::function`` object, which lets you choose how the
+message is passed to the callback.
+One may invoke this overload for example as follows
+
+.. code-block:: C++
+
+    message_filters::Subscriber<example_interfaces::msg::UInt32> sub(node, "my_topic", 1);
+    std::function<void(example_interfaces::msg::UInt32::ConstSharedPtr)> callback =
+      [](example_interfaces::msg::UInt32::ConstSharedPtr msg) {
+        // Some work done here on a message
+      };
+    message_filters::Connection conn_std_func = sub.registerCallback(callback);
+
+1.1.3 Free function as a callback
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The third overload allows you to pass a standard C-style function pointer.
+It is the ``template<typename P> Connection registerCallback(void (* callback)(P))`` overload.
+Note that a function pointer cannot capture any state, unlike a lambda.
+
+.. code-block:: C++
+
+    void freeFunctionCallback(example_interfaces::msg::UInt32::ConstSharedPtr msg);
+    void freeFunctionModifyingCallback(example_interfaces::msg::UInt32::SharedPtr msg);
+
+    message_filters::Subscriber<example_interfaces::msg::UInt32> sub(node, "my_topic", 1);
+    message_filters::Connection conn_free_func = sub.registerCallback(freeFunctionCallback);
+    message_filters::Connection comm_modifying_free_func = sub.registerCallback(freeFunctionModifyingCallback);
+
+1.1.4 Member function as a callback
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+he last overload is ``template<typename T, typename P> Connection registerCallback(void (T::* callback)(P), T * t)``.
+It requires two arguments: a pointer to the member function (e.g., ``&Class::method``) and a pointer to the instance (``this`` or a specific object) on which the method should be invoked.
+This overload allows you to bind a non-static member function of a specific class instance.
+
+.. code-block:: C++
+
+    class CallbackHandler
+    {
+    public:
+      void handle_msg(const example_interfaces::msg::UInt32::ConstSharedPtr & msg);
+      void handle_and_modify_msg(example_interfaces::msg::UInt32::SharedPtr msg);
+    };
+    CallbackHandler handler_instance;
+    message_filters::Subscriber<example_interfaces::msg::UInt32> sub(node, "my_topic", 1);
+    message_filters::Connection conn_member_function = sub.registerCallback(&CallbackHandler::handle_msg, &handler_instance);
+    message_filters::Connection conn_modifying_member_function = sub.registerCallback(
+      &CallbackHandler::handle_and_modify_msg, &handler_instance
+    );
+
 2. Subscriber
 -------------
 The Subscriber filter is simply a wrapper around a ROS 2 subscription that provides a source for other filters. The Subscriber filter cannot connect to another filter's output, instead it uses a ROS 2 topic as its input.
