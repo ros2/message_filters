@@ -76,6 +76,9 @@ if(BUILD_TESTING)
     test/test_latest_time_policy.cpp)
   if(TARGET ${PROJECT_NAME}-test_policies)
     target_link_libraries(${PROJECT_NAME}-test_policies ${PROJECT_NAME})
+    target_precompile_headers(${PROJECT_NAME}-test_policies PRIVATE
+      <gtest/gtest.h>
+      <rclcpp/rclcpp.hpp>)
   endif()
 
   ament_add_gtest(${PROJECT_NAME}-test_sync
@@ -85,6 +88,8 @@ if(BUILD_TESTING)
     test/test_input_aligner.cpp)
   if(TARGET ${PROJECT_NAME}-test_sync)
     target_link_libraries(${PROJECT_NAME}-test_sync ${PROJECT_NAME})
+    target_precompile_headers(${PROJECT_NAME}-test_sync
+      REUSE_FROM ${PROJECT_NAME}-test_policies)
   endif()
 
   ament_add_gtest(${PROJECT_NAME}-test_filters
@@ -98,6 +103,8 @@ if(BUILD_TESTING)
     test/test_custom_time_getter.cpp)
   if(TARGET ${PROJECT_NAME}-test_filters)
     target_link_libraries(${PROJECT_NAME}-test_filters ${PROJECT_NAME})
+    target_precompile_headers(${PROJECT_NAME}-test_filters
+      REUSE_FROM ${PROJECT_NAME}-test_policies)
   endif()
 
   ament_add_gtest(${PROJECT_NAME}-test_subscriber test/test_subscriber.cpp)
