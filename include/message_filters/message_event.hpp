@@ -34,7 +34,6 @@
 
 #include <cassert>
 #include <functional>
-#include <map>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -50,9 +49,6 @@ namespace message_filters
  * rclcpp/clock.hpp, which transitively pulls in the entire rcl/rmw C API.
  */
 MESSAGE_FILTERS_PUBLIC rclcpp::Time systemClockNow();
-
-using M_string = std::map<std::string, std::string>;
-using M_stringPtr = std::shared_ptr<M_string>;
 
 template<typename M>
 struct DefaultMessageCreator
