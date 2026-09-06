@@ -2,8 +2,8 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.3.20 (2026-09-06)
+-------------------
 * (`#163 <https://github.com/ros2/message_filters/issues/163>`_) Extend registerCallback section in documentation (`#326 <https://github.com/ros2/message_filters/issues/326>`_) (`#333 <https://github.com/ros2/message_filters/issues/333>`_)
 * Contributors: mergify[bot]
 
