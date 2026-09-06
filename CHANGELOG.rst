@@ -2,6 +2,11 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* (`#163 <https://github.com/ros2/message_filters/issues/163>`_) Extend registerCallback section in documentation (`#326 <https://github.com/ros2/message_filters/issues/326>`_) (`#333 <https://github.com/ros2/message_filters/issues/333>`_)
+* Contributors: mergify[bot]
+
 4.3.19 (2026-07-13)
 -------------------
 * Defer annotation evaluation to fix RHEL import. (backport `#309 <https://github.com/ros2/message_filters/issues/309>`_) (`#318 <https://github.com/ros2/message_filters/issues/318>`_)
