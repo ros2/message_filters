@@ -29,11 +29,13 @@
 #ifndef MESSAGE_FILTERS__SYNC_POLICIES__EXACT_TIME_HPP_
 #define MESSAGE_FILTERS__SYNC_POLICIES__EXACT_TIME_HPP_
 
+#include <cassert>
+#include <cstddef>
 #include <cstdint>
-#include <deque>
 #include <map>
-#include <string>
+#include <mutex>
 #include <tuple>
+#include <utility>
 
 #include <rclcpp/time.hpp>
 

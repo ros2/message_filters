@@ -29,11 +29,13 @@
 #ifndef MESSAGE_FILTERS__SYNCHRONIZER_HPP_
 #define MESSAGE_FILTERS__SYNCHRONIZER_HPP_
 
+#include <cstddef>
 #include <functional>
 #include <memory>
 #include <string>
 #include <tuple>
 #include <type_traits>
+#include <utility>
 
 #include "message_filters/connection.hpp"
 #include "message_filters/null_types.hpp"

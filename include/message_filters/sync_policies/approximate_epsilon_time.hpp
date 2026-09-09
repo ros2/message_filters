@@ -29,11 +29,9 @@
 #ifndef MESSAGE_FILTERS__SYNC_POLICIES__APPROXIMATE_EPSILON_TIME_HPP_
 #define MESSAGE_FILTERS__SYNC_POLICIES__APPROXIMATE_EPSILON_TIME_HPP_
 
-#include <cstdint>
 #include <cstddef>
-#include <deque>
+#include <cstdint>
 #include <limits>
-#include <string>
 #include <tuple>
 #include <utility>
 #include <vector>
