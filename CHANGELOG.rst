@@ -2,6 +2,14 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+8.0.4 (2026-09-10)
+------------------
+* Fixed doxygen warnings (`#329 <https://github.com/ros2/message_filters/issues/329>`_)
+* Include what you use (`#334 <https://github.com/ros2/message_filters/issues/334>`_)
+* (`#163 <https://github.com/ros2/message_filters/issues/163>`_) Extend registerCallback section in documentation (`#326 <https://github.com/ros2/message_filters/issues/326>`_)
+* Granular rclcpp/rclcpp.hpp also in documentation (`#328 <https://github.com/ros2/message_filters/issues/328>`_)
+* Contributors: Alejandro Hernández Cordero, Pavel Esipov
+
 8.0.3 (2026-09-02)
 ------------------
 * MessageTraits: Add support for custom TimeStamp (`#319 <https://github.com/ros2/message_filters/issues/319>`_)
