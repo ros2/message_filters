@@ -62,10 +62,15 @@ void callback(const sensor_msgs::CameraInfo::ConstPtr &, const sensor_msgs::Imag
 #define MESSAGE_FILTERS__SYNC_POLICIES__LATEST_TIME_HPP_
 
 #include <algorithm>
+#include <cassert>
 #include <cmath>
+#include <cstddef>
 #include <memory>
+#include <mutex>
 #include <numeric>
+#include <stdexcept>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 #include <rclcpp/clock.hpp>

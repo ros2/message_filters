@@ -33,8 +33,11 @@
 #include <cstddef>
 #include <deque>
 #include <functional>
+#include <iterator>
 #include <memory>
+#include <mutex>
 #include <stdexcept>
+#include <type_traits>
 #include <vector>
 
 #include <rclcpp/time.hpp>
