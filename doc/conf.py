@@ -39,20 +39,36 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-# import sys, os
+import os
+import re
+import sys
 from datetime import datetime
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-# sys.path.append(os.path.abspath('.'))
+# Put this package's Python sources on sys.path so autodoc can import them.
+#
+# rosdoc2 only does this for packages that let it generate conf.py; this one ships
+# its own, so without this autodoc reports "No module named 'message_filters'"
+# unless the package happens to be installed and sourced. rosdoc2 exec()s this file
+# from a generated conf.py inside the build tree, so __file__ points there rather
+# than at doc/ -- recover the real location from that wrapper's exec() call.
+_conf_dir = os.path.dirname(os.path.abspath(__file__))
+_doc_dir = _conf_dir
+_wrapper = os.path.join(_conf_dir, 'conf.py')
+if os.path.isfile(_wrapper):
+    with open(_wrapper, encoding='utf-8') as _f:
+        _match = re.search(r'exec\(open\("(.+?)"\)', _f.read())
+    if _match:
+        _doc_dir = os.path.dirname(_match.group(1))
+_src_dir = os.path.join(os.path.dirname(_doc_dir), 'src')
+if os.path.isdir(os.path.join(_src_dir, 'message_filters')) and _src_dir not in sys.path:
+    sys.path.insert(0, _src_dir)
 
 # -- General configuration -----------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx',
-              'sphinx.ext.imgmath', 'sphinx_rtd_theme', 'sphinx_tabs.tabs']
+              'sphinx.ext.imgmath', 'sphinx_rtd_theme']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -65,6 +81,13 @@ source_suffix = '.rst'
 
 # The master toctree document.
 master_doc = 'index'
+
+# rosdoc2 copies this directory a second time under 'user_docs/' and generates
+# 'user_docs.rst' / '__readme_include.rst' wrappers for packages that do not ship
+# their own index. This one does, and index.rst already links the tutorials and the
+# API references, so exclude the duplicate tree.
+exclude_patterns = ['user_docs', 'user_docs.rst', 'user_docs_tutorials.rst',
+                    '__readme_include.rst']
 
 # General information about the project.
 now = datetime.now()  # current date and time

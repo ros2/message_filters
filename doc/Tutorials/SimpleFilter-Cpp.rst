@@ -246,7 +246,7 @@ Now let's take a look at the ``public`` section of the class.
       {
       connectInput(filter);
       }
-``
+
 It starts with a default destructor and constructor for the class, and one constructor that receives a reference to another filter.
 The latter gives an option to create an instance of the ``CounterWithLastMessageCache`` filter that is already connected to another filter's output.
 Following the last constructor is the ``connectInput`` method, which removes the previous connection with another filter, if there was any.
@@ -454,26 +454,18 @@ Finally, add the ``install(TARGETS…)`` section so ros2 run can find your execu
 
 From the root of your workspace:
 
-.. tabs::
+**Linux and macOS**
 
-    .. group-tab:: Linux
+.. code-block:: console
 
-        .. code-block:: console
+    $ colcon build && . install/setup.bash
 
-             $ colcon build && . install/setup.bash
+**Windows**
 
-    .. group-tab:: macOS
+.. code-block:: console
 
-        .. code-block:: console
-
-            $ colcon build && . install/setup.bash
-
-    .. group-tab:: Windows
-
-        .. code-block:: console
-
-            $ colcon build
-            $ call C:\dev\ros2\local_setup.bat
+    $ colcon build
+    $ call C:\dev\ros2\local_setup.bat
 
 5. Run the Node
 ~~~~~~~~~~~~~~~

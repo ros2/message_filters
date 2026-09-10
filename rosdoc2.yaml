@@ -28,7 +28,7 @@ settings:
     ## be assumed for 'sphinx-apidoc' invocation. The user can provide the path
     ## (relative to the 'package.xml' file) where the Python modules defined by this
     ## package are located.
-    python_source: 'message_filters'
+    python_source: 'src/message_filters'
 
     ## This setting, if true, attempts to run `doxygen` and the `breathe`/`exhale`
     ## extensions to `sphinx` regardless of build type. This is most useful if the
@@ -58,7 +58,13 @@ builders:
 
     - doxygen: {
         name: 'message_filters Public C/C++ API',
-        output_dir: 'generated/doxygen'
+        output_dir: 'generated/doxygen',
+        extra_doxyfile_statements: [
+            'PREDEFINED += MESSAGE_FILTERS_PUBLIC=',
+            'PREDEFINED += MESSAGE_FILTERS_LOCAL=',
+            'PREDEFINED += MESSAGE_FILTERS_EXPORT=',
+            'PREDEFINED += MESSAGE_FILTERS_IMPORT='
+        ]
     }
     - sphinx: {
         name: 'message_filters',

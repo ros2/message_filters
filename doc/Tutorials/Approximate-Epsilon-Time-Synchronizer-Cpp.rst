@@ -1,5 +1,5 @@
 Approximate Epsilon Time Synchronizer (C++):
----------------------------------------
+--------------------------------------------
 
 Prerequisites
 ~~~~~~~~~~~~~
@@ -379,26 +379,18 @@ Finally, add the ``install(TARGETS…)`` section so ``ros2 run`` can find your e
 
 From the root of your workspace:
 
-.. tabs::
+**Linux and macOS**
 
-    .. group-tab:: Linux
+.. code-block:: console
 
-        .. code-block:: console
+    $ colcon build && . install/setup.bash
 
-             $ colcon build && . install/setup.bash
+**Windows**
 
-    .. group-tab:: macOS
+.. code-block:: console
 
-        .. code-block:: console
-
-            $ colcon build && . install/setup.bash
-
-    .. group-tab:: Windows
-
-        .. code-block:: console
-
-            $ colcon build
-            $ call C:\dev\ros2\local_setup.bat
+    $ colcon build
+    $ call C:\dev\ros2\local_setup.bat
 
 5. Run the Node
 ~~~~~~~~~~~~~~~
@@ -424,6 +416,7 @@ The console output should look something like this:
 Let's take a look at a timestamp difference between values from the first line.
 
 .. code-block:: console
+
   1773177603.600124849 sec - 1773177603.550153015 sec = 0.04997181892 sec
 
 The resulting ``0.04997181892`` seconds difference is definitely within the specified ``Epsilon``.

@@ -35,7 +35,7 @@
  * whenever a new one is received. This is essentially an upsampling of slower messages using a
  * zero-order hold (no interpolation).
 
- * \section usage USAGE
+ * \section latest_time_usage USAGE
  * Example usage would be:
 \verbatim
 using latest_policy = LatestTime<sensor_msgs::CameraInfo, sensor_msgs::Image, sensor_msgs::Image>;

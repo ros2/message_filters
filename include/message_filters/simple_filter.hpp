@@ -93,6 +93,7 @@ public:
   /**
    * \brief Register a callback to be called when this filter has passed
    * \param callback The callback to call
+   * \param t The instance the member function is called on
    */
   template<typename T, typename P>
   Connection registerCallback(void (T::* callback)(P), T * t)

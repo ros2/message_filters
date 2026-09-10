@@ -49,12 +49,7 @@ namespace message_filters
  * The required queue size parameter when constructing the TimeSynchronizer tells it how many sets of messages it should
  * store (by timestamp) while waiting for messages to arrive and complete their "set"
  *
- * The timestamp is extracted by the TimeGetter template parameter, which defaults to
- * message_traits::DefaultTimeGetter (header.stamp via the TimeStamp trait).  Use the
- * TimeSynchronizerBase spelling to supply a custom getter, e.g.
- * TimeSynchronizerBase<MyTimeGetter, M0, M1>.
- *
- * \section connections CONNECTIONS
+ * \section time_synchronizer_connections CONNECTIONS
  *
  * The input connections for the TimeSynchronizer object is the same signature as for rclcpp subscription callbacks, ie.
 \verbatim
@@ -65,7 +60,7 @@ void callback(const std::shared_ptr<M const>&);
 \verbatim
 void callback(const std::shared_ptr<M0 const>&, const std::shared_ptr<M1 const>&, const std::shared_ptr<M2 const>&);
 \endverbatim
- * \section usage USAGE
+ * \section time_synchronizer_usage USAGE
  * Example usage would be:
 \verbatim
 TimeSynchronizer<sensor_msgs::msg::CameraInfo, sensor_msgs::msg::Image, sensor_msgs::msg::Image> sync_policies(caminfo_sub, limage_sub, rimage_sub, 3);

@@ -52,7 +52,7 @@ public:
    * \brief Retrieve a filter from this chain by index.  Returns an empty shared_ptr if the index is greater than
    * the size of the chain.  \b NOT type-safe
    *
-   * \param F [template] The type of the filter
+   * \tparam F The type of the filter
    * \param index The index of the filter (returned by addFilter())
    */
   template<typename F>
@@ -165,7 +165,7 @@ public:
    * \brief Retrieve a filter from this chain by index.  Returns an empty shared_ptr if the index is greater than
    * the size of the chain.  \b NOT type-safe
    *
-   * \param F [template] The type of the filter
+   * \tparam F The type of the filter
    * \param index The index of the filter (returned by addFilter())
    */
   template<typename F>
