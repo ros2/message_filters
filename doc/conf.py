@@ -39,10 +39,10 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+from datetime import datetime
 import os
 import re
 import sys
-from datetime import datetime
 
 # Put this package's Python sources on sys.path so autodoc can import them.
 #
