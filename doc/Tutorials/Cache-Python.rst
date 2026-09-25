@@ -89,8 +89,8 @@ The next step is to create a new Python file inside your package, e.g., ``cache_
                 self.get_logger().info(f"Cached: {msg.data}")
 
 
-    def main(args=None):
-        rclpy.init(args=args)
+    def main():
+        rclpy.init()
 
         cache_node = CacheNode()
         rclpy.spin(cache_node)

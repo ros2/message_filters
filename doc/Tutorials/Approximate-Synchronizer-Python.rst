@@ -94,8 +94,8 @@ Finally, create a main function and spin the node
 
 .. code-block:: Python
 
-    def main(args=None):
-        rclpy.init(args=args)
+    def main():
+        rclpy.init()
 
         time_sync = TimeSyncNode()
 
