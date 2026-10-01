@@ -59,6 +59,27 @@ struct Msg
 };
 using MsgConstPtr = std::shared_ptr<Msg const>;
 
+struct SpecializedMsg
+{
+  int32_t sec;
+  uint32_t nanosec;
+  int data;
+};
+using SpecializedMsgConstPtr = std::shared_ptr<SpecializedMsg const>;
+
+namespace message_filters::message_traits
+{
+template<>
+struct TimeStamp<SpecializedMsg>
+{
+  static rclcpp::Time value(const SpecializedMsg & m)
+  {
+    return rclcpp::Time(m.sec, m.nanosec, RCL_ROS_TIME);
+  }
+};
+}  // namespace message_filters::message_traits
+
+
 template<typename M>
 struct FieldTimeGetter
 {
@@ -180,6 +201,22 @@ TEST(CustomTimeGetter, cache)
 
   const auto interval = cache.getInterval(
     rclcpp::Time(15, 0, RCL_ROS_TIME), rclcpp::Time(35, 0, RCL_ROS_TIME));
+  ASSERT_EQ(interval.size(), 2u);
+  EXPECT_EQ(interval[0]->data, 2);
+  EXPECT_EQ(interval[1]->data, 3);
+}
+
+TEST(CustomTimeGetter, cacheWithCustomTimestamp) {
+  message_filters::Cache<SpecializedMsg> cache(10);
+
+  cache.add(std::make_shared<SpecializedMsg>(SpecializedMsg{10, 0u, 1}));
+  cache.add(std::make_shared<SpecializedMsg>(SpecializedMsg{30, 0u, 3}));
+  cache.add(std::make_shared<SpecializedMsg>(SpecializedMsg{20, 0u, 2}));
+
+  const auto interval = cache.getInterval(
+    rclcpp::Time(15, 0, RCL_ROS_TIME),
+    rclcpp::Time(35, 0, RCL_ROS_TIME)
+  );
   ASSERT_EQ(interval.size(), 2u);
   EXPECT_EQ(interval[0]->data, 2);
   EXPECT_EQ(interval[1]->data, 3);
