@@ -86,6 +86,8 @@ struct FrameId<M, typename std::enable_if<HasHeader<M>::value>::type>
 template<typename M, typename Enable = void>
 struct TimeStamp
 {
+  using is_default_fallback = void;
+
   static rclcpp::Time value(const M & m)
   {
     (void)m;
@@ -101,6 +103,10 @@ struct TimeStamp<M, typename std::enable_if<HasHeader<M>::value>::type>
     return rclcpp::Time(m.header.stamp, RCL_ROS_TIME);
   }
 };
+
+template<typename M>
+struct HasTimeStamp : std::bool_constant<!requires {typename TimeStamp<M>::is_default_fallback;}>
+{};
 
 /**
  * \brief Default TimeGetter used by all filters.

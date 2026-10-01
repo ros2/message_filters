@@ -75,7 +75,7 @@ public:
   // A custom TimeGetter extracts the timestamp itself, so the headerless
   // fallback only applies when the default getter has no header to read.
   static constexpr bool kMessageProvidesTime =
-    message_traits::HasHeader<M>::value ||
+    message_traits::HasTimeStamp<M>::value ||
     !std::is_same_v<TimeGetter<M>, message_traits::DefaultTimeGetter<M>>;
 
   template<class F>
