@@ -28,6 +28,8 @@
 
 #include "message_filters/connection.hpp"
 
+#include <utility>
+
 namespace message_filters
 {
 
@@ -42,8 +44,10 @@ Connection::Connection(const VoidDisconnectFunction & func)
 
 void Connection::disconnect()
 {
-  if (void_disconnect_) {
-    void_disconnect_();
+  // Clear the callback before invoking it to allow repeated or reentrant disconnects.
+  auto void_disconnect = std::exchange(void_disconnect_, VoidDisconnectFunction{});
+  if (void_disconnect) {
+    void_disconnect();
   }
 }
 
