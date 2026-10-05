@@ -27,8 +27,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 """Tests for the custom time_getter support of the Python filters."""
+import pytest
 
-import unittest
+import unittest     # noqa: I100
 
 import message_filters
 from message_filters import ApproximateTimeSynchronizer, Cache, TimeSynchronizer
@@ -104,7 +105,17 @@ class TestCustomTimeGetter(unittest.TestCase):
         f = MockFilter()
         cache = Cache(f, cache_size=5)
 
-        f.signalMessage(MockHeaderlessMessage(1, 0, 1))
+        with pytest.raises(
+            RuntimeError,
+            match='Can not use message filters messages '
+                  'without timestamp information when '
+                  '"allow_headerless" is disabled. '
+                  'Auto assign ROSTIME to headerless '
+                  'messages once enabling constructor '
+                  'option of "allow_headerless"',
+
+        ):
+            f.signalMessage(MockHeaderlessMessage(1, 0, 1))
 
         self.assertEqual(cache.cache_times, [])
         self.assertEqual(cache.cache_msgs, [])
