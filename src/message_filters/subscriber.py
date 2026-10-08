@@ -27,7 +27,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-from typing import Optional, Type, Union
+from typing import Any, Optional, Type, Union
 
 from rclpy.callback_groups import CallbackGroup
 from rclpy.event_handler import SubscriptionEventCallbacks
@@ -94,12 +94,38 @@ class Subscriber(SimpleFilter):
             content_filter_options=content_filter_options,
         )
 
-    def callback(self, msg):
+    def callback(self, msg: MsgT) -> None:
+        """
+        Handle internal ROS 2 subscription callback handler.
+
+        Receives the incoming ROS message from the subscription and forwards
+        it directly to the downstream filter pipeline by triggering all registered hooks.
+
+        :param msg: The incoming ROS message object received from the topic.
+        """
         self.signalMessage(msg)
 
-    def getTopic(self):
+    def getTopic(self) -> str:
+        """
+        Retrieve the name of the subscribed ROS topic.
+
+        :return: The name of the topic this filter is currently listening to.
+        :rtype: str
+        """
         return self.topic
 
-    def __getattr__(self, key):
-        """Serve same API as rospy.Subscriber."""
+    def __getattr__(self, key: str) -> Any:
+        """
+        Serve same API as rospy.Subscriber.
+
+        Dynamically forward attribute access requests to the underlying subscription object.
+
+        Allows this filter class to serve the same API surface area as a native
+        ROS subscription instance.
+
+        :param key: The name of the attribute or method being accessed.
+        :type key: str
+        :return: The attribute value or callable method from the internal subscription.
+        :rtype: Any
+        """
         return self.sub.__getattribute__(key)
