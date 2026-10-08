@@ -31,8 +31,15 @@ from rclpy.type_support import MsgT
 
 
 class SimpleFilter:
+    """
+    Base class for simple message filters in ROS 2.
+
+    Provides core mechanisms for managing downstream callback functions and
+    dispatching incoming or filtered messages to all registered hooks.
+    """
 
     def __init__(self):
+        """Construct a SimpleFilter instance."""
         self.callbacks = {}
 
     def registerCallback(
@@ -44,16 +51,36 @@ class SimpleFilter:
         Register a callback `callback` to be called when this filter has output.
 
         The filter calls the function ``callback`` with a filter-dependent.
-
         list of arguments,followed by the call-supplied arguments ``args.``.
+
+        :param callback: The callable handler to register for incoming data events.
+        :param args: Additional static arguments to pass to the callback upon invocation.
+        :return: A unique connection index token representing this registration.
+        :rtype: int
         """
         conn = len(self.callbacks)
         self.callbacks[conn] = (callback, args)
         return conn
 
-    def signalMessage(self, *msg):
+    def signalMessage(self, *msg) -> None:
+        """
+        Broadcast a message (or multiple messages) to all registered callbacks.
+
+        Appends the filter-specific data components to the static arguments
+        provided at the time of each callback's registration.
+
+        :param msg: Variadic argument list representing the payload to forward.
+        """
         for (callback, args) in self.callbacks.values():
             callback(*(msg + args))
 
-    def unregisterCallback(self, conn):
+    def unregisterCallback(self, conn: int) -> None:
+        """
+        Remove a previously registered callback from the filter pipeline.
+
+        If the connection token does not exist, the removal request is silently ignored.
+
+        :param conn: The connection index token returned during registration.
+        :type conn: int
+        """
         self.callbacks.pop(conn, None)
