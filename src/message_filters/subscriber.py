@@ -27,7 +27,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-from typing import Optional, Type, Union
+from typing import Any, Optional, Type, Union
 
 from rclpy.callback_groups import CallbackGroup
 from rclpy.event_handler import SubscriptionEventCallbacks
@@ -54,7 +54,7 @@ class Subscriber(SimpleFilter):
         node: Node,
         msg_type: Type[MsgT],
         topic: str,
-        qos_profile: Union[QoSProfile, int] = QoSProfile(depth=10),
+        qos_profile: Union[QoSProfile, int, None] = None,
         *,
         callback_group: Optional[CallbackGroup] = None,
         event_callbacks: Optional[SubscriptionEventCallbacks] = None,
@@ -72,6 +72,7 @@ class Subscriber(SimpleFilter):
             subscription. In the case that a history depth is provided, the QoS history is
             set to KEEP_LAST, the QoS history depth is set to the value of the parameter,
             and all other QoS settings are set to their default values.
+            If provided qos_profile value is None then qos profile is set to QosProfile(depth=10).
         :param callback_group: The callback group for the subscription. If ``None``, then the
             default callback group for the node is used.
         :param event_callbacks: User-defined callbacks for middleware events.
@@ -86,7 +87,7 @@ class Subscriber(SimpleFilter):
             msg_type=msg_type,
             topic=self.topic,
             callback=self.callback,
-            qos_profile=qos_profile,
+            qos_profile=qos_profile if qos_profile is not None else QoSProfile(depth=10),
             callback_group=callback_group,
             event_callbacks=event_callbacks,
             qos_overriding_options=qos_overriding_options,
@@ -94,12 +95,41 @@ class Subscriber(SimpleFilter):
             content_filter_options=content_filter_options,
         )
 
-    def callback(self, msg):
+    def callback(self, msg: MsgT) -> None:
+        """
+        Handle internal ROS 2 subscription callback handler.
+
+        Receives the incoming ROS message from the subscription and forwards
+        it directly to the downstream filter pipeline by triggering all registered hooks.
+
+        :param msg: The incoming ROS message object received from the topic.
+        """
         self.signalMessage(msg)
 
-    def getTopic(self):
+    def getTopic(self) -> str:
+        """
+        Retrieve the name of the subscribed ROS topic.
+
+        :return: The name of the topic this filter is currently listening to.
+        :rtype: str
+        """
         return self.topic
 
-    def __getattr__(self, key):
-        """Serve same API as rospy.Subscriber."""
+    def __getattr__(self, key: str) -> Any:
+        """
+        Serve same API as rospy.Subscriber.
+
+        Dynamically forward attribute access requests to the underlying subscription object.
+
+        Allows this filter class to serve the same API surface area as a native
+        ROS subscription instance.
+
+        :param key: The name of the attribute or method being accessed.
+        :type key: str
+        :return: The attribute value or callable method from the internal subscription.
+        :rtype: Any
+        """
+        if key == 'sub' or 'sub' not in self.__dict__:
+            raise AttributeError(f"'{type(self).__name__}' object has no attribute '{key}'")
+
         return self.sub.__getattribute__(key)
