@@ -34,7 +34,6 @@
 #include <mutex>
 #include <vector>
 
-#include "message_filters/connection.hpp"
 #include "message_filters/message_event.hpp"
 #include "message_filters/parameter_adapter.hpp"
 

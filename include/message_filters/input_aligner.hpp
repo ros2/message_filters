@@ -34,7 +34,7 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
-#include <cstdint>
+#include <cstddef>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -48,7 +48,6 @@
 
 #include "message_filters/connection.hpp"
 #include "message_filters/message_traits.hpp"
-#include "message_filters/null_types.hpp"
 #include "message_filters/signal1.hpp"
 
 namespace message_filters

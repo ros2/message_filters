@@ -35,7 +35,6 @@
 #include <cassert>
 #include <functional>
 #include <memory>
-#include <string>
 #include <type_traits>
 
 #include <rclcpp/time.hpp>

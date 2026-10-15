@@ -30,9 +30,7 @@
 #define MESSAGE_FILTERS__SUBSCRIBER_HPP_
 
 #include <memory>
-#include <stdexcept>
 #include <string>
-#include <type_traits>
 
 #include <rclcpp/create_subscription.hpp>
 #include <rclcpp/node_interfaces/node_interfaces.hpp>

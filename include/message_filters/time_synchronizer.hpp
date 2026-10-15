@@ -30,9 +30,6 @@
 #ifndef MESSAGE_FILTERS__TIME_SYNCHRONIZER_HPP_
 #define MESSAGE_FILTERS__TIME_SYNCHRONIZER_HPP_
 
-#include <memory>
-
-#include "message_filters/message_event.hpp"
 #include "message_filters/synchronizer.hpp"
 #include "message_filters/sync_policies/exact_time.hpp"
 
