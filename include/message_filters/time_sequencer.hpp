@@ -158,7 +158,7 @@ public:
     messages_.insert(evt);
 
     if (queue_size_ != 0 && messages_.size() > queue_size_) {
-      messages_.erase(*messages_.begin());
+      messages_.erase(messages_.begin());
     }
   }
 
