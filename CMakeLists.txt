@@ -115,6 +115,8 @@ if(BUILD_TESTING)
   ament_add_pytest_test(test_message_filters_chain.py "test/test_message_filters_chain.py")
   ament_add_pytest_test(test_input_aligner.py "test/test_input_aligner.py")
   ament_add_pytest_test(test_custom_time_getter.py "test/test_custom_time_getter.py")
+  ament_add_pytest_test(test_time_sequencer.py "test/test_time_sequencer.py")
+  ament_add_pytest_test(test_message_filters_delta_filter.py "test/test_message_filters_delta_filter.py")
 endif()
 
 ament_package()
