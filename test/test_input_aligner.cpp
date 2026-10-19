@@ -42,6 +42,7 @@
 #include <rclcpp/time.hpp>
 #include <rclcpp/utilities.hpp>
 #include "message_filters/input_aligner.hpp"
+#include "message_filters/null_types.hpp"
 
 namespace
 {

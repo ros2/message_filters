@@ -4,7 +4,9 @@ __pycache__/
 
 # C extensions
 *.so
-
+docs_build/
+docs_output
+cross_reference
 # Distribution / packaging
 .Python
 env/

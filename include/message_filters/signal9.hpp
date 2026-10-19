@@ -37,7 +37,6 @@
 #include <vector>
 
 #include "message_filters/connection.hpp"
-#include "message_filters/null_types.hpp"
 #include "message_filters/message_event.hpp"
 #include "message_filters/parameter_adapter.hpp"
 
@@ -88,8 +87,6 @@ class Signal9
   using V_CallbackHelper9 = std::vector<CallbackHelper9Ptr>;
 
 public:
-  using NullP = const std::shared_ptr<NullType const> &;
-
   template<typename ... Ps>
   Connection addCallback(const std::function<void(Ps...)> & callback)
   {

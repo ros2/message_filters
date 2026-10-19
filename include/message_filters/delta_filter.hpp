@@ -38,7 +38,6 @@
 #include <mutex>
 #include <optional>
 #include <string>
-#include <type_traits>
 #include <variant>
 
 #include <message_filters/connection.hpp>

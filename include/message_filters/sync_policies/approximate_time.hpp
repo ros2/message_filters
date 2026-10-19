@@ -42,9 +42,7 @@
 #include <rclcpp/duration.hpp>
 #include <rclcpp/time.hpp>
 
-#include "message_filters/connection.hpp"
 #include "message_filters/message_traits.hpp"
-#include "message_filters/null_types.hpp"
 #include "message_filters/signal9.hpp"
 #include "message_filters/synchronizer.hpp"
 
