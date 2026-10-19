@@ -284,6 +284,40 @@ TEST(TimeSequencer, queueSizeEviction)
   EXPECT_EQ(h.count_, 0);
 }
 
+// Eviction must drop exactly one message, even when several share the oldest timestamp.
+// Regression test: erase(*begin()) on a multiset keyed by stamp removed every equal-stamp
+// message instead of just the oldest one.
+TEST(TimeSequencer, queueSizeEvictionWithDuplicateStamps)
+{
+  rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("test_node");
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node);
+
+  const rclcpp::Duration delay(0, 250000000);
+  const rclcpp::Duration rate(0, 10000000);
+  message_filters::TimeSequencer<Msg> seq(delay, rate, /*queue_size=*/ 2, node);
+
+  Helper h;
+  seq.registerCallback(std::bind(&Helper::cb, &h, std::placeholders::_1));
+
+  // All stamps are already past the delay so everything left in the queue dispatches
+  // on the first tick; nothing dispatches while adding because the executor is not spun.
+  rclcpp::Time old = rclcpp::Clock(RCL_ROS_TIME).now() - rclcpp::Duration(1, 0);
+  const rclcpp::Time stamps[] = {old, old, old + rclcpp::Duration(0, 10000000)};
+  for (int i = 0; i < 3; ++i) {
+    auto msg = std::make_shared<Msg>();
+    msg->header.stamp = stamps[i];
+    msg->data = i;
+    seq.add(msg);
+  }
+
+  // Queue is 2, so exactly one message (the first of the two equal-stamp ones) is evicted.
+  ASSERT_TRUE(spinUntil(executor, [&h]() {return h.count_ >= 2;}));
+  ASSERT_EQ(h.count_, 2);
+  EXPECT_EQ(h.received_[0]->data, 1);
+  EXPECT_EQ(h.received_[1]->data, 2);
+}
+
 // queue_size == 0 means unlimited; no messages should be evicted.
 TEST(TimeSequencer, zeroQueueSizeIsUnlimited)
 {
