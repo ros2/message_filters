@@ -388,6 +388,69 @@ TEST(Subscriber, topicWithRemap) {
               reported_topic == "/" + remapped_topic_name);
 }
 
+// Custom type adapted from sensor_msgs::msg::Imu (REP 2007).
+struct AdaptedImu
+{
+  double linear_acceleration_x = 0.0;
+};
+
+template<>
+struct rclcpp::TypeAdapter<AdaptedImu, Msg>
+{
+  using is_specialized = std::true_type;
+  using custom_type = AdaptedImu;
+  using ros_message_type = Msg;
+
+  static void convert_to_ros_message(const custom_type & source, ros_message_type & destination)
+  {
+    destination.linear_acceleration.x = source.linear_acceleration_x;
+  }
+
+  static void convert_to_custom(const ros_message_type & source, custom_type & destination)
+  {
+    destination.linear_acceleration_x = source.linear_acceleration.x;
+  }
+};
+
+struct AdaptedHelper
+{
+  void cb(const std::shared_ptr<AdaptedImu const> msg)
+  {
+    msg_ = msg;
+  }
+
+  std::shared_ptr<AdaptedImu const> msg_;
+};
+
+TEST(Subscriber, typeAdapter)
+{
+  using Adapter = rclcpp::TypeAdapter<AdaptedImu, Msg>;
+
+  auto node = std::make_shared<rclcpp::Node>("test_node");
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node);
+  AdaptedHelper h;
+  rclcpp::QoS default_qos =
+    rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(rmw_qos_profile_default));
+  // The subscriber is templated on the adapter and delivers the custom type.
+  message_filters::Subscriber<Adapter> sub(node, "test_topic", default_qos);
+  sub.registerCallback(&AdaptedHelper::cb, &h);
+  auto pub = node->create_publisher<Msg>("test_topic", 10);
+  Msg msg;
+  msg.linear_acceleration.x = 9.81;
+
+  rclcpp::Clock ros_clock;
+  auto start = ros_clock.now();
+  while (!h.msg_ && (ros_clock.now() - start) < rclcpp::Duration(1, 0)) {
+    pub->publish(msg);
+    rclcpp::Rate(50).sleep();
+    executor.spin_some();
+  }
+
+  ASSERT_TRUE(h.msg_);
+  EXPECT_DOUBLE_EQ(9.81, h.msg_->linear_acceleration_x);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);

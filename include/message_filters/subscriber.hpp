@@ -280,9 +280,12 @@ public:
       auto parameters_interface = node_interfaces.template get<NodeParametersInterface>();
       auto topics_interface = node_interfaces.template get<NodeTopicsInterface>();
 
-      sub_ = rclcpp::create_subscription<MessageType>(parameters_interface,
-                                                      topics_interface,
-                                                      topic, qos,
+      // Subscribe with M, not MessageType: when M is a rclcpp::TypeAdapter the
+      // subscription must be created for the adapter so that rclcpp converts the
+      // incoming ROS message and the callback receives MessageType (the custom type).
+      sub_ = rclcpp::create_subscription<M>(parameters_interface,
+                                            topics_interface,
+                                            topic, qos,
           [this](const std::shared_ptr<MessageType const> msg) {
             this->cb(EventType(msg));
           }, options);
