@@ -2,6 +2,12 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+7.4.3 (2026-10-23)
+------------------
+* Fix Subscriber with rclcpp::TypeAdapter (backport `#344 <https://github.com/ros2/message_filters/issues/344>`_) (`#348 <https://github.com/ros2/message_filters/issues/348>`_)
+* (`#163 <https://github.com/ros2/message_filters/issues/163>`_) Extend registerCallback section in documentation (`#326 <https://github.com/ros2/message_filters/issues/326>`_) (`#330 <https://github.com/ros2/message_filters/issues/330>`_)
+* Contributors: mergify[bot]
+
 7.4.2 (2026-06-29)
 ------------------
 * Tutorials: Add DeltaFilter C++ tutorial (`#304 <https://github.com/ros2/message_filters/issues/304>`_) (`#305 <https://github.com/ros2/message_filters/issues/305>`_)
