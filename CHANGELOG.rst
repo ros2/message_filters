@@ -2,6 +2,11 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.11.18 (2026-10-23)
+--------------------
+* (`#163 <https://github.com/ros2/message_filters/issues/163>`_) Extend registerCallback section in documentation (`#326 <https://github.com/ros2/message_filters/issues/326>`_) (`#332 <https://github.com/ros2/message_filters/issues/332>`_)
+* Contributors: mergify[bot]
+
 4.11.17 (2026-06-14)
 --------------------
 * Merge pull request `#309 <https://github.com/ros2/message_filters/issues/309>`_ from ros2/marcoag/fix-message-filters-py39-concatenate
