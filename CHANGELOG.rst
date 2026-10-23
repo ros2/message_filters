@@ -2,6 +2,17 @@
 Changelog for package message_filters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+8.0.5 (2026-10-23)
+------------------
+* Cleanup headers (`#345 <https://github.com/ros2/message_filters/issues/345>`_)
+* Fix TimeSequencer dropping all messages that share the oldest stamp (`#346 <https://github.com/ros2/message_filters/issues/346>`_)
+* Register the TimeSequencer and DeltaFilter Python tests (`#347 <https://github.com/ros2/message_filters/issues/347>`_)
+* Fix Subscriber with rclcpp::TypeAdapter (`#344 <https://github.com/ros2/message_filters/issues/344>`_)
+* Delete old-style ament_export_include_directories() and ament_export_libraries() calls (`#340 <https://github.com/ros2/message_filters/issues/340>`_)
+* Remove unused args from Python tutorial main functions (`#339 <https://github.com/ros2/message_filters/issues/339>`_)
+* Fix warning (`#335 <https://github.com/ros2/message_filters/issues/335>`_)
+* Contributors: Alejandro Hernández Cordero, Francois Gonothi Toure, Manashvi Sharma
+
 8.0.4 (2026-09-10)
 ------------------
 * Fixed doxygen warnings (`#329 <https://github.com/ros2/message_filters/issues/329>`_)
