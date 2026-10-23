@@ -28,13 +28,14 @@
 
 from bisect import insort_right
 import threading
-from typing import Union
+from typing import Any, Optional, Union
 
 from builtin_interfaces.msg import Time as TimeMsg
 
 from rclpy.duration import Duration
 from rclpy.node import Node
 from rclpy.time import Time
+from rclpy.type_support import MsgT
 
 from message_filters.simple_filter import SimpleFilter     # noqa: I100
 
@@ -61,7 +62,7 @@ class TimeSequencer(SimpleFilter):
         queue_size: int,
         node: Node,
         msg_stamp_attr: str = 'header.stamp',
-    ):
+    ) -> None:
         """
         Construct a TimeSequencer filter for a subscriber.
 
@@ -96,7 +97,17 @@ class TimeSequencer(SimpleFilter):
         if input_filter is not None:
             self.connectInput(input_filter)
 
-    def _getMsgStampAttr(self, msg):
+    def _getMsgStampAttr(self, msg: MsgT) -> Optional[Any]:
+        """
+        Dynamically resolve and retrieve the configured timestamp attribute from the message.
+
+        Recursively traverses the nested attributes specified during construction
+        to find the target timestamp field.
+
+        :param msg: The incoming message object to inspect.
+        :return: The resolved attribute value if found, or None if the path does not exist.
+        :rtype: Any or None
+        """
         obj = msg
         for attr in self.msg_stamp_attrs:
             if not hasattr(obj, attr):
@@ -104,12 +115,32 @@ class TimeSequencer(SimpleFilter):
             obj = getattr(obj, attr)
         return obj
 
-    def connectInput(self, input_filter: SimpleFilter):
+    def connectInput(self, input_filter: SimpleFilter) -> None:
+        """
+        Connect the sequencer to an upstream input filter pipeline.
+
+        Registers an internal callback to intercept incoming messages from the
+        specified filter. Only one source input filter can be connected at a time.
+
+        :param input_filter: The upstream simple filter pipeline to listen to.
+        :type input_filter: SimpleFilter
+        :raises RuntimeError: If this sequencer is already connected to an input filter.
+        """
         if self.incoming_connection is not None:
             raise RuntimeError('Already connected to an input filter.')
         self.incoming_connection = input_filter.registerCallback(self._add)
 
-    def _add(self, msg):
+    def _add(self, msg: MsgT) -> None:
+        """
+        Process and insert a new incoming message into the temporal sequencing queue.
+
+        Extracts the timestamp from the message, filters out messages that arrive out of
+        chronological order (older than the last dispatched timestamp), and stores the valid
+        messages sorted by time. If the internal queue limit is exceeded, the oldest stored
+        message is dropped.
+
+        :param msg: The incoming message object forwarded from the input filter.
+        """
         with self.lock:
             stamp = self._getStamp(msg)
             if stamp is None:
@@ -122,7 +153,18 @@ class TimeSequencer(SimpleFilter):
             if self.queue_size != 0 and len(self.messages) > self.queue_size:
                 del self.messages[0]
 
-    def _getStamp(self, msg):
+    def _getStamp(self, msg: MsgT) -> Optional[Time]:
+        """
+        Extract and validate the ROS 2 Time representation from the message metadata.
+
+        Uses the resolved attribute path to locate the timestamp, ensures it matches the
+        expected ROS 2 message Time type, and converts it into a `rclpy.time.Time` object.
+
+        :param msg: The message object to extract the timestamp from.
+        :return: The validated Time instance, or None if the attribute is missing.
+        :rtype: rclpy.time.Time or None
+        :raises TypeError: If the extracted attribute does not match the builtin TimeMsg type.
+        """
         stamp = self._getMsgStampAttr(msg)
         if stamp is not None:
             if not isinstance(stamp, TimeMsg):
@@ -138,7 +180,14 @@ class TimeSequencer(SimpleFilter):
             )
             return None
 
-    def _dispatch(self):
+    def _dispatch(self) -> None:
+        """
+        Periodically evaluate the queue and broadcast ready messages to downstream handlers.
+
+        Iterates through the sorted queue to find messages whose timestamps are older
+        than the current time minus the configured delay duration. Those messages are
+        popped out and signaled in order to all registered callbacks.
+        """
         to_call = []
         with self.lock:
             while self.messages:
@@ -153,7 +202,12 @@ class TimeSequencer(SimpleFilter):
         for msg in to_call:
             self.signalMessage(msg)
 
-    def shutdown(self):
-        """Clean up the TimeSequencer."""
+    def shutdown(self) -> None:
+        """
+        Clean up the TimeSequencer.
+
+        Cancels the active internal dispatch timer and safely destroys its reference
+        within the associated ROS 2 node context.
+        """
         self.update_timer.cancel()
         self.node.destroy_timer(self.update_timer)
