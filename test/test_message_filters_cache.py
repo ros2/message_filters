@@ -30,12 +30,16 @@
 # import time
 import unittest
 
-from message_filters import Cache, Subscriber
+import pytest
 import rclpy
+
 from rclpy.clock import ClockType, ROSClock
 from rclpy.duration import Duration
 from rclpy.time import Time
 from std_msgs.msg import String
+
+# noqa is for importing local modules after modules from another package
+from message_filters import Cache, Subscriber   # noqa: I100
 
 PKG = 'message_filters'
 
@@ -130,10 +134,16 @@ class TestCache(unittest.TestCase):
         cache = Cache(sub, 5, allow_headerless=False)
 
         msg = String()
-        cache.add(msg)
-
-        self.assertIsNone(cache.getElemAfterTime(Time(clock_type=ClockType.ROS_TIME)),
-                          'Headerless message invalidly added.')
+        with pytest.raises(
+            RuntimeError,
+            match='Can not use message filters messages '
+                  'without timestamp information when '
+                  '"allow_headerless" is disabled. '
+                  'Auto assign ROSTIME to headerless '
+                  'messages once enabling constructor '
+                  'option of "allow_headerless"',
+        ):
+            cache.add(msg)
 
         cache = Cache(sub, 5, allow_headerless=True)
         cache.add(msg)
