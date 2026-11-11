@@ -116,6 +116,7 @@ if(BUILD_TESTING)
   ament_add_pytest_test(test_custom_time_getter.py "test/test_custom_time_getter.py")
   ament_add_pytest_test(test_time_sequencer.py "test/test_time_sequencer.py")
   ament_add_pytest_test(test_message_filters_delta_filter.py "test/test_message_filters_delta_filter.py")
+  ament_add_pytest_test(test_async_callback.py "test/test_async_callback.py")
 endif()
 
 ament_package()
