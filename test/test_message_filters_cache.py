@@ -129,6 +129,32 @@ class TestCache(unittest.TestCase):
         s = cache.getOldestTime()
         self.assertEqual(s, Time(seconds=1), 'wrong message discarded')
 
+    def test_out_of_order(self):
+        sub = Subscriber(self.node, String, '/empty')
+        cache = Cache(sub, 3)
+
+        for seconds in (2, 0, 3, 1):
+            msg = AnonymMsg()
+            msg.header.stamp = Time(seconds=seconds)
+            cache.add(msg)
+
+        # The cache is kept sorted by stamp, and the oldest stamp is discarded
+        self.assertEqual(
+            cache.cache_times,
+            [Time(seconds=1), Time(seconds=2), Time(seconds=3)])
+        self.assertEqual(
+            [m.header.stamp for m in cache.cache_msgs],
+            [Time(seconds=1), Time(seconds=2), Time(seconds=3)])
+        self.assertEqual(cache.getOldestTime(), Time(seconds=1))
+        self.assertEqual(cache.getLatestTime(), Time(seconds=3))
+        self.assertEqual(cache.getLast().header.stamp, Time(seconds=3))
+        self.assertEqual(
+            cache.getElemBeforeTime(Time(seconds=2.5)).header.stamp,
+            Time(seconds=2))
+        self.assertEqual(
+            cache.getElemAfterTime(Time(seconds=1.5)).header.stamp,
+            Time(seconds=2))
+
     def test_headerless(self):
         sub = Subscriber(self.node, String, '/empty')
         cache = Cache(sub, 5, allow_headerless=False)

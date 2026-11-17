@@ -26,6 +26,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+import bisect
 from typing import Callable, List, Optional
 
 from rclpy.clock import ROSClock
@@ -155,11 +156,13 @@ class Cache(SimpleFilter):
                 )
 
             stamp = ROSClock().now()
-        # Insert sorted
-        self.cache_times.append(stamp)
-        self.cache_msgs.append(msg)
+        # Insert sorted by time stamp, after any messages with the same stamp,
+        # so the cache stays ordered when messages arrive out of order
+        index = bisect.bisect_right(self.cache_times, stamp)
+        self.cache_times.insert(index, stamp)
+        self.cache_msgs.insert(index, msg)
 
-        # Implement a ring buffer, discard older if oversized
+        # Implement a ring buffer, discard the oldest if oversized
         if (len(self.cache_msgs) > self.cache_size):
             del self.cache_msgs[0]
             del self.cache_times[0]
