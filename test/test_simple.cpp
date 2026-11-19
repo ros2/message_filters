@@ -150,4 +150,56 @@ TEST(SimpleFilter, oldRegisterWithNewFilter)
   Helper h;
   f.registerCallback(std::bind(&Helper::cb3, &h, std::placeholders::_1));
 }
+
+TEST(Connection, disconnectIsIdempotent)
+{
+  int calls = 0;
+  message_filters::Connection connection([&calls]() {++calls;});
+
+  connection.disconnect();
+  connection.disconnect();
+
+  EXPECT_EQ(calls, 1);
+}
+
+TEST(Connection, disconnectIsReentrant)
+{
+  int calls = 0;
+  message_filters::Connection connection;
+  connection = message_filters::Connection([&calls, &connection]() {
+        if (++calls == 1) {
+          connection.disconnect();
+        }
+    });
+
+  connection.disconnect();
+
+  EXPECT_EQ(calls, 1);
+}
+
+TEST(Connection, disconnectReleasesCallbackCaptures)
+{
+  auto owner = std::make_shared<int>(42);
+  std::weak_ptr<int> weak_owner = owner;
+  message_filters::Connection connection([owner]() {});
+  owner.reset();
+  ASSERT_FALSE(weak_owner.expired());
+
+  connection.disconnect();
+
+  EXPECT_TRUE(weak_owner.expired());
+}
+
+TEST(Connection, disconnectAgainAfterFilterDestruction)
+{
+  auto filter = std::make_unique<Filter>();
+  int calls = 0;
+  auto connection = filter->registerCallback([&calls](const MsgConstPtr &) {++calls;});
+
+  connection.disconnect();
+  filter->add(Filter::EventType(std::make_shared<Msg>()));
+  EXPECT_EQ(calls, 0);
+  filter.reset();
+  connection.disconnect();
+}
 }  // namespace
