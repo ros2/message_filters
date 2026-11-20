@@ -30,12 +30,16 @@
 # import time
 import unittest
 
-from message_filters import Cache, Subscriber
+import pytest
 import rclpy
+
 from rclpy.clock import ClockType, ROSClock
 from rclpy.duration import Duration
 from rclpy.time import Time
 from std_msgs.msg import String
+
+# noqa is for importing local modules after modules from another package
+from message_filters import Cache, Subscriber   # noqa: I100
 
 PKG = 'message_filters'
 
@@ -125,15 +129,47 @@ class TestCache(unittest.TestCase):
         s = cache.getOldestTime()
         self.assertEqual(s, Time(seconds=1), 'wrong message discarded')
 
+    def test_out_of_order(self):
+        sub = Subscriber(self.node, String, '/empty')
+        cache = Cache(sub, 3)
+
+        for seconds in (2, 0, 3, 1):
+            msg = AnonymMsg()
+            msg.header.stamp = Time(seconds=seconds)
+            cache.add(msg)
+
+        # The cache is kept sorted by stamp, and the oldest stamp is discarded
+        self.assertEqual(
+            cache.cache_times,
+            [Time(seconds=1), Time(seconds=2), Time(seconds=3)])
+        self.assertEqual(
+            [m.header.stamp for m in cache.cache_msgs],
+            [Time(seconds=1), Time(seconds=2), Time(seconds=3)])
+        self.assertEqual(cache.getOldestTime(), Time(seconds=1))
+        self.assertEqual(cache.getLatestTime(), Time(seconds=3))
+        self.assertEqual(cache.getLast().header.stamp, Time(seconds=3))
+        self.assertEqual(
+            cache.getElemBeforeTime(Time(seconds=2.5)).header.stamp,
+            Time(seconds=2))
+        self.assertEqual(
+            cache.getElemAfterTime(Time(seconds=1.5)).header.stamp,
+            Time(seconds=2))
+
     def test_headerless(self):
         sub = Subscriber(self.node, String, '/empty')
         cache = Cache(sub, 5, allow_headerless=False)
 
         msg = String()
-        cache.add(msg)
-
-        self.assertIsNone(cache.getElemAfterTime(Time(clock_type=ClockType.ROS_TIME)),
-                          'Headerless message invalidly added.')
+        with pytest.raises(
+            RuntimeError,
+            match='Can not use message filters messages '
+                  'without timestamp information when '
+                  '"allow_headerless" is disabled. '
+                  'Auto assign ROSTIME to headerless '
+                  'messages once enabling constructor '
+                  'option of "allow_headerless"',
+        ):
+            cache.add(msg)
 
         cache = Cache(sub, 5, allow_headerless=True)
         cache.add(msg)

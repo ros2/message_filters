@@ -28,12 +28,22 @@
 
 
 """Message Filter Objects."""
-from message_filters.cache import Cache  # noqa: F401
-from message_filters.chain import Chain  # noqa: F401
-from message_filters.simple_filter import SimpleFilter  # noqa: F401
-from message_filters.subscriber import Subscriber  # noqa: F401
-from message_filters.time_sequencer import TimeSequencer  # noqa: F401
-from message_filters.time_synchronizer import (     # noqa: F401
-    ApproximateTimeSynchronizer,    # noqa: F401
-    TimeSynchronizer,   # noqa: F401
+from .cache import Cache
+from .chain import Chain
+from .simple_filter import SimpleFilter
+from .subscriber import Subscriber
+from .time_sequencer import TimeSequencer
+from .time_synchronizer import (
+    ApproximateTimeSynchronizer,
+    TimeSynchronizer,
 )
+
+__all__ = [
+    'Cache',
+    'Chain',
+    'SimpleFilter',
+    'Subscriber',
+    'TimeSequencer',
+    'ApproximateTimeSynchronizer',
+    'TimeSynchronizer',
+]

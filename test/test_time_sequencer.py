@@ -107,7 +107,7 @@ class TestTimeSequencer(unittest.TestCase):
 
         # Check that the messages were received in order after the delay
         expected_data = [f'Message {i}' for i in range(5)]
-        received_data = [msg.data for _, msg in sequencer.messages]
+        received_data = [msg.data for _, _, msg in sequencer.messages]
         self.assertEqual(
             received_data, expected_data, 'Messages were not received in order'
         )
@@ -138,7 +138,7 @@ class TestTimeSequencer(unittest.TestCase):
 
         # Check that the messages were received in order after the delay
         expected_data = [f'Message {i}' for i in range(5)]
-        received_data = [msg.data for _, msg in sequencer.messages]
+        received_data = [msg.data for _, _, msg in sequencer.messages]
         self.assertEqual(
             received_data, expected_data, 'Messages were not received in order'
         )
@@ -166,7 +166,7 @@ class TestTimeSequencer(unittest.TestCase):
 
         # Only the last 'queue_size' messages should have been received
         expected_data = [f'Message {i}' for i in range(2, 5)]
-        received_data = [msg.data for _, msg in sequencer.messages]
+        received_data = [msg.data for _, _, msg in sequencer.messages]
         self.assertEqual(
             received_data,
             expected_data,
@@ -195,7 +195,7 @@ class TestTimeSequencer(unittest.TestCase):
             sequencer._add(msg)
 
         # The message should not have been received
-        received_data = [msg.data for _, msg in sequencer.messages]
+        received_data = [msg.data for _, _, msg in sequencer.messages]
         self.assertEqual(
             len(received_data),
             0,
@@ -231,7 +231,7 @@ class TestTimeSequencer(unittest.TestCase):
 
         # Check that the messages were received in order after the delay
         expected_data = [f'Message {i}' for i in range(5)]
-        received_data = [msg.data for _, msg in sequencer.messages]
+        received_data = [msg.data for _, _, msg in sequencer.messages]
         self.assertEqual(
             received_data, expected_data, 'Messages were not received in order'
         )
@@ -262,7 +262,7 @@ class TestTimeSequencer(unittest.TestCase):
             sequencer._add(msg)
 
         expected_data = [f'Message {i}' for i in range(5)]
-        received_data = [msg.data for _, msg in sequencer.messages]
+        received_data = [msg.data for _, _, msg in sequencer.messages]
         self.assertEqual(
             received_data, expected_data, 'Messages were not received in order'
         )

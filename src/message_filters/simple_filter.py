@@ -25,35 +25,64 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+from itertools import count
 import typing as tp
 
 from rclpy.type_support import MsgT
 
 
 class SimpleFilter:
+    """
+    Base class for simple message filters in ROS 2.
+
+    Provides core mechanisms for managing downstream callback functions and
+    dispatching incoming or filtered messages to all registered hooks.
+    """
 
     def __init__(self):
+        """Construct a SimpleFilter instance."""
         self.callbacks = {}
+        self.callbacks_counter = count()
 
     def registerCallback(
         self,
         callback: tp.Callable[tp.Concatenate[MsgT, ...], None],
         *args
-    ):
+    ) -> int:
         """
         Register a callback `callback` to be called when this filter has output.
 
-        The filter calls the function ``callback`` with a filter-dependent.
+        The filter calls the function ``callback`` with the incoming message(s),
+        followed by the static registration-supplied arguments ``args``
 
-        list of arguments,followed by the call-supplied arguments ``args.``.
+        :param callback: The callable handler to register for incoming data events.
+        :param args: Additional static arguments to pass to the callback upon invocation.
+        :return: A unique connection index token representing this registration.
+        :rtype: int
         """
-        conn = len(self.callbacks)
+        conn = next(self.callbacks_counter)
         self.callbacks[conn] = (callback, args)
         return conn
 
-    def signalMessage(self, *msg):
+    def signalMessage(self, *msg) -> None:
+        """
+        Broadcast a message (or multiple messages) to all registered callbacks.
+
+        Executes all registered callbacks with the msg followed by the static
+        arguments provided at the time of each callback's registration.
+
+        :param msg: Variadic argument representing the payload to forward.
+        """
         for (callback, args) in self.callbacks.values():
             callback(*(msg + args))
 
-    def unregisterCallback(self, conn):
+    def unregisterCallback(self, conn: int) -> None:
+        """
+        Remove a previously registered callback from the filter pipeline.
+
+        If the connection token does not exist, the removal request is silently ignored.
+
+        :param conn: The connection index token returned during registration.
+        :type conn: int
+        """
         self.callbacks.pop(conn, None)

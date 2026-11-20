@@ -31,16 +31,35 @@ from abc import ABC
 from functools import partial
 from typing import Any, Callable
 
-from message_filters.simple_filter import SimpleFilter
 from rclpy.type_support import MsgT
+
+from .simple_filter import SimpleFilter
 
 
 class ComparisonHandler(ABC):
+    """Abstract base class for defining message comparison logic."""
 
     def message_fits(self, message: MsgT) -> bool:
+        """
+        Evaluate if the incoming message satisfies the filtering conditions.
+
+        :param message: The incoming message to evaluate.
+        :return: True if the message fits the comparison criteria, False otherwise.
+        :rtype: bool
+        :raises NotImplementedError: If the method is not overridden in a subclass.
+        """
         raise NotImplementedError()
 
     def do_fields_fit(self, field_a: Any, field_b: Any) -> bool:
+        """
+        Compare two individual message fields.
+
+        :param field_a: The first field value to compare (usually from a cached message).
+        :param field_b: The second field value to compare (usually from the current message).
+        :return: True if the fields satisfy the comparison match, False otherwise.
+        :rtype: bool
+        :raises NotImplementedError: If the method is not overridden in a subclass.
+        """
         raise NotImplementedError()
 
 
@@ -55,12 +74,37 @@ class CachedComparisonHandler(ComparisonHandler):
     is stored in the ``_message_cache`` and the ``message_fits`` method returns ``True``.
     """
 
-    def __init__(self):
+    def __init__(
+        self,
+        field_getters: list[Callable[[MsgT], Any]] = None,
+    ):
+        """
+        Construct a CachedComparisonHandler.
+
+        :param field_getters: A list of callable objects that are expected
+            to retrieve a value of a basic type from a message field for comparison.
+            Any of the ``field_getters`` is applied to the cached and to the current
+            message. The returned values are compared. If any of these values differ
+            between cached and current message, the current message is accepted.
+
+        """
         super().__init__()
 
         self._message_cache: MsgT | None = None
+        self._field_getters = field_getters if field_getters is not None else []
 
     def message_fits(self, message: MsgT) -> bool:
+        """
+        Evaluate the message against the cached message field by field.
+
+        If the cache is empty, the message is automatically accepted and cached.
+        Otherwise, it applies ``do_fields_fit`` across all registered field getters.
+        If a match is found, the internal cache is updated with the new message.
+
+        :param message: The incoming message to evaluate.
+        :return: True if the cache is empty or if any field comparison passes, False otherwise.
+        :rtype: bool
+        """
         if self._message_cache is None:
             self._message_cache = message
             return True
@@ -78,6 +122,15 @@ class CachedComparisonHandler(ComparisonHandler):
         return any_field_fits
 
     def do_fields_fit(self, field_a: Any, field_b: Any) -> bool:
+        """
+        Compare two individual fields to determine if they fit criteria.
+
+        :param field_a: The field value from the cached message.
+        :param field_b: The field value from the current message.
+        :return: True if the fields match the condition.
+        :rtype: bool
+        :raises NotImplementedError: Subclasses must implement this method.
+        """
         raise NotImplementedError(
             f'Field comparison not implemented for class: {self.__class__.__name__}. '
             f'Consider implementing do_fields_fit'
@@ -102,7 +155,7 @@ class DeltaCompare(CachedComparisonHandler):
 
     def __init__(
         self,
-        field_getters: Callable[[MsgT], Any],
+        field_getters: list[Callable[[MsgT], Any]],
     ):
         """
         Construct DeltaCompare.
@@ -113,11 +166,20 @@ class DeltaCompare(CachedComparisonHandler):
             message. The returned values are compared. If any of these values differ
             between cached and current message, the current message is accepted.
         """
-        super().__init__()
+        super().__init__(field_getters=field_getters)
 
-        self._field_getters = field_getters
+    def do_fields_fit(self, val_a: Any, val_b: Any) -> bool:
+        """
+        Check if the values of two fields are different (delta check).
 
-    def do_fields_fit(self, val_a, val_b) -> bool:
+        Ensures both values are of the supported basic types before performing the comparison.
+
+        :param val_a: The field value from the cached message.
+        :param val_b: The field value from the incoming message.
+        :return: True if the field values are different, False if they are equal.
+        :rtype: bool
+        :raises TypeError: If either of the values is not one of the supported basic types.
+        """
         if any(not isinstance(val, self._basic_types) for val in [val_a, val_b]):
             raise TypeError(f'Unable to compare fields of types {type(val_a)} and {type(val_b)}')
         return val_a != val_b
@@ -153,13 +215,34 @@ class ComparisonFilter(SimpleFilter):
         self.connectInput(message_filter)
 
     def add(self, message: MsgT):
+        """
+        Process an incoming message.
+
+        If the message satisfies the internal comparison handler conditions,
+        it is propagated forward to the registered callbacks.
+
+        :param message: The incoming message to process.
+        """
         if self.message_fits(message):
             self.signalMessage(message)
 
-    def message_fits(self, message: MsgT):
+    def message_fits(self, message: MsgT) -> bool:
+        """
+        Check if the message satisfies the comparison filter logic.
+
+        :param message: The incoming message to evaluate.
+        :return: True if the message fits the criteria, False otherwise.
+        :rtype: bool
+        """
         return self._comparison_handler.message_fits(message)
 
-    def connectInput(self, message_filter):
+    def connectInput(self, message_filter: SimpleFilter | None):
+        """
+        Connect this filter to an upstream input filter.
+
+        :param message_filter: The upstream filter providing incoming messages.
+        :raises RuntimeError: If this filter is already connected to an incoming source.
+        """
         if self.incoming_connection is not None:
             raise RuntimeError(
                 'This instance of ComparisonFilter already has an incoming connection'
@@ -231,7 +314,18 @@ class PathDeltaFilter(DeltaFilter):
             message_filter=message_filter,
         )
 
-    def get_field_by_path(self, message: MsgT, field_path: str):
+    def get_field_by_path(self, message: MsgT, field_path: str) -> Any:
+        """
+        Extract a nested field value from a message using a dot-separated string path.
+
+        Dynamically navigates through the attributes of the message structure.
+
+        :param message: The message object containing the desired field.
+        :param field_path: A dot-separated string path pointing to the target nested field.
+        :return: The extracted field value.
+        :rtype: Any
+        :raises RuntimeError: If any attribute along the path evaluates to None or doesn't exist.
+        """
         res = message
 
         for field_name in field_path.split('.'):
