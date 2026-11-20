@@ -41,6 +41,7 @@
 #include <vector>
 
 #include <rclcpp/time.hpp>
+#include <rcutils/logging_macros.h>
 
 #include "message_filters/connection.hpp"
 #include "message_filters/simple_filter.hpp"
@@ -143,7 +144,7 @@ public:
   void setCacheSize(unsigned int cache_size)
   {
     if (cache_size == 0) {
-      // ROS_ERROR("Cannot set max_size to 0");
+      RCUTILS_LOG_ERROR("Cannot set cache size to 0");
       return;
     }
 
