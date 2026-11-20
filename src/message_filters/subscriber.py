@@ -101,5 +101,5 @@ class Subscriber(SimpleFilter):
         return self.topic
 
     def __getattr__(self, key):
-        """Serve same API as rospy.Subscriber."""
+        """Serve same API as rclpy.subscription.Subscription."""
         return self.sub.__getattribute__(key)
