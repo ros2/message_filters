@@ -315,16 +315,20 @@ It is possible to pass bare pointers in. These will not be automatically deleted
 
 8. Input Aligner
 -----------------
-* Python: the InputAligner filter is not yet implemented.
-
 The InputAligner filter aligns multiple inputs in time and passing them through in order. For N inputs this filter provides N outputs. Often sensors or pre-processing chains might introduce delays to messages until they arrive at a target node. The input aligner ensures that the messages are forwarded in order.
+
+For step-by-step guides, see:
+  * `InputAligner (C++) Tutorial <Tutorials/Input-Aligner-Cpp.html>`_
+  * `InputAligner (Python) Tutorial <Tutorials/Input-Aligner-Python.html>`_
 
 8.1 Connections
 ~~~~~~~~~~~~~~~
 Input:
-  * C++: N separted filters, each of which is of the signature ``void callback(const std::shared_ptr<M const>&)``. The number of filters supported is determined by the number of template arguments the class was created with.
+  * C++: N separated filters, each of which is of the signature ``void callback(const std::shared_ptr<M const>&)``. The number of filters supported is determined by the number of template arguments the class was created with.
+  * Python: N filters passed to the constructor or ``connectInput()``.
 Output:
-  * C++: N separted filters, each of which is of the signature ``void callback(const std::shared_ptr<M const>&)``. The number of filters supported is determined by the number of template arguments the class was created with.
+  * C++: N separated signals, connected via ``registerCallback<index>(callback)``.
+  * Python: N callback slots, registered via ``registerCallback(index, callback)``.
 
 8.2 Example (C++)
 ~~~~~~~~~~~~~~~~~
@@ -336,11 +340,30 @@ Output:
        rclcpp::Duration(0.5), sub0, sub1);
      aligner.registerCallback<0>(myTwistCallback);
      aligner.registerCallback<1>(myVectorCallback);
-     // optinally give a hint about the input periods
+     // optionally give a hint about the input periods
      aligner.setInputPeriod<0>(rclcpp::Duration(0.009));
      aligner.setInputPeriod<1>(rclcpp::Duration(0.045));
-     // Setup dispatch timer (alternativly `aligner.dispatchMessages()` can be called as required)
+     // Setup dispatch timer (alternatively `aligner.dispatchMessages()` can be called as required)
      aligner.setupDispatchTimer(node, rclcpp::Duration(0.01));
+
+8.3 Example (Python)
+~~~~~~~~~~~~~~~~~~~~
+.. code-block:: python
+
+     from message_filters import Subscriber
+     from message_filters.input_aligner import InputAligner
+     from rclpy.duration import Duration
+
+     sub0 = Subscriber(node, TwistStamped, "my_twist")
+     sub1 = Subscriber(node, Vector3Stamped, "my_vector")
+     aligner = InputAligner(Duration(seconds=0.5), filters=[sub0, sub1])
+     aligner.registerCallback(0, my_twist_callback)
+     aligner.registerCallback(1, my_vector_callback)
+     # optionally give a hint about the input periods
+     aligner.setInputPeriod(0, Duration(nanoseconds=int(9e6)))
+     aligner.setInputPeriod(1, Duration(nanoseconds=int(45e6)))
+     # Setup dispatch timer (alternatively `aligner.dispatchMessages()` can be called as required)
+     aligner.setupDispatchTimer(node, Duration(nanoseconds=int(10e6)))
 
 
 The message filter interface
