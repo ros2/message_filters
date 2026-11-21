@@ -385,9 +385,10 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
             stamps.append(topic_stamps)
         for vv in itertools.product(*[list(zip(*s))[0] for s in stamps]):
             vv = list(vv)
-            # insert the new message
+            # insert the new message under the offset stamp it is stored with
             if msg_buffer_index is not None:
-                vv.insert(msg_buffer_index, stamp)
+                vv.insert(msg_buffer_index,
+                          Time(nanoseconds=new_timestamp, clock_type=stamp.clock_type))
             qt = list(zip(self.queues, vv))
             if (((max(vv) - min(vv)) < self.tolerance_seconds) and
                (len([1 for q, t in qt if t.nanoseconds not in q]) == 0)):

@@ -188,6 +188,43 @@ class TestApproxSync(unittest.TestCase):
                 m1.signalMessage(msg)
             self.assertEqual(set(self.collector), set(zip(seq0, seq1)))
 
+    def test_approx_offset_message_arrives_last(self):
+        # Same pairs as test_approx_offset, but the message from the
+        # offset input arrives after its partner
+        m0 = MockFilter()
+        m1 = MockFilter()
+        ts = ApproximateTimeSynchronizer([m0, m1], 1, 0.1, queue_offset=[int(0.5*1e9), 0])
+        ts.registerCallback(self.cb_collector_2msg)
+
+        for t in range(10):
+            self.collector = []
+            msg0 = MockMessage(Time(seconds=t+0.5), 33)
+            msg1 = MockMessage(Time(seconds=t), 34)
+            m1.signalMessage(msg1)
+            self.assertEqual(self.collector, [])
+            m0.signalMessage(msg0)
+            self.assertEqual(self.collector, [(msg0, msg1)])
+
+        # Scrambled sequences of length N, delivered interleaved so either
+        # input can complete a set
+        random.seed(0)
+        for N in range(1, 10):
+            m0 = MockFilter()
+            m1 = MockFilter()
+            seq0 = [MockMessage(Time(seconds=t+0.5), random.random())
+                    for t in range(N)]
+            seq1 = [MockMessage(Time(seconds=t), random.random())
+                    for t in range(N)]
+            ts = ApproximateTimeSynchronizer([m0, m1], N, 0.1, queue_offset=[int(0.5*1e9), 0])
+            ts.registerCallback(self.cb_collector_2msg)
+            self.collector = []
+            for msg in random.sample(seq1, N):
+                m1.signalMessage(msg)
+            self.assertEqual(self.collector, [])
+            for msg in random.sample(seq0, N):
+                m0.signalMessage(msg)
+            self.assertEqual(set(self.collector), set(zip(seq0, seq1)))
+
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
