@@ -357,44 +357,45 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
         new_timestamp = stamp.nanoseconds
         if msg_buffer_index is not None and self.queue_offset:
             new_timestamp -= self.queue_offset[msg_buffer_index]
-        self.lock.acquire()
-        msg_buffer[new_timestamp] = msg
-        while len(msg_buffer) > self.queue_size:
-            del msg_buffer[min(msg_buffer)]
-        # self.queues = [topic_0 {stamp: msg}, topic_1 {stamp: msg}, ...]
-        if msg_buffer_index is None:
-            search_queues = self.queues
-        else:
-            search_queues = self.queues[:msg_buffer_index] + \
-                self.queues[msg_buffer_index+1:]
-        # sort and leave only reasonable stamps for synchronization
-        stamps = []
-        for queue in search_queues:
-            topic_stamps = []
-            for s in queue:
-                stamp_delta = Duration(nanoseconds=abs(s - new_timestamp))
-                if stamp_delta > self.tolerance_seconds:
-                    continue  # exceeds tolerance hence dropped
-                topic_stamps.append(((Time(nanoseconds=s,
-                                           clock_type=stamp.clock_type)),
-                                    stamp_delta))
-            if not topic_stamps:
-                self.lock.release()
-                return
-            topic_stamps = sorted(topic_stamps, key=lambda x: x[1])
-            stamps.append(topic_stamps)
-        for vv in itertools.product(*[list(zip(*s))[0] for s in stamps]):
-            vv = list(vv)
-            # insert the new message under the offset stamp it is stored with
-            if msg_buffer_index is not None:
-                vv.insert(msg_buffer_index,
-                          Time(nanoseconds=new_timestamp, clock_type=stamp.clock_type))
-            qt = list(zip(self.queues, vv))
-            if (((max(vv) - min(vv)) < self.tolerance_seconds) and
-               (len([1 for q, t in qt if t.nanoseconds not in q]) == 0)):
-                msgs = [q[t.nanoseconds] for q, t in qt]
-                self.signalMessage(*msgs)
-                for q, t in qt:
-                    del q[t.nanoseconds]
-                break  # fast finish after the synchronization
-        self.lock.release()
+        # Hold the lock with a context manager so that an exception raised
+        # inside (e.g. by a user callback) cannot leave it held forever.
+        with self.lock:
+            msg_buffer[new_timestamp] = msg
+            while len(msg_buffer) > self.queue_size:
+                del msg_buffer[min(msg_buffer)]
+            # self.queues = [topic_0 {stamp: msg}, topic_1 {stamp: msg}, ...]
+            if msg_buffer_index is None:
+                search_queues = self.queues
+            else:
+                search_queues = self.queues[:msg_buffer_index] + \
+                    self.queues[msg_buffer_index+1:]
+            # sort and leave only reasonable stamps for synchronization.
+            # Stamps are compared as plain nanosecond integers rather than
+            # rclpy Time objects: an offset stamp may be negative, which
+            # Time() rejects with a ValueError.
+            tolerance_ns = self.tolerance_seconds.nanoseconds
+            stamps = []
+            for queue in search_queues:
+                topic_stamps = []
+                for s in queue:
+                    stamp_delta = abs(s - new_timestamp)
+                    if stamp_delta > tolerance_ns:
+                        continue  # exceeds tolerance hence dropped
+                    topic_stamps.append((s, stamp_delta))
+                if not topic_stamps:
+                    return
+                topic_stamps = sorted(topic_stamps, key=lambda x: x[1])
+                stamps.append(topic_stamps)
+            for vv in itertools.product(*[list(zip(*s))[0] for s in stamps]):
+                vv = list(vv)
+                # insert the new message under the offset stamp it is stored with
+                if msg_buffer_index is not None:
+                    vv.insert(msg_buffer_index, new_timestamp)
+                qt = list(zip(self.queues, vv))
+                if (((max(vv) - min(vv)) < tolerance_ns) and
+                   (len([1 for q, t in qt if t not in q]) == 0)):
+                    msgs = [q[t] for q, t in qt]
+                    self.signalMessage(*msgs)
+                    for q, t in qt:
+                        del q[t]
+                    break  # fast finish after the synchronization

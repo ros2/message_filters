@@ -225,9 +225,61 @@ class TestApproxSync(unittest.TestCase):
                 m0.signalMessage(msg)
             self.assertEqual(set(self.collector), set(zip(seq0, seq1)))
 
+    def test_approx_offset_stamp_below_offset(self):
+        # A stamp smaller than its queue offset is stored under a negative
+        # offset stamp. It must still synchronize in either arrival order
+        # and must not leave the synchronizer lock held.
+        for offset_input_first in (True, False):
+            m0 = MockFilter()
+            m1 = MockFilter()
+            ts = ApproximateTimeSynchronizer([m0, m1], 10, 0.1, queue_offset=[int(0.5*1e9), 0])
+            ts.registerCallback(self.cb_collector_2msg)
+            self.collector = []
+            msg0 = MockMessage(Time(seconds=0.45), 33)
+            msg1 = MockMessage(Time(seconds=0), 34)
+            if offset_input_first:
+                m0.signalMessage(msg0)
+                self.assertEqual(self.collector, [])
+                m1.signalMessage(msg1)
+            else:
+                m1.signalMessage(msg1)
+                self.assertEqual(self.collector, [])
+                m0.signalMessage(msg0)
+            self.assertEqual(self.collector, [(msg0, msg1)])
+            self.assertFalse(ts.lock.locked())
+
+    def test_lock_released_when_callback_raises(self):
+        # An exception raised by a user callback must not leave the lock
+        # held, otherwise every later add() would block forever.
+        m0 = MockFilter()
+        m1 = MockFilter()
+        ts = ApproximateTimeSynchronizer([m0, m1], 10, 0.1)
+
+        def raising_cb(msg0, msg1):
+            raise RuntimeError('callback failure')
+
+        conn = ts.registerCallback(raising_cb)
+        m0.signalMessage(MockMessage(Time(seconds=1), 33))
+        with self.assertRaises(RuntimeError):
+            m1.signalMessage(MockMessage(Time(seconds=1), 34))
+        self.assertFalse(ts.lock.locked())
+
+        # The synchronizer keeps working afterwards
+        ts.unregisterCallback(conn)
+        ts.registerCallback(self.cb_collector_2msg)
+        self.collector = []
+        msg0 = MockMessage(Time(seconds=2), 33)
+        msg1 = MockMessage(Time(seconds=2), 34)
+        m0.signalMessage(msg0)
+        m1.signalMessage(msg1)
+        self.assertEqual(self.collector, [(msg0, msg1)])
+
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     suite.addTest(TestApproxSync('test_approx'))
     suite.addTest(TestApproxSync('test_approx_offset'))
+    suite.addTest(TestApproxSync('test_approx_offset_message_arrives_last'))
+    suite.addTest(TestApproxSync('test_approx_offset_stamp_below_offset'))
+    suite.addTest(TestApproxSync('test_lock_released_when_callback_raises'))
     unittest.TextTestRunner(verbosity=2).run(suite)
