@@ -31,8 +31,6 @@
 
 #include <inttypes.h>
 
-#include <rcutils/logging_macros.h>
-
 #include <cassert>
 #include <deque>
 #include <limits>
@@ -40,6 +38,7 @@
 #include <vector>
 
 #include <rclcpp/duration.hpp>
+#include <rclcpp/logging.hpp>
 #include <rclcpp/time.hpp>
 
 #include "message_filters/message_traits.hpp"
@@ -144,10 +143,13 @@ struct ApproximateTimeBase : public PolicyBase<Ms...>
         previous_msg);
     }
     if (msg_time < previous_msg_time) {
-      RCUTILS_LOG_WARN_ONCE("Messages of type %d arrived out of order (will print only once)", i);
+      RCLCPP_WARN_ONCE(
+        rclcpp::get_logger("message_filters"),
+        "Messages of type %d arrived out of order (will print only once)", i);
       warned_about_incorrect_bound_[i] = true;
     } else if ((msg_time - previous_msg_time) < inter_message_lower_bounds_[i]) {
-      RCUTILS_LOG_WARN_ONCE(
+      RCLCPP_WARN_ONCE(
+        rclcpp::get_logger("message_filters"),
         "Messages of type %d arrived closer ("
         "%" PRId64 ") than the lower bound you provided ("
         "%" PRId64 ") (will print only once)",

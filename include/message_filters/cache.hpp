@@ -40,8 +40,8 @@
 #include <type_traits>
 #include <vector>
 
+#include <rclcpp/logging.hpp>
 #include <rclcpp/time.hpp>
-#include <rcutils/logging_macros.h>
 
 #include "message_filters/connection.hpp"
 #include "message_filters/simple_filter.hpp"
@@ -144,7 +144,7 @@ public:
   void setCacheSize(unsigned int cache_size)
   {
     if (cache_size == 0) {
-      RCUTILS_LOG_ERROR("Cannot set cache size to 0");
+      RCLCPP_ERROR(rclcpp::get_logger("message_filters"), "Cannot set cache size to 0");
       return;
     }
 
@@ -367,7 +367,7 @@ private:
 
   mutable std::mutex cache_lock_;      //!< Lock for cache_
   std::deque<EventType> cache_;        //!< Cache for the messages
-  unsigned int cache_size_;            //!< Maximum number of elements allowed in the cache.
+  unsigned int cache_size_ = 1;        //!< Maximum number of elements allowed in the cache.
 
   Connection incoming_connection_;
 

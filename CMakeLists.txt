@@ -10,7 +10,6 @@ find_package(ament_cmake_python REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
 find_package(ament_cmake_ros_core REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(rcutils REQUIRED)
 find_package(std_msgs REQUIRED)
 
 add_library(${PROJECT_NAME}
@@ -26,7 +25,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} PUBLIC
   ament_cmake_ros_core::ament_ros_defaults
   rclcpp::rclcpp
-  rcutils::rcutils
   std_msgs::std_msgs
 )
 
@@ -48,7 +46,7 @@ ament_python_install_package(${PROJECT_NAME}
 # Export modern CMake targets
 ament_export_targets(${PROJECT_NAME})
 
-ament_export_dependencies(ament_cmake_ros_core rclcpp rcutils std_msgs)
+ament_export_dependencies(ament_cmake_ros_core rclcpp std_msgs)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
