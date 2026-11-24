@@ -32,6 +32,7 @@ from .cache import Cache
 from .chain import Chain
 from .simple_filter import SimpleFilter
 from .subscriber import Subscriber
+from .synchronizing_callback import SynchronizingCallback
 from .time_sequencer import TimeSequencer
 from .time_synchronizer import (
     ApproximateTimeSynchronizer,
@@ -43,6 +44,7 @@ __all__ = [
     'Chain',
     'SimpleFilter',
     'Subscriber',
+    'SynchronizingCallback',
     'TimeSequencer',
     'ApproximateTimeSynchronizer',
     'TimeSynchronizer',
