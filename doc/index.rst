@@ -149,18 +149,12 @@ Output:
     message_filters::Subscriber<example_interfaces::msg::UInt32> sub(node, "my_topic", 1);
     sub.registerCallback(myCallback);
 
-or
-
-.. code-block:: C++
-
-    message_filters::Subscriber sub = node.subscribe("my_topic", 1, myCallback);
-
 2.3 Example (Python)
 ~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: Python
 
-   sub = message_filters.Subscriber(node_object, "pose_topic", robot_msgs.msg.Pose)
+   sub = message_filters.Subscriber(node_object, geometry_msgs.msg.PoseStamped, "pose_topic")
    sub.registerCallback(myCallback)
 
 3. Time Synchronizer
@@ -285,7 +279,7 @@ Output:
 
 .. code-block:: C++
 
-     void myCallback(const MsgConstPtr& msg)
+     void myCallback(const std::shared_ptr<Msg const>& msg)
      {
      }
 
@@ -368,7 +362,7 @@ Here's a simple example of using a Subscriber with a Cache::
     def myCallback(posemsg):
        print(posemsg)
 
-    sub = message_filters.Subscriber(node_object, robot_msgs.msg.Pose, "pose_topic")
+    sub = message_filters.Subscriber(node_object, geometry_msgs.msg.PoseStamped, "pose_topic")
     cache = message_filters.Cache(sub, 10)
     cache.registerCallback(myCallback)
 

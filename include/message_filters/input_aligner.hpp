@@ -29,8 +29,6 @@
 #ifndef MESSAGE_FILTERS__INPUT_ALIGNER_HPP_
 #define MESSAGE_FILTERS__INPUT_ALIGNER_HPP_
 
-#include <rcutils/logging_macros.h>
-
 #include <algorithm>
 #include <array>
 #include <chrono>
@@ -43,6 +41,7 @@
 #include <tuple>
 
 #include <rclcpp/duration.hpp>
+#include <rclcpp/logging.hpp>
 #include <rclcpp/time.hpp>
 #include <rclcpp/timer.hpp>
 
@@ -354,7 +353,9 @@ protected:
     // evaluate age of msg
     if (msg_timestamp < last_out_ts_) {
       event_queue.msgDropped();
-      RCUTILS_LOG_WARN("Messages of type %zu arrived too late and will be dropped", I);
+      RCLCPP_WARN(
+        rclcpp::get_logger("message_filters"),
+        "Messages of type %zu arrived too late and will be dropped", I);
       return;
     }
 

@@ -117,7 +117,7 @@ class Subscriber(SimpleFilter):
 
     def __getattr__(self, key: str) -> Any:
         """
-        Serve same API as rospy.Subscriber.
+        Serve same API as rclpy.subscription.Subscription.
 
         Dynamically forward attribute access requests to the underlying subscription object.
 

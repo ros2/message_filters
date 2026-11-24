@@ -427,6 +427,22 @@ TEST(Cache, setCacheSizeZeroIsNoop)
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
+// Constructing with cache size 0 keeps the default size instead of
+// leaving cache_size_ uninitialized
+// ──────────────────────────────────────────────────────────────────────────────
+
+TEST(Cache, constructWithZeroSizeKeepsDefault)
+{
+  message_filters::Cache<Msg> cache(0);  // logs an error, size stays 1
+  fillCacheEasy(cache, 0, 4);  // 4 messages, only the newest survives
+
+  auto data = cache.getInterval(
+    rclcpp::Time(0, 0, RCL_ROS_TIME),
+    rclcpp::Time(100, 0, RCL_ROS_TIME));
+  EXPECT_EQ(data.size(), 1u);
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
 // Headerless cache throws without allow_headerless
 // ──────────────────────────────────────────────────────────────────────────────
 

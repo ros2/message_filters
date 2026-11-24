@@ -26,21 +26,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-#  image_transport::SubscriberFilter wide_left;   // "/wide_stereo/left/image_raw"
-#  image_transport::SubscriberFilter wide_right;  // "/wide_stereo/right/image_raw"
-#  message_filters::Subscriber<CameraInfo> wide_left_info;    // "/wide_stereo/left/camera_info"
-#  message_filters::Subscriber<CameraInfo> wide_right_info;   // "/wide_stereo/right/camera_info"
-#  message_filters::TimeSynchronizer<Image, CameraInfo, Image, CameraInfo> wide;
-#
-#  PersonDataRecorder() :
-#    wide_left(nh_, "/wide_stereo/left/image_raw", 10),
-#    wide_right(nh_, "/wide_stereo/right/image_raw", 10),
-#    wide_left_info(nh_, "/wide_stereo/left/camera_info", 10),
-#    wide_right_info(nh_, "/wide_stereo/right/camera_info", 10),
-#    wide(wide_left, wide_left_info, wide_right, wide_right_info, 4),
-#
-#    wide.registerCallback(boost::bind(&PersonDataRecorder::wideCB, this, _1, _2, _3, _4));
-
 import functools
 import unittest
 
