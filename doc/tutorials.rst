@@ -29,3 +29,5 @@ Basic Tutorials
    Tutorials/Latest-Time-Cpp.rst
    Tutorials/Delta-Filter-Python.rst
    Tutorials/Delta-Filter-Cpp.rst
+   Tutorials/Input-Aligner-Cpp.rst
+   Tutorials/Input-Aligner-Python.rst
