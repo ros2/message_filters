@@ -33,7 +33,7 @@ import unittest
 import pytest
 import rclpy
 
-from rclpy.clock import ClockType, ROSClock
+from rclpy.clock import Clock, ClockType
 from rclpy.duration import Duration
 from rclpy.time import Time
 from std_msgs.msg import String
@@ -178,7 +178,7 @@ class TestCache(unittest.TestCase):
         self.assertEqual(s, msg,
                          'invalid msg returned in headerless scenario')
 
-        currentRosTime = ROSClock().now()
+        currentRosTime = Clock(clock_type=ClockType.ROS_TIME).now()
         s = cache.getElemAfterTime(currentRosTime)
         self.assertIsNone(s, 'invalid msg returned in headerless scenario')
 
