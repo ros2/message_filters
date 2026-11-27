@@ -105,6 +105,11 @@ if(BUILD_TESTING)
       sensor_msgs::sensor_msgs)
   endif()
 
+  ament_add_gtest(${PROJECT_NAME}-test_manual_call_policy test/test_manual_call_policy.cpp)
+  if(TARGET ${PROJECT_NAME}-test_manual_call_policy)
+    target_link_libraries(${PROJECT_NAME}-test_manual_call_policy ${PROJECT_NAME} rclcpp::rclcpp)
+  endif()
+
   ament_add_gtest(${PROJECT_NAME}-test_fuzz test/test_fuzz.cpp SKIP_TEST)
   if(TARGET ${PROJECT_NAME}-test_fuzz)
     target_link_libraries(${PROJECT_NAME}-test_fuzz
