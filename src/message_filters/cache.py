@@ -29,7 +29,8 @@
 import bisect
 from typing import Callable, List, Optional
 
-from rclpy.clock import ROSClock
+from rclpy.clock import Clock
+from rclpy.clock_type import ClockType
 from rclpy.time import Time
 from rclpy.type_support import MsgT
 
@@ -155,7 +156,7 @@ class Cache(SimpleFilter):
                     'option of "allow_headerless".'
                 )
 
-            stamp = ROSClock().now()
+            stamp = Clock(clock_type=ClockType.ROS_TIME).now()
         # Insert sorted by time stamp, after any messages with the same stamp,
         # so the cache stays ordered when messages arrive out of order
         index = bisect.bisect_right(self.cache_times, stamp)

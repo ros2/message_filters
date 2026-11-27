@@ -32,7 +32,8 @@ import unittest
 import message_filters
 from message_filters import ApproximateTimeSynchronizer
 
-from rclpy.clock import ROSClock
+from rclpy.clock import Clock
+from rclpy.clock_type import ClockType
 from rclpy.duration import Duration
 from rclpy.time import Time
 
@@ -104,11 +105,12 @@ class TestApproxSync(unittest.TestCase):
 
         # test headerless scenarios: scramble sequences of length N of
         # headerless and header-having messages.
+        clock = Clock(clock_type=ClockType.ROS_TIME)
         random.seed(0)
         for N in range(1, 10):
             m0 = MockFilter()
             m1 = MockFilter()
-            seq0 = [MockMessage((ROSClock().now() + Duration(seconds=t)),
+            seq0 = [MockMessage((clock.now() + Duration(seconds=t)),
                     random.random()) for t in range(N)]
             seq1 = [MockHeaderlessMessage(random.random()) for t in range(N)]
 
@@ -166,11 +168,12 @@ class TestApproxSync(unittest.TestCase):
 
         # test headerless scenarios: scramble sequences of length N of
         # headerless and header-having messages.
+        clock = Clock(clock_type=ClockType.ROS_TIME)
         random.seed(0)
         for N in range(1, 10):
             m0 = MockFilter()
             m1 = MockFilter()
-            seq0 = [MockMessage((ROSClock().now() + Duration(seconds=t+0.5)),
+            seq0 = [MockMessage((clock.now() + Duration(seconds=t+0.5)),
                     random.random()) for t in range(N)]
             seq1 = [MockHeaderlessMessage(random.random()) for t in range(N)]
 

@@ -32,7 +32,8 @@ import threading
 from typing import Callable, Optional, Sequence
 
 import rclpy
-from rclpy.clock import ROSClock
+from rclpy.clock import Clock
+from rclpy.clock_type import ClockType
 from rclpy.duration import Duration
 from rclpy.logging import LoggingSeverity
 from rclpy.time import Time
@@ -353,7 +354,7 @@ class ApproximateTimeSynchronizer(TimeSynchronizer):
                                            'option of "allow_headerless".')
                 return
 
-            stamp = ROSClock().now()
+            stamp = Clock(clock_type=ClockType.ROS_TIME).now()
         new_timestamp = stamp.nanoseconds
         if msg_buffer_index is not None and self.queue_offset:
             new_timestamp -= self.queue_offset[msg_buffer_index]
